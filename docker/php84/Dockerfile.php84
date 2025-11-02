@@ -1,0 +1,107 @@
+FROM debian:bookworm AS build
+
+ARG PHP_VERSION=8.4.0
+ENV DEBIAN_FRONTEND=noninteractive
+WORKDIR /usr/src
+
+# Build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential pkg-config autoconf bison re2c \
+    libxml2-dev libsqlite3-dev libpq-dev \
+    libzip-dev zlib1g-dev \
+    libpng-dev libjpeg-dev libwebp-dev libfreetype6-dev \
+    libssl-dev libcurl4-openssl-dev \
+    libonig-dev libreadline-dev \
+    libgmp-dev libicu-dev \
+    libxslt1-dev \
+    git curl ca-certificates unzip && \
+    rm -rf /var/lib/apt/lists/*
+
+# Download PHP source
+RUN curl -fsSL https://www.php.net/distributions/php-${PHP_VERSION}.tar.gz | tar xz
+WORKDIR /usr/src/php-${PHP_VERSION}
+
+# Configure & compile PHP with FTP+OpenSSL baked in
+RUN mkdir -p /usr/local/etc/php/conf.d \
+ && ./configure \
+    --prefix=/usr/local \
+    --exec-prefix=/usr/local \
+    --with-config-file-path=/usr/local/etc \
+    --with-config-file-scan-dir=/usr/local/etc/php/conf.d \
+    --enable-fpm \
+    --enable-cli \
+    --enable-mbstring \
+    --enable-bcmath \
+    --enable-soap \
+    --enable-opcache \
+    --enable-pcntl \
+    --with-openssl \
+    --with-zip \
+    --with-zlib \
+    --with-curl \
+    --with-libxml \
+    --with-gd \
+    --with-jpeg \
+    --with-freetype \
+    --with-webp \
+    --with-pgsql \
+    --with-pdo-pgsql \
+    --enable-ftp \
+    --with-readline \
+    --with-xsl \
+    --with-pear \
+    --disable-cgi && \
+    make -j"$(nproc)" && \
+    make install && \
+    cp php.ini-production /usr/local/lib/php.ini
+
+# Install PECL extensions during build so runtime doesn't need build tooling
+RUN pecl install redis xdebug && \
+    echo "extension=redis.so" > /usr/local/etc/php/conf.d/redis.ini && \
+    echo "zend_extension=xdebug.so" > /usr/local/etc/php/conf.d/xdebug.ini
+
+# Runtime image
+FROM debian:bookworm AS runtime
+ENV DEBIAN_FRONTEND=noninteractive
+WORKDIR /var/www/html
+
+# Runtime libs
+RUN apt-get update && apt-get install -y \
+    libpq5 libzip4 \
+    libpng16-16 libjpeg62-turbo libwebp7 libfreetype6 \
+    libxml2 libonig5 libreadline8 libgmp10 \
+    libxslt1.1 libcurl4 ca-certificates \
+    libsqlite3-0 \
+    git unzip && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy PHP + composer from build stages
+COPY --from=build /usr/local /usr/local
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
+# php-fpm config
+RUN mkdir -p /usr/local/etc/php-fpm.d && \
+    cp /usr/local/etc/php-fpm.conf.default /usr/local/etc/php-fpm.conf && \
+    cp /usr/local/etc/php-fpm.d/www.conf.default /usr/local/etc/php-fpm.d/www.conf && \
+    # Global FPM error log to stderr (move after cp)
+    sed -i '/^;error_log/c\error_log = /proc/self/fd/2' /usr/local/etc/php-fpm.conf && \
+    # Pool access log to stdout (optional, for request logging; move after cp)
+    sed -i '/^;access.log/c\access.log = /proc/self/fd/1' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's/^user = .*/user = www-data/' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's/^group = .*/group = www-data/' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's/^listen = .*/listen = \/run\/php\/php-fpm.sock/' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's/^;listen.mode = .*/listen.mode = 0666/' /usr/local/etc/php-fpm.d/www.conf
+
+# Entry script
+RUN echo '#!/bin/bash' > /entrypoint.sh && \
+    echo 'mkdir -p /run/php' >> /entrypoint.sh && \
+    echo 'ln -sf /var/www/html/node_modules/monaco-editor/esm/vs /var/www/html/public/monaco' >> /entrypoint.sh && \
+    echo 'chown -R www-data:www-data /var/www/html/node_modules /var/www/html/public' >> /entrypoint.sh && \
+    echo 'find /var/www/html/node_modules -type d -exec chmod 755 {} \;' >> /entrypoint.sh && \
+    echo 'find /var/www/html/node_modules -type f -exec chmod 644 {} \;' >> /entrypoint.sh && \
+    echo 'find /var/www/html/public -type d -exec chmod 755 {} \;' >> /entrypoint.sh && \
+    echo 'find /var/www/html/public -type f -exec chmod 644 {} \;' >> /entrypoint.sh && \
+    echo 'exec php-fpm -F' >> /entrypoint.sh && \
+    chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
