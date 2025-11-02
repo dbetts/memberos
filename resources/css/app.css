@@ -1,27 +1,57 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --color-brand-50: #f2fbff;
+    --color-brand-100: #e6f7ff;
+    --color-brand-200: #bfeaff;
+    --color-brand-300: #99dcff;
+    --color-brand-400: #4ec0ff;
+    --color-brand-500: #1ea2ff;
+    --color-brand-600: #0b84e5;
+    --color-brand-700: #0767b3;
+    --color-brand-800: #064f8a;
+    --color-brand-900: #063d6b;
+    --shadow-card: 0 8px 24px rgba(2, 6, 23, 0.08);
+    --radius-xl: 14px;
+}
+
+/* App look & feel */
 :root {
     --card: 255 255 255;
     --muted: 100 116 139; /* slate-500 */
+    --glass-start: rgba(255,255,255,0.75);
+    --glass-end: rgba(255,255,255,0.6);
+    --glass-border: rgba(255,255,255,0.6);
+}
+
+.dark {
+    --card: 31 41 55; /* gray-800 example */
+    --muted: 148 163 184; /* slate-400 */
+    --glass-start: rgba(31,41,55,0.75);
+    --glass-end: rgba(31,41,55,0.6);
+    --glass-border: rgb(31 41 55 / 0.6);
 }
 
 html, body, #root { height: 100%; }
+
+body {
+    @apply bg-slate-50 dark:bg-gray-900 text-slate-900 dark:text-slate-100;
+}
 
 .card {
     background-color: rgb(var(--card));
     box-shadow: var(--shadow-card);
     border-radius: var(--radius-xl);
     border: 1px solid hsl(0 0% 96%);
+    @apply dark:border-gray-700;
 }
 
 .glass {
     backdrop-filter: blur(8px);
-    background: linear-gradient(
-            180deg,
-            rgba(255,255,255,0.75) 0%,
-            rgba(255,255,255,0.6) 100%
-    );
-    border: 1px solid rgba(255,255,255,0.6);
+    background: linear-gradient(180deg, var(--glass-start) 0%, var(--glass-end) 100%);
+    border: 1px solid var(--glass-border);
     box-shadow: var(--shadow-card);
     border-radius: var(--radius-xl);
 }
