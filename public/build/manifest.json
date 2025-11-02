@@ -1,0 +1,154 @@
+{
+  "_Badge-XyIVOoyz.js": {
+    "file": "assets/Badge-XyIVOoyz.js",
+    "name": "Badge",
+    "imports": [
+      "resources/js/app.tsx",
+      "_clsx-iXZ1VDC0.js"
+    ]
+  },
+  "_Button-YNTBm0Z3.js": {
+    "file": "assets/Button-YNTBm0Z3.js",
+    "name": "Button",
+    "imports": [
+      "resources/js/app.tsx",
+      "_clsx-iXZ1VDC0.js"
+    ]
+  },
+  "_ChartCard-CSQZ7km-.js": {
+    "file": "assets/ChartCard-CSQZ7km-.js",
+    "name": "ChartCard",
+    "imports": [
+      "resources/js/app.tsx",
+      "_clsx-iXZ1VDC0.js"
+    ]
+  },
+  "_clsx-iXZ1VDC0.js": {
+    "file": "assets/clsx-iXZ1VDC0.js",
+    "name": "clsx",
+    "imports": [
+      "resources/js/app.tsx"
+    ]
+  },
+  "_mock-CygCSSR1.js": {
+    "file": "assets/mock-CygCSSR1.js",
+    "name": "mock",
+    "imports": [
+      "resources/js/app.tsx"
+    ]
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-B1DhpJWb.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.tsx": {
+    "file": "assets/app-B87SmlFt.js",
+    "name": "app",
+    "src": "resources/js/app.tsx",
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/pages/Dashboard.tsx",
+      "resources/js/pages/Retention.tsx",
+      "resources/js/pages/Capacity.tsx",
+      "resources/js/pages/CRM.tsx",
+      "resources/js/pages/Playbooks.tsx",
+      "resources/js/pages/Settings.tsx"
+    ],
+    "css": [
+      "assets/app-B1DhpJWb.css"
+    ]
+  },
+  "resources/js/pages/CRM.tsx": {
+    "file": "assets/CRM-CUo10CTD.js",
+    "name": "CRM",
+    "src": "resources/js/pages/CRM.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_clsx-iXZ1VDC0.js",
+      "_mock-CygCSSR1.js",
+      "_ChartCard-CSQZ7km-.js"
+    ],
+    "css": [
+      "assets/app-B1DhpJWb.css"
+    ]
+  },
+  "resources/js/pages/Capacity.tsx": {
+    "file": "assets/Capacity-CUo10CTD.js",
+    "name": "Capacity",
+    "src": "resources/js/pages/Capacity.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_clsx-iXZ1VDC0.js",
+      "_mock-CygCSSR1.js",
+      "_ChartCard-CSQZ7km-.js"
+    ],
+    "css": [
+      "assets/app-B1DhpJWb.css"
+    ]
+  },
+  "resources/js/pages/Dashboard.tsx": {
+    "file": "assets/Dashboard-DhHLUU2c.js",
+    "name": "Dashboard",
+    "src": "resources/js/pages/Dashboard.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_clsx-iXZ1VDC0.js",
+      "_Badge-XyIVOoyz.js",
+      "_mock-CygCSSR1.js",
+      "_ChartCard-CSQZ7km-.js"
+    ],
+    "css": [
+      "assets/app-B1DhpJWb.css"
+    ]
+  },
+  "resources/js/pages/Playbooks.tsx": {
+    "file": "assets/Playbooks-BUwZezfp.js",
+    "name": "Playbooks",
+    "src": "resources/js/pages/Playbooks.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_clsx-iXZ1VDC0.js",
+      "_mock-CygCSSR1.js",
+      "_Badge-XyIVOoyz.js",
+      "_Button-YNTBm0Z3.js"
+    ],
+    "css": [
+      "assets/app-B1DhpJWb.css"
+    ]
+  },
+  "resources/js/pages/Retention.tsx": {
+    "file": "assets/Retention-flEHQfuQ.js",
+    "name": "Retention",
+    "src": "resources/js/pages/Retention.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_clsx-iXZ1VDC0.js",
+      "_mock-CygCSSR1.js",
+      "_Badge-XyIVOoyz.js",
+      "_Button-YNTBm0Z3.js"
+    ],
+    "css": [
+      "assets/app-B1DhpJWb.css"
+    ]
+  },
+  "resources/js/pages/Settings.tsx": {
+    "file": "assets/Settings-Bbg1Rl5_.js",
+    "name": "Settings",
+    "src": "resources/js/pages/Settings.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_clsx-iXZ1VDC0.js",
+      "_Button-YNTBm0Z3.js"
+    ],
+    "css": [
+      "assets/app-B1DhpJWb.css"
+    ]
+  }
+}
