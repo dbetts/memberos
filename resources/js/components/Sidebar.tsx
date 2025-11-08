@@ -1,11 +1,12 @@
 import { NavLink } from "react-router-dom";
-import { Gauge, Users, CalendarCheck, Bot, Settings, LineChart } from "lucide-react";
+import { Gauge, Users, CalendarCheck, Bot, Settings, LineChart, Target } from "lucide-react";
 
 const items = [
     { to: "/", icon: LineChart, label: "Dashboard" },
     { to: "/retention", icon: Users, label: "Retention" },
     { to: "/capacity", icon: CalendarCheck, label: "Capacity" },
     { to: "/crm", icon: Gauge, label: "CRM" },
+    { to: "/coach", icon: Target, label: "Coach" },
     { to: "/playbooks", icon: Bot, label: "Playbooks" },
     { to: "/settings", icon: Settings, label: "Settings" },
 ];

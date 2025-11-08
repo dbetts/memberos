@@ -1,6 +1,7 @@
-export default function Table<T>({ cols, rows }: {
+export default function Table<T>({ cols, rows, loading }: {
     cols: { key: keyof T; header: string; render?: (value: any, row: T) => React.ReactNode }[];
     rows: T[];
+    loading?: boolean;
 }) {
     return (
         <div className="overflow-x-auto">
@@ -15,15 +16,29 @@ export default function Table<T>({ cols, rows }: {
                     </tr>
                 </thead>
                 <tbody>
-                    {rows.map((r, idx) => (
-                        <tr key={idx} className="bg-white shadow-sm">
-                            {cols.map(c => (
-                                <td key={String(c.key)} className="px-3 py-3 text-sm text-slate-700">
-                                    {c.render ? c.render((r as any)[c.key], r) : String((r as any)[c.key])}
-                                </td>
-                            ))}
+                    {loading ? (
+                        <tr>
+                            <td colSpan={cols.length} className="px-3 py-6 text-sm text-slate-500 text-center">
+                                Loading…
+                            </td>
                         </tr>
-                    ))}
+                    ) : rows.length === 0 ? (
+                        <tr>
+                            <td colSpan={cols.length} className="px-3 py-6 text-sm text-slate-500 text-center">
+                                No records yet.
+                            </td>
+                        </tr>
+                    ) : (
+                        rows.map((r, idx) => (
+                            <tr key={idx} className="bg-white shadow-sm">
+                                {cols.map(c => (
+                                    <td key={String(c.key)} className="px-3 py-3 text-sm text-slate-700">
+                                        {c.render ? c.render((r as any)[c.key], r) : String((r as any)[c.key])}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))
+                    )}
                 </tbody>
             </table>
         </div>

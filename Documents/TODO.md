@@ -1,0 +1,2 @@
+- [ ] Wire SMS/email delivery providers for cadences/tasks (Phase 3).
+- [ ] Add automated verification scripts for ACC-RET/CAP metrics after Phase 2 manual validation.

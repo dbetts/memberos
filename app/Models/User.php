@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -21,6 +23,15 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'organization_id',
+        'primary_location_id',
+        'phone',
+        'timezone',
+        'default_role',
+        'mfa_preference',
+        'mfa_enabled',
+        'last_login_at',
+        'profile',
     ];
 
     /**
@@ -43,6 +54,29 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'last_login_at' => 'datetime',
+            'mfa_enabled' => 'boolean',
+            'profile' => 'array',
         ];
+    }
+
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
+    public function primaryLocation(): BelongsTo
+    {
+        return $this->belongsTo(Location::class, 'primary_location_id');
+    }
+
+    public function roleAssignments(): HasMany
+    {
+        return $this->hasMany(RoleAssignment::class);
+    }
+
+    public function mfaMethods(): HasMany
+    {
+        return $this->hasMany(UserMfaMethod::class);
     }
 }

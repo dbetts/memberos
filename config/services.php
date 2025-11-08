@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'memberos' => [
+        'api_token' => env('MEMBEROS_API_TOKEN'),
+        'webhook_secret' => env('MEMBEROS_WEBHOOK_SECRET', 'demo-secret'),
+        'webhook_endpoints' => explode(',', env('MEMBEROS_WEBHOOK_ENDPOINTS', '')),
+    ],
+
 ];
