@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Card from "../components/Card";
 import Table from "../components/Table";
 import Button from "../components/Button";
@@ -30,6 +30,21 @@ export default function CRM() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [analytics, setAnalytics] = useState<AnalyticsResponse | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [memberForm, setMemberForm] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone: "",
+    timezone: "",
+    portal_email: "",
+    portal_password: "",
+  });
+  const [memberSuccess, setMemberSuccess] = useState<string | null>(null);
+  const leadFormUrl =
+    typeof window !== "undefined" && window.location
+      ? `${window.location.origin}/public/leads`
+      : "/public/leads";
 
   useEffect(() => {
     let active = true;
@@ -67,8 +82,148 @@ export default function CRM() {
     }
   }
 
+  async function handleMemberCreate(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    setMemberSuccess(null);
+    try {
+      const response = await apiFetch<{
+        data: { member: LeadRow; credentials: { email: string; temp_password: string | null } | null };
+      }>("/members", {
+        method: "POST",
+        body: JSON.stringify(memberForm),
+      });
+      setMemberSuccess(
+        response.data.credentials?.temp_password
+          ? `Member created. Temporary password: ${response.data.credentials.temp_password}`
+          : "Member created."
+      );
+      setMemberForm({
+        first_name: "",
+        last_name: "",
+        email: "",
+        phone: "",
+        timezone: "",
+        portal_email: "",
+        portal_password: "",
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create member");
+    }
+  }
+
+  function openLeadForm() {
+    window.open("/public/leads", "_blank", "noopener,noreferrer");
+  }
+
+  function copyLeadForm() {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(leadFormUrl).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
+    }
+  }
+
   return (
     <div className="grid gap-6">
+      <Card title="Lead capture form" subtitle="Share this public link with prospects">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm text-slate-600">Submissions go straight into the pipeline below.</p>
+            <code className="mt-2 inline-flex rounded-2xl bg-slate-100 px-3 py-1 text-sm text-slate-700">
+              {leadFormUrl}
+            </code>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Button type="button" onClick={openLeadForm}>
+              Open form
+            </Button>
+            <button
+              type="button"
+              onClick={copyLeadForm}
+              className="inline-flex items-center rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              Copy link
+            </button>
+          </div>
+        </div>
+        {copied && <p className="mt-2 text-xs text-emerald-600">Copied! Paste it into your marketing pages.</p>}
+      </Card>
+      <Card title="Add member manually" subtitle="One-off enrollments with optional portal login">
+        <form className="grid gap-4 md:grid-cols-2" onSubmit={handleMemberCreate}>
+          <label className="text-sm">
+            First name
+            <input
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              value={memberForm.first_name}
+              onChange={(event) => setMemberForm((prev) => ({ ...prev, first_name: event.target.value }))}
+              required
+            />
+          </label>
+          <label className="text-sm">
+            Last name
+            <input
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              value={memberForm.last_name}
+              onChange={(event) => setMemberForm((prev) => ({ ...prev, last_name: event.target.value }))}
+              required
+            />
+          </label>
+          <label className="text-sm">
+            Email
+            <input
+              type="email"
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              value={memberForm.email}
+              onChange={(event) => setMemberForm((prev) => ({ ...prev, email: event.target.value }))}
+              placeholder="Optional"
+            />
+          </label>
+          <label className="text-sm">
+            Phone
+            <input
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              value={memberForm.phone}
+              onChange={(event) => setMemberForm((prev) => ({ ...prev, phone: event.target.value }))}
+              placeholder="+1 (555) 555-0123"
+            />
+          </label>
+          <label className="text-sm">
+            Timezone
+            <input
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              value={memberForm.timezone}
+              onChange={(event) => setMemberForm((prev) => ({ ...prev, timezone: event.target.value }))}
+              placeholder="Defaults to org timezone"
+            />
+          </label>
+          <label className="text-sm">
+            Portal email
+            <input
+              type="email"
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              value={memberForm.portal_email}
+              onChange={(event) => setMemberForm((prev) => ({ ...prev, portal_email: event.target.value }))}
+              placeholder="Creates login if provided"
+            />
+          </label>
+          <label className="text-sm">
+            Portal password
+            <input
+              type="password"
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              value={memberForm.portal_password}
+              onChange={(event) => setMemberForm((prev) => ({ ...prev, portal_password: event.target.value }))}
+              placeholder="Leave blank to auto-generate"
+            />
+          </label>
+          <div className="md:col-span-2 flex items-center gap-3">
+            <Button type="submit">Create member</Button>
+            {memberSuccess && <span className="text-sm text-emerald-600">{memberSuccess}</span>}
+          </div>
+        </form>
+      </Card>
       {analytics && (
         <Card title="Funnel" subtitle="Lead quality & throughput">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

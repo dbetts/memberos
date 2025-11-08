@@ -1,11 +1,13 @@
 import clsx from "clsx";
-import logo from "../../img/logoB_1.png";
+import logo from "../../img/logo.png";
 
 type Props = {
   orientation?: "row" | "column";
   size?: "sm" | "md" | "lg";
   subtitle?: string | null;
   className?: string;
+  logoUrl?: string | null;
+  name?: string;
 };
 
 export default function BrandMark({
@@ -13,12 +15,16 @@ export default function BrandMark({
   size = "md",
   subtitle = "Retention & revenue intelligence",
   className,
+  logoUrl,
+  name = "FitFlow",
 }: Props) {
   const sizes = {
     sm: "w-8 h-8",
     md: "w-10 h-10",
     lg: "w-12 h-12",
   };
+
+  const imageSrc = logoUrl ?? logo;
 
   return (
     <div
@@ -28,11 +34,11 @@ export default function BrandMark({
         className
       )}
     >
-      <div className={clsx("", sizes[size])}>
-        <img src={logo} alt="FitFlow" className="w-full h-full object-contain" />
+      <div className={clsx("rounded-2xl bg-white/10 p-2 backdrop-blur", sizes[size])}>
+        <img src={imageSrc} alt="Brand logo" className="w-full h-full object-contain" />
       </div>
       <div>
-        <p className="text-lg font-semibold tracking-tight text-white">FitFlow</p>
+        <p className="text-lg font-semibold tracking-tight text-white">{name}</p>
         {subtitle && <p className="text-xs text-white/70">{subtitle}</p>}
       </div>
     </div>

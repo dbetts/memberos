@@ -21,21 +21,37 @@ use App\Http\Controllers\Api\AdminLocationController;
 use App\Http\Controllers\Api\ClassTypeAdminController;
 use App\Http\Controllers\Api\StaffProfileController;
 use App\Http\Controllers\Api\ObservabilityController;
+use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\CoachController;
 use App\Http\Controllers\Api\CommunicationComplianceController;
 use App\Http\Controllers\Api\GraphqlController;
 use App\Http\Controllers\Api\LeadConversionController;
+use App\Http\Controllers\Api\MemberImportController;
+use App\Http\Controllers\Api\OnboardingController;
+use App\Http\Controllers\Api\OrganizationBrandingController;
 
 Route::prefix('v1')->group(function (): void {
     Route::get('health', static fn () => ['status' => 'ok']);
 
+    Route::post('checkout/subscribe', [CheckoutController::class, 'subscribe']);
+
     Route::get('dashboard/kpis', [DashboardController::class, 'index']);
     Route::get('dashboard/filters', [DashboardController::class, 'filters']);
 
+    Route::post('onboarding/signup', [OnboardingController::class, 'store']);
+
     Route::get('members', [MemberController::class, 'index']);
     Route::get('members/{member}', [MemberController::class, 'show']);
+    Route::post('members', [MemberController::class, 'store']);
     Route::put('members/{member}/consents', [MemberController::class, 'updateConsents']);
     Route::put('members/{member}/quiet-hours', [MemberController::class, 'updateQuietHours']);
+
+    Route::get('organizations/branding', [OrganizationBrandingController::class, 'show']);
+    Route::put('organizations/branding', [OrganizationBrandingController::class, 'updateBranding']);
+    Route::put('organizations/domain', [OrganizationBrandingController::class, 'updateDomain']);
+    Route::put('organizations/smtp', [OrganizationBrandingController::class, 'updateSmtp']);
+    Route::post('organizations/branding/logo', [OrganizationBrandingController::class, 'uploadLogo']);
+    Route::post('imports/members', [MemberImportController::class, 'store']);
 
     Route::get('retention/heatmap', [RetentionController::class, 'heatmap']);
     Route::get('retention/at-risk', [RetentionController::class, 'atRiskRoster']);

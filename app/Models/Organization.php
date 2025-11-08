@@ -18,11 +18,21 @@ class Organization extends Model
         'primary_timezone',
         'is_active',
         'metadata',
+        'subdomain',
+        'custom_domain',
+        'support_email',
+        'logo_path',
+        'primary_color',
+        'accent_color',
+        'smtp_settings',
+        'branding_overrides',
     ];
 
     protected $casts = [
         'is_active' => 'bool',
         'metadata' => 'array',
+        'smtp_settings' => 'array',
+        'branding_overrides' => 'array',
     ];
 
     public function locations(): HasMany
@@ -38,5 +48,10 @@ class Organization extends Model
     public function settings(): HasMany
     {
         return $this->hasMany(OrganizationSetting::class);
+    }
+
+    public function members(): HasMany
+    {
+        return $this->hasMany(Member::class);
     }
 }

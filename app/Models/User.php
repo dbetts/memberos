@@ -30,6 +30,7 @@ class User extends Authenticatable
         'default_role',
         'mfa_preference',
         'mfa_enabled',
+        'is_master',
         'last_login_at',
         'profile',
     ];
@@ -56,6 +57,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'last_login_at' => 'datetime',
             'mfa_enabled' => 'boolean',
+            'is_master' => 'boolean',
             'profile' => 'array',
         ];
     }

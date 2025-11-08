@@ -382,5 +382,7 @@ class DatabaseSeeder extends Seeder
             'channel_strategy' => ['primary' => 'email'],
             'primary_template_id' => $winbackTemplate->id,
         ]);
+
+        $this->call(MasterAccountsSeeder::class);
     }
 }

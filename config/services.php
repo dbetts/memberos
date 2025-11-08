@@ -42,5 +42,9 @@ return [
             explode(',', env('FITFLOW_WEBHOOK_ENDPOINTS', env('MEMBEROS_WEBHOOK_ENDPOINTS', '')))
         ),
     ],
+    'stripe' => [
+        'secret' => env('STRIPE_SECRET'),
+        'subscription_amount_cents' => env('STRIPE_AMOUNT_CENTS', 9995),
+    ],
 
 ];

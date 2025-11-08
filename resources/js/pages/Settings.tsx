@@ -1,10 +1,11 @@
-import { MouseEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, MouseEvent, useEffect, useState } from "react";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import Toggle from "../components/Toggle";
 import Table from "../components/Table";
 import Badge from "../components/Badge";
 import { apiFetch } from "../api/client";
+import type { BrandingSettings } from "../types/branding";
 
 interface IntegrationRow {
   id: string;
@@ -151,6 +152,34 @@ export default function Settings() {
   const [domainForm, setDomainForm] = useState({ domain: "", spf_record: "", dkim_selector: "", dkim_value: "" });
   const [smsRegistrations, setSmsRegistrations] = useState<SmsRegistration[]>([]);
   const [smsForm, setSmsForm] = useState({ brand_name: "", campaign_name: "" });
+  const [brandingSettings, setBrandingSettings] = useState<BrandingSettings | null>(null);
+  const [brandingForm, setBrandingForm] = useState({
+    name: "",
+    support_email: "",
+    primary_color: "#4b79ff",
+    accent_color: "#2f63ff",
+  });
+  const [domainSettings, setDomainSettings] = useState({ subdomain: "", custom_domain: "" });
+  const [smtpForm, setSmtpForm] = useState({
+    host: "",
+    port: 587,
+    username: "",
+    password: "",
+    encryption: "tls",
+    from_email: "",
+    from_name: "",
+  });
+  const [brandingNotice, setBrandingNotice] = useState<string | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [domainNotice, setDomainNotice] = useState<string | null>(null);
+  const [smtpNotice, setSmtpNotice] = useState<string | null>(null);
+  const [importSummary, setImportSummary] = useState<{
+    processed: number;
+    created: number;
+    credentials: { member: string; email: string; temp_password: string | null }[];
+  } | null>(null);
+  const [importUploading, setImportUploading] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -170,6 +199,7 @@ export default function Settings() {
           sloRes,
           domainsRes,
           smsRes,
+          brandingRes,
         ] = await Promise.all([
           apiFetch<{ data: IntegrationRow[] }>("/integrations"),
           apiFetch<{ data: CommunicationPolicy }>("/communications/policy"),
@@ -182,6 +212,7 @@ export default function Settings() {
           apiFetch<{ data: SloMetrics }>("/observability/slo"),
           apiFetch<{ data: CommunicationDomain[] }>("/compliance/domains"),
           apiFetch<{ data: SmsRegistration[] }>("/compliance/sms"),
+          apiFetch<{ data: BrandingSettings }>("/organizations/branding"),
         ]);
 
         if (!active) return;
@@ -210,6 +241,30 @@ export default function Settings() {
         setSlo(sloRes.data ?? null);
         setDomains(domainsRes.data ?? []);
         setSmsRegistrations(smsRes.data ?? []);
+        const brand = brandingRes.data ?? null;
+        setBrandingSettings(brand);
+        if (brand) {
+          setBrandingForm({
+            name: brand.name ?? "",
+            support_email: brand.support_email ?? "",
+            primary_color: brand.primary_color ?? "#4b79ff",
+            accent_color: brand.accent_color ?? "#2f63ff",
+          });
+          setDomainSettings({
+            subdomain: brand.subdomain ?? "",
+            custom_domain: brand.custom_domain ?? "",
+          });
+          setSmtpForm((prev) => ({
+            ...prev,
+            host: brand.smtp?.host ?? "",
+            port: brand.smtp?.port ?? 587,
+            username: brand.smtp?.username ?? "",
+            encryption: brand.smtp?.encryption ?? "tls",
+            from_email: brand.smtp?.from_email ?? brand.support_email ?? "",
+            from_name: brand.smtp?.from_name ?? brand.name ?? "",
+            password: "",
+          }));
+        }
       } catch (err) {
         if (!active) return;
         setError(err instanceof Error ? err.message : "Failed to load settings");
@@ -223,6 +278,94 @@ export default function Settings() {
       active = false;
     };
   }, []);
+
+  async function saveBrandingSettings(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBrandingNotice(null);
+    try {
+      const response = await apiFetch<{ data: BrandingSettings }>("/organizations/branding", {
+        method: "PUT",
+        body: JSON.stringify(brandingForm),
+      });
+      setBrandingSettings(response.data);
+      setBrandingNotice("Branding updated.");
+    } catch (err) {
+      setBrandingNotice(err instanceof Error ? err.message : "Unable to update branding.");
+    }
+  }
+
+  async function handleLogoChange(event: ChangeEvent<HTMLInputElement>) {
+    if (!event.target.files?.length) return;
+    setLogoUploading(true);
+    const file = event.target.files[0];
+    try {
+      const formData = new FormData();
+      formData.append("logo", file);
+      const response = await apiFetch<{ data: BrandingSettings }>("/organizations/branding/logo", {
+        method: "POST",
+        body: formData,
+      });
+      setBrandingSettings(response.data);
+    } catch (err) {
+      setBrandingNotice(err instanceof Error ? err.message : "Logo upload failed.");
+    } finally {
+      setLogoUploading(false);
+      event.target.value = "";
+    }
+  }
+
+  async function saveDomainSettings(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setDomainNotice(null);
+    try {
+      const response = await apiFetch<{ data: BrandingSettings }>("/organizations/domain", {
+        method: "PUT",
+        body: JSON.stringify(domainSettings),
+      });
+      setBrandingSettings(response.data);
+      setDomainNotice("Domain preferences saved.");
+    } catch (err) {
+      setDomainNotice(err instanceof Error ? err.message : "Unable to save domain preferences.");
+    }
+  }
+
+  async function saveSmtpSettings(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSmtpNotice(null);
+    try {
+      const response = await apiFetch<{ data: BrandingSettings }>("/organizations/smtp", {
+        method: "PUT",
+        body: JSON.stringify(smtpForm),
+      });
+      setBrandingSettings(response.data);
+      setSmtpNotice("SMTP settings updated.");
+      setSmtpForm((prev) => ({ ...prev, password: "" }));
+    } catch (err) {
+      setSmtpNotice(err instanceof Error ? err.message : "Unable to update SMTP settings.");
+    }
+  }
+
+  async function handleImportUpload(event: ChangeEvent<HTMLInputElement>) {
+    if (!event.target.files?.length) return;
+    setImportUploading(true);
+    setImportError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", event.target.files[0]);
+      const response = await apiFetch<{
+        data: { processed: number; created: number; credentials: { member: string; email: string; temp_password: string | null }[] };
+      }>("/imports/members", {
+        method: "POST",
+        body: formData,
+      });
+      setImportSummary(response.data);
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : "Import failed.");
+    } finally {
+      setImportUploading(false);
+      event.target.value = "";
+    }
+  }
 
   async function handleImport() {
     try {
@@ -345,6 +488,202 @@ export default function Settings() {
 
   return (
     <div className="grid gap-6">
+      <Card title="White-label branding" subtitle="Logo, contact info, and palette gym members will see">
+        <form className="grid gap-4 md:grid-cols-2" onSubmit={saveBrandingSettings}>
+          <label className="text-sm">
+            Brand name
+            <input
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              value={brandingForm.name}
+              onChange={(event) => setBrandingForm((prev) => ({ ...prev, name: event.target.value }))}
+            />
+          </label>
+          <label className="text-sm">
+            Support email
+            <input
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              value={brandingForm.support_email}
+              onChange={(event) => setBrandingForm((prev) => ({ ...prev, support_email: event.target.value }))}
+            />
+          </label>
+          <label className="text-sm">
+            Primary color
+            <input
+              type="color"
+              className="mt-1 h-11 w-full rounded-xl border border-slate-200"
+              value={brandingForm.primary_color}
+              onChange={(event) => setBrandingForm((prev) => ({ ...prev, primary_color: event.target.value }))}
+            />
+          </label>
+          <label className="text-sm">
+            Accent color
+            <input
+              type="color"
+              className="mt-1 h-11 w-full rounded-xl border border-slate-200"
+              value={brandingForm.accent_color}
+              onChange={(event) => setBrandingForm((prev) => ({ ...prev, accent_color: event.target.value }))}
+            />
+          </label>
+          <div className="md:col-span-2 flex items-center gap-3">
+            <Button type="submit">Save theme</Button>
+            {brandingNotice && <span className="text-sm text-emerald-600">{brandingNotice}</span>}
+          </div>
+        </form>
+        <div className="mt-6 border-t border-slate-100 pt-4">
+          <p className="text-sm font-semibold text-slate-700">Logo</p>
+          <div className="mt-3 flex flex-wrap items-center gap-4">
+            {brandingSettings?.logo_url && (
+              <img src={brandingSettings.logo_url} alt="Brand logo" className="h-16 w-16 rounded-2xl border border-slate-200 bg-white object-contain" />
+            )}
+            <label className="text-sm font-medium text-brand-600 cursor-pointer">
+              <input type="file" className="hidden" accept="image/*" onChange={handleLogoChange} disabled={logoUploading} />
+              {logoUploading ? "Uploading…" : "Upload logo"}
+            </label>
+          </div>
+        </div>
+      </Card>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card title="Domain & routing" subtitle="FitFlow subdomain or branded domain for your team">
+          <form className="grid gap-4" onSubmit={saveDomainSettings}>
+            <label className="text-sm">
+              FitFlow subdomain
+              <div className="mt-1 flex items-center gap-2">
+                <input
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2"
+                  value={domainSettings.subdomain}
+                  onChange={(event) => setDomainSettings((prev) => ({ ...prev, subdomain: event.target.value }))}
+                  placeholder="mygym"
+                />
+                <span className="text-xs text-slate-500">.fitflow.app</span>
+              </div>
+            </label>
+            <label className="text-sm">
+              Custom domain
+              <input
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+                value={domainSettings.custom_domain}
+                onChange={(event) => setDomainSettings((prev) => ({ ...prev, custom_domain: event.target.value }))}
+                placeholder="members.yourclub.com"
+              />
+            </label>
+            <div className="flex items-center gap-3">
+              <Button type="submit">Save domain</Button>
+              {domainNotice && <span className="text-sm text-emerald-600">{domainNotice}</span>}
+            </div>
+          </form>
+        </Card>
+
+        <Card title="SMTP & email identity" subtitle="Use your sending reputation and reply-to inbox">
+          <form className="grid gap-4" onSubmit={saveSmtpSettings}>
+            <label className="text-sm">
+              Host
+              <input
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+                value={smtpForm.host}
+                onChange={(event) => setSmtpForm((prev) => ({ ...prev, host: event.target.value }))}
+                required
+              />
+            </label>
+            <label className="text-sm">
+              Port
+              <input
+                type="number"
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+                value={smtpForm.port}
+                onChange={(event) => setSmtpForm((prev) => ({ ...prev, port: Number(event.target.value) }))}
+                required
+              />
+            </label>
+            <label className="text-sm">
+              Username
+              <input
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+                value={smtpForm.username}
+                onChange={(event) => setSmtpForm((prev) => ({ ...prev, username: event.target.value }))}
+              />
+            </label>
+            <label className="text-sm">
+              Password
+              <input
+                type="password"
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+                value={smtpForm.password}
+                onChange={(event) => setSmtpForm((prev) => ({ ...prev, password: event.target.value }))}
+                placeholder={brandingSettings?.smtp?.has_password ? "••••••••" : ""}
+              />
+            </label>
+            <label className="text-sm">
+              Encryption
+              <select
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+                value={smtpForm.encryption}
+                onChange={(event) => setSmtpForm((prev) => ({ ...prev, encryption: event.target.value }))}
+              >
+                <option value="tls">TLS</option>
+                <option value="ssl">SSL</option>
+                <option value="starttls">STARTTLS</option>
+                <option value="none">None</option>
+              </select>
+            </label>
+            <label className="text-sm">
+              From name
+              <input
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+                value={smtpForm.from_name}
+                onChange={(event) => setSmtpForm((prev) => ({ ...prev, from_name: event.target.value }))}
+              />
+            </label>
+            <label className="text-sm">
+              From email
+              <input
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+                value={smtpForm.from_email}
+                onChange={(event) => setSmtpForm((prev) => ({ ...prev, from_email: event.target.value }))}
+              />
+            </label>
+            <div className="flex items-center gap-3">
+              <Button type="submit">Save SMTP settings</Button>
+              {smtpNotice && <span className="text-sm text-emerald-600">{smtpNotice}</span>}
+            </div>
+          </form>
+        </Card>
+      </div>
+
+      <Card title="Customer import" subtitle="Upload a CSV of members, leads, or alumni">
+        <div className="space-y-4">
+          <p className="text-sm text-slate-600">
+            CSV headers supported: <code>first_name</code>, <code>last_name</code>, <code>email</code>, <code>phone</code>,{" "}
+            <code>status</code>, <code>timezone</code>. We will provision member portal logins for any row containing an email.
+          </p>
+          <input
+            type="file"
+            accept=".csv,text/csv"
+            onChange={handleImportUpload}
+            disabled={importUploading}
+            className="rounded-xl border border-dashed border-slate-300 px-4 py-6 text-sm text-slate-600"
+          />
+          {importError && <p className="text-sm text-rose-600">{importError}</p>}
+          {importSummary && (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-600">
+                Processed {importSummary.processed} rows · created {importSummary.created} members.
+              </p>
+              {importSummary.credentials.length > 0 && (
+                <Table
+                  cols={[
+                    { key: "member", header: "Member" },
+                    { key: "email", header: "Email" },
+                    { key: "temp_password", header: "Temp password" },
+                  ]}
+                  rows={importSummary.credentials}
+                />
+              )}
+            </div>
+          )}
+        </div>
+      </Card>
+
       <Card title="Integrations" subtitle="Connect your stack">
         {error && <div className="text-sm text-red-600 mb-3">{error}</div>}
         <Table

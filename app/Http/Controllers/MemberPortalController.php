@@ -2,21 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Member;
+use App\Models\MemberAccount;
 use App\Models\MemberGoalEntry;
-use App\Models\Organization;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class MemberPortalController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:member');
+    }
+
     public function show(Request $request): View
     {
-        $organization = Organization::first();
-        $member = Member::with(['booking', 'membershipPlan'])
-            ->where('organization_id', optional($organization)->id)
-            ->first();
+        /** @var MemberAccount $account */
+        $account = $request->user('member');
+        $member = $account->member()->with(['booking.session', 'membershipPlan', 'organization'])->firstOrFail();
+        $organization = $member->organization;
 
         $goals = MemberGoalEntry::where('member_id', optional($member)->id)
             ->orderByDesc('created_at')
@@ -26,13 +31,21 @@ class MemberPortalController extends Controller
         return view('member-portal', [
             'member' => $member,
             'goals' => $goals,
+            'branding' => [
+                'logo_url' => $organization?->logo_path ? Storage::disk('public')->url($organization->logo_path) : null,
+                'primary_color' => $organization?->primary_color ?? '#4b79ff',
+                'accent_color' => $organization?->accent_color ?? '#2f63ff',
+                'support_email' => $organization?->support_email,
+                'organization_name' => $organization?->name ?? 'FitFlow Studio',
+            ],
         ]);
     }
 
     public function storeGoal(Request $request): RedirectResponse
     {
-        $organization = Organization::first();
-        $member = Member::where('organization_id', optional($organization)->id)->firstOrFail();
+        /** @var MemberAccount $account */
+        $account = $request->user('member');
+        $member = $account->member()->firstOrFail();
 
         $data = $request->validate([
             'title' => ['required', 'string'],

@@ -71,6 +71,16 @@ class Member extends Model
         return $this->hasMany(Booking::class);
     }
 
+    public function booking(): HasOne
+    {
+        return $this->hasOne(Booking::class)->latest('booked_at');
+    }
+
+    public function account(): HasOne
+    {
+        return $this->hasOne(MemberAccount::class);
+    }
+
     public function riskScore(): HasOne
     {
         return $this->hasOne(RiskScore::class);

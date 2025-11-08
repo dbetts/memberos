@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Api\Concerns\ResolvesOrganization;
 use App\Http\Controllers\Controller;
 use App\Models\Member;
+use App\Models\MemberAccount;
 use App\Services\Retention\RiskScoringService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class MemberController extends Controller
 {
@@ -114,5 +117,62 @@ class MemberController extends Controller
             'daily_send_cap',
             'weekly_send_cap',
         ])]);
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        $organization = $this->resolveOrganization($request);
+
+        $data = $request->validate([
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'timezone' => ['nullable', 'string', 'max:64'],
+            'status' => ['nullable', 'string', 'max:50'],
+            'portal_email' => ['nullable', 'email', 'max:255'],
+            'portal_password' => ['nullable', 'string', 'min:8'],
+        ]);
+
+        if (! empty($data['portal_email']) && MemberAccount::where('email', strtolower($data['portal_email']))->exists()) {
+            throw ValidationException::withMessages([
+                'portal_email' => 'Portal email already in use.',
+            ]);
+        }
+
+        $member = Member::create([
+            'organization_id' => $organization->id,
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'status' => $data['status'] ?? 'active',
+            'timezone' => $data['timezone'] ?? $organization->primary_timezone,
+            'email_encrypted' => isset($data['email']) ? encrypt($data['email']) : null,
+            'email_hash' => isset($data['email']) ? hash('sha256', strtolower($data['email'])) : null,
+            'phone_encrypted' => isset($data['phone']) ? encrypt($data['phone']) : null,
+            'phone_hash' => isset($data['phone']) ? hash('sha256', preg_replace('/[^\\d+]/', '', $data['phone'])) : null,
+        ]);
+
+        $credentials = null;
+        if (! empty($data['portal_email'])) {
+            $password = isset($data['portal_password']) && $data['portal_password'] !== ''
+                ? $data['portal_password']
+                : Str::password(10);
+            $account = MemberAccount::create([
+                'member_id' => $member->id,
+                'email' => strtolower($data['portal_email']),
+                'password' => $password,
+            ]);
+            $credentials = [
+                'email' => $account->email,
+                'temp_password' => ! empty($data['portal_password']) ? null : $password,
+            ];
+        }
+
+        return response()->json([
+            'data' => [
+                'member' => $member->fresh(),
+                'credentials' => $credentials,
+            ],
+        ], 201);
     }
 }

@@ -25,6 +25,8 @@
     --glass-start: rgba(255, 255, 255, 0.85);
     --glass-end: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(255, 255, 255, 0.8);
+    --brand-primary: #4b79ff;
+    --brand-accent: #2f63ff;
 }
 
 .dark {

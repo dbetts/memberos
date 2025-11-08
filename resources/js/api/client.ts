@@ -1,11 +1,27 @@
+function csrfToken(): string | undefined {
+  const meta = document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement | null;
+  return meta?.content;
+}
+
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const isFormData = options.body instanceof FormData;
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
+    ...(options.headers as Record<string, string> | undefined),
+  };
+
+  if (!isFormData) {
+    headers['Content-Type'] = headers['Content-Type'] ?? 'application/json';
+  }
+
+  const token = csrfToken();
+  if (token) {
+    headers['X-CSRF-TOKEN'] = token;
+  }
+
   const response = await fetch(`/api/v1${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
-      ...(options.headers || {}),
-    },
+    headers,
     credentials: 'same-origin',
     ...options,
   });
