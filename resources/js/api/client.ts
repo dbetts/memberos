@@ -3,6 +3,10 @@ function csrfToken(): string | undefined {
   return meta?.content;
 }
 
+function organizationId(): string | null {
+  return localStorage.getItem("fitflow.orgId");
+}
+
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const isFormData = options.body instanceof FormData;
   const headers: Record<string, string> = {
@@ -18,6 +22,11 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
   const token = csrfToken();
   if (token) {
     headers['X-CSRF-TOKEN'] = token;
+  }
+
+  const orgId = organizationId();
+  if (orgId && !headers['X-Organization-Id']) {
+    headers['X-Organization-Id'] = orgId;
   }
 
   const response = await fetch(`/api/v1${path}`, {
