@@ -10,7 +10,7 @@ export function LineStat({ data }: { data: any[] }) {
                         <XAxis dataKey="month" />
                         <YAxis domain={[80, 100]} unit="%" />
                         <Tooltip />
-                        <Line type="monotone" dataKey="retained" stroke="#1ea2ff" strokeWidth={2} dot={false} />
+                        <Line type="monotone" dataKey="retained" stroke="#4b79ff" strokeWidth={3} dot={false} />
                     </LineChart>
                 </ResponsiveContainer>
             </div>
@@ -27,7 +27,7 @@ export function BarStat({ data, title, xKey, yKey }: { data: any[]; title: strin
                         <XAxis dataKey={xKey} />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey={yKey} />
+                        <Bar dataKey={yKey} fill="#4b79ff" radius={[8, 8, 0, 0]} />
                     </BarChart>
                 </ResponsiveContainer>
             </div>
@@ -38,7 +38,7 @@ export function BarStat({ data, title, xKey, yKey }: { data: any[]; title: strin
 export function PieStat({ data, title, nameKey, valueKey }: {
     data: any[]; title: string; nameKey: string; valueKey: string;
 }) {
-    const palette = ["#1ea2ff", "#4ec0ff", "#99dcff", "#bfeaff", "#e6f7ff"];
+    const palette = ["#4b79ff", "#6d92ff", "#93adff", "#b8c9ff", "#dbe4ff"];
     return (
         <Card title={title}>
             <div className="h-64">

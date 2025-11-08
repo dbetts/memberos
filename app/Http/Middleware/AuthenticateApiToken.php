@@ -10,7 +10,7 @@ class AuthenticateApiToken
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $configuredToken = config('services.memberos.api_token');
+        $configuredToken = config('services.fitflow.api_token');
 
         if (! $configuredToken) {
             return $next($request);

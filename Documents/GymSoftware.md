@@ -1,4 +1,4 @@
-Below is a comprehensive, role‑organized **spec and feature checklist** for the platform (working name: **MemberOS**) that fully addresses the three core problems we identified: **retention & engagement**, **fragmented tech stacks**, and **lead conversion \+ capacity utilization**. Use this as your PRD/RFP backbone with partners and vendors.
+Below is a comprehensive, role‑organized **spec and feature checklist** for the platform (now branded **FitFlow**) that fully addresses the three core problems we identified: **retention & engagement**, **fragmented tech stacks**, and **lead conversion \+ capacity utilization**. Use this as your PRD/RFP backbone with partners and vendors.
 
 ---
 
@@ -716,4 +716,3 @@ Provide **OpenAPI/GraphQL schemas** for these and a **CDC event catalog** (membe
 3. **Lead pipeline with cadences** to fix conversion gaps.
 
 4. **KPI dashboard** to prove retention/fill improvements.
-

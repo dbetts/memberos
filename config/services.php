@@ -35,10 +35,12 @@ return [
         ],
     ],
 
-    'memberos' => [
-        'api_token' => env('MEMBEROS_API_TOKEN'),
-        'webhook_secret' => env('MEMBEROS_WEBHOOK_SECRET', 'demo-secret'),
-        'webhook_endpoints' => explode(',', env('MEMBEROS_WEBHOOK_ENDPOINTS', '')),
+    'fitflow' => [
+        'api_token' => env('FITFLOW_API_TOKEN', env('MEMBEROS_API_TOKEN')),
+        'webhook_secret' => env('FITFLOW_WEBHOOK_SECRET', env('MEMBEROS_WEBHOOK_SECRET', 'demo-secret')),
+        'webhook_endpoints' => array_filter(
+            explode(',', env('FITFLOW_WEBHOOK_ENDPOINTS', env('MEMBEROS_WEBHOOK_ENDPOINTS', '')))
+        ),
     ],
 
 ];

@@ -3,27 +3,28 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --color-brand-50: #f2fbff;
-    --color-brand-100: #e6f7ff;
-    --color-brand-200: #bfeaff;
-    --color-brand-300: #99dcff;
-    --color-brand-400: #4ec0ff;
-    --color-brand-500: #1ea2ff;
-    --color-brand-600: #0b84e5;
-    --color-brand-700: #0767b3;
-    --color-brand-800: #064f8a;
-    --color-brand-900: #063d6b;
-    --shadow-card: 0 8px 24px rgba(2, 6, 23, 0.08);
-    --radius-xl: 14px;
+    --color-brand-50: #eef2ff;
+    --color-brand-100: #dbe4ff;
+    --color-brand-200: #b8c9ff;
+    --color-brand-300: #93adff;
+    --color-brand-400: #6d92ff;
+    --color-brand-500: #4b79ff;
+    --color-brand-600: #2f63ff;
+    --color-brand-700: #2048e0;
+    --color-brand-800: #162f9c;
+    --color-brand-900: #0e1d63;
+    --shadow-card: 0 30px 60px rgba(9, 22, 67, 0.08);
+    --radius-xl: 18px;
 }
 
 /* App look & feel */
 :root {
+    --surface-base: #f4f6ff;
     --card: 255 255 255;
-    --muted: 100 116 139; /* slate-500 */
-    --glass-start: rgba(255,255,255,0.75);
-    --glass-end: rgba(255,255,255,0.6);
-    --glass-border: rgba(255,255,255,0.6);
+    --muted: 100 116 139;
+    --glass-start: rgba(255, 255, 255, 0.85);
+    --glass-end: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.8);
 }
 
 .dark {
@@ -37,15 +38,15 @@
 html, body, #root { height: 100%; }
 
 body {
-    @apply bg-slate-50 dark:bg-gray-900 text-slate-900 dark:text-slate-100;
+    background: radial-gradient(circle at top, #ffffff 0%, var(--surface-base) 55%, #e8ecff 100%);
+    @apply text-slate-900;
 }
 
 .card {
-    background-color: rgb(var(--card));
+    background-color: rgb(var(--card) / 0.97);
     box-shadow: var(--shadow-card);
     border-radius: var(--radius-xl);
-    border: 1px solid hsl(0 0% 96%);
-    @apply dark:border-gray-700;
+    border: 1px solid rgba(10, 22, 67, 0.06);
 }
 
 .glass {

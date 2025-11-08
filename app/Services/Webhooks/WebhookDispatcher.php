@@ -9,13 +9,13 @@ class WebhookDispatcher
 {
     public function dispatch(string $event, array $payload): void
     {
-        $endpoints = array_filter(config('services.memberos.webhook_endpoints', []));
+        $endpoints = array_filter(config('services.fitflow.webhook_endpoints', []));
         if (empty($endpoints)) {
             return;
         }
 
         $timestamp = (string) now()->getTimestamp();
-        $secret = config('services.memberos.webhook_secret');
+        $secret = config('services.fitflow.webhook_secret');
         $body = [
             'event' => $event,
             'payload' => $payload,
@@ -26,9 +26,9 @@ class WebhookDispatcher
         foreach ($endpoints as $endpoint) {
             try {
                 Http::withHeaders([
-                    'MemberOS-Event' => $event,
-                    'MemberOS-Timestamp' => $timestamp,
-                    'MemberOS-Signature' => $signature,
+                    'FitFlow-Event' => $event,
+                    'FitFlow-Timestamp' => $timestamp,
+                    'FitFlow-Signature' => $signature,
                 ])->post($endpoint, $body);
             } catch (\Throwable $throwable) {
                 Log::warning('Failed to dispatch webhook', [
