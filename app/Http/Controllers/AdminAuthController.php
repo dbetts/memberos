@@ -9,8 +9,16 @@ use Illuminate\View\View;
 
 class AdminAuthController extends Controller
 {
-    public function showLogin(): View
+    public function showLogin(Request $request): View|RedirectResponse
     {
+        if (Auth::guard('web')->check()) {
+            $user = $request->user();
+
+            $redirect = $user?->is_master ? route('master.dashboard') : url('/app');
+
+            return redirect()->intended($redirect);
+        }
+
         return view('admin-login');
     }
 
