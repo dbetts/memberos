@@ -18,8 +18,8 @@ Route::post('/public/leads', [PublicLeadCaptureController::class, 'store']);
 Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
 Route::post('/login', [AdminAuthController::class, 'login'])->name('admin.login.attempt');
 Route::post('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
-Route::get('/member/login', [MemberAuthController::class, 'showLogin'])->name('member.login');
-Route::post('/member/login', [MemberAuthController::class, 'login'])->name('member.login.attempt');
+Route::get('/member/login', fn () => redirect('/login'))->name('member.login');
+Route::post('/member/login', [AdminAuthController::class, 'login'])->name('member.login.attempt');
 Route::post('/member/logout', [MemberAuthController::class, 'logout'])->name('member.logout');
 
 Route::middleware('auth:member')->group(function (): void {

@@ -17,6 +17,8 @@ export default function Topbar({ user, userLoaded }: TopbarProps) {
   const accent = branding?.accent_color ?? "var(--brand-accent)";
   const primary = branding?.primary_color ?? "var(--brand-primary)";
   const avatarRef = useRef<HTMLDivElement | null>(null);
+  const logoutFormRef = useRef<HTMLFormElement | null>(null);
+  const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement | null)?.content ?? "";
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
@@ -43,17 +45,12 @@ export default function Topbar({ user, userLoaded }: TopbarProps) {
     .map((part) => part[0]?.toUpperCase())
     .join("");
 
-  async function handleLogout() {
-    const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement | null)?.content;
-    await fetch("/logout", {
-      method: "POST",
-      headers: {
-        "X-CSRF-TOKEN": token ?? "",
-        "X-Requested-With": "XMLHttpRequest",
-        Accept: "application/json",
-      },
-    });
-    window.location.href = "/login";
+  function handleLogout() {
+    if (logoutFormRef.current) {
+      logoutFormRef.current.requestSubmit();
+    } else {
+      window.location.href = "/logout";
+    }
   }
 
   return (
@@ -131,6 +128,9 @@ export default function Topbar({ user, userLoaded }: TopbarProps) {
           </div>
         </div>
       </div>
+      <form ref={logoutFormRef} method="POST" action="/logout" className="hidden">
+        <input type="hidden" name="_token" value={csrfToken} />
+      </form>
     </header>
   );
 }

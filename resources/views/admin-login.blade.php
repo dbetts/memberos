@@ -39,7 +39,7 @@
             </label>
             <button type="submit">Sign in</button>
         </form>
-        <p class="meta">Members should log in at <a href="/member/login" style="color:#93c5fd;">/member/login</a></p>
+        <p class="meta">Need access? Contact your FitFlow owner or support.</p>
     </div>
 </body>
 </html>

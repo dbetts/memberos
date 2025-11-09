@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MemberAccount;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +39,16 @@ class AdminAuthController extends Controller
             $redirect = $user->is_master ? route('master.dashboard') : url('/app');
 
             return redirect()->intended($redirect);
+        }
+
+        if (Auth::guard('member')->attempt($credentials, $remember)) {
+            /** @var MemberAccount $account */
+            $account = Auth::guard('member')->user();
+            $account->forceFill(['last_login_at' => now()])->save();
+
+            $request->session()->regenerate();
+
+            return redirect()->intended('/member/portal');
         }
 
         return back()->withErrors([
