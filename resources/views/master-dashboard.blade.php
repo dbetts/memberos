@@ -44,6 +44,7 @@
                         <th>Plans</th>
                         <th>Last payment ref</th>
                         <th>Created</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -62,10 +63,17 @@
                             <td>{{ $org['plans'] }}</td>
                             <td>{{ $org['last_payment'] ?? '—' }}</td>
                             <td>{{ optional($org['created_at'])->format('M d, Y') }}</td>
+                            <td>
+                                <form method="POST" action="{{ route('master.impersonate') }}">
+                                    @csrf
+                                    <input type="hidden" name="organization_id" value="{{ $org['id'] }}">
+                                    <button type="submit" style="background:#2f63ff;border:none;border-radius:.7rem;padding:.45rem 1rem;font-size:.8rem;font-weight:600;color:#fff;cursor:pointer;">Impersonate</button>
+                                </form>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" style="text-align:center;color:#94a3b8;">No workspaces provisioned yet.</td>
+                            <td colspan="8" style="text-align:center;color:#94a3b8;">No workspaces provisioned yet.</td>
                         </tr>
                     @endforelse
                 </tbody>

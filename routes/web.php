@@ -29,6 +29,8 @@ Route::middleware('auth:member')->group(function (): void {
 
 Route::middleware('auth')->group(function (): void {
     Route::get('/master-control', \App\Http\Controllers\MasterDashboardController::class)->name('master.dashboard');
+    Route::post('/master-control/impersonate', [\App\Http\Controllers\MasterImpersonationController::class, 'start'])->name('master.impersonate');
+    Route::post('/impersonation/stop', [\App\Http\Controllers\MasterImpersonationController::class, 'stop'])->name('master.impersonate.stop');
 });
 
 require __DIR__.'/tenant.php';

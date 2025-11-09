@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Api\Concerns\ResolvesOrganization;
 use App\Http\Controllers\Controller;
 use App\Models\Organization;
+use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -30,6 +31,7 @@ class AuthenticatedUserController extends Controller
         abort_unless($user, 401);
 
         $branding = null;
+        $impersonation = null;
 
         try {
             $organization = $this->resolveOrganization($request);
@@ -40,10 +42,19 @@ class AuthenticatedUserController extends Controller
             }
         }
 
+        if ($request->session()->has('impersonated_by')) {
+            $impersonation = [
+                'active' => true,
+                'master_name' => optional(User::find($request->session()->get('impersonated_by')))->name,
+                'organization_id' => $request->session()->get('impersonating_org_id'),
+            ];
+        }
+
         return response()->json([
             'data' => [
                 'user' => $this->transformUser($user),
                 'branding' => $branding,
+                'impersonation' => $impersonation,
             ],
         ]);
     }
@@ -103,6 +114,7 @@ class AuthenticatedUserController extends Controller
             'email' => $user->email,
             'phone' => $user->phone,
             'organization_id' => $user->organization_id,
+            'is_master' => (bool) $user->is_master,
             'address' => [
                 'line1' => $address['line1'] ?? '',
                 'line2' => $address['line2'] ?? '',

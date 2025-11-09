@@ -3,14 +3,15 @@ import { Link } from "react-router-dom";
 import { Bell, Search, LogOut, User } from "lucide-react";
 import Toggle from "./Toggle";
 import { useBranding } from "../context/BrandingContext";
-import type { AuthenticatedUser } from "../types/auth";
+import type { AuthenticatedUser, ImpersonationState } from "../types/auth";
 
 type TopbarProps = {
   user: AuthenticatedUser | null;
   userLoaded: boolean;
+  impersonation: ImpersonationState | null;
 };
 
-export default function Topbar({ user, userLoaded }: TopbarProps) {
+export default function Topbar({ user, userLoaded, impersonation }: TopbarProps) {
   const { branding, brandingLoaded } = useBranding();
   const [dark, setDark] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -18,6 +19,7 @@ export default function Topbar({ user, userLoaded }: TopbarProps) {
   const primary = branding?.primary_color ?? "var(--brand-primary)";
   const avatarRef = useRef<HTMLDivElement | null>(null);
   const logoutFormRef = useRef<HTMLFormElement | null>(null);
+  const stopImpersonateFormRef = useRef<HTMLFormElement | null>(null);
   const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement | null)?.content ?? "";
 
   useEffect(() => {
@@ -53,6 +55,12 @@ export default function Topbar({ user, userLoaded }: TopbarProps) {
     }
   }
 
+  function handleStopImpersonate() {
+    if (stopImpersonateFormRef.current) {
+      stopImpersonateFormRef.current.requestSubmit();
+    }
+  }
+
   return (
     <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200">
       <div className="flex items-center justify-between px-8 h-20">
@@ -71,6 +79,15 @@ export default function Topbar({ user, userLoaded }: TopbarProps) {
           </div>
         </div>
         <div className="flex items-center gap-5">
+          {impersonation?.active && (
+            <button
+              type="button"
+              onClick={handleStopImpersonate}
+              className="rounded-2xl border border-rose-200/60 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-600 shadow-sm"
+            >
+              Stop impersonating
+            </button>
+          )}
           <button
             className="relative rounded-2xl border border-slate-200 bg-white p-3 text-slate-500 transition hover:text-slate-900"
             aria-label="Notifications"
@@ -129,6 +146,9 @@ export default function Topbar({ user, userLoaded }: TopbarProps) {
         </div>
       </div>
       <form ref={logoutFormRef} method="POST" action="/logout" className="hidden">
+        <input type="hidden" name="_token" value={csrfToken} />
+      </form>
+      <form ref={stopImpersonateFormRef} method="POST" action="/impersonation/stop" className="hidden">
         <input type="hidden" name="_token" value={csrfToken} />
       </form>
     </header>

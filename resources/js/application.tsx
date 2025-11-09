@@ -6,7 +6,7 @@ import { routes } from "./routes";
 import type { BrandingSettings } from "./types/branding";
 import { apiFetch, isAbortError } from "./api/client";
 import { BrandingProvider } from "./context/BrandingContext";
-import type { AuthenticatedUser } from "./types/auth";
+import type { AuthenticatedUser, ImpersonationState } from "./types/auth";
 
 export default function App() {
   const location = useLocation();
@@ -19,6 +19,7 @@ export default function App() {
   const [brandingLoaded, setBrandingLoaded] = useState(false);
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [userLoaded, setUserLoaded] = useState(false);
+  const [impersonation, setImpersonation] = useState<ImpersonationState | null>(null);
 
   useEffect(() => {
     if (isPublicRoute) return;
@@ -27,7 +28,13 @@ export default function App() {
 
     async function loadBootstrap() {
       try {
-        const response = await apiFetch<{ data: { user: AuthenticatedUser; branding: BrandingSettings | null } }>(
+        const response = await apiFetch<{
+          data: {
+            user: AuthenticatedUser;
+            branding: BrandingSettings | null;
+            impersonation: ImpersonationState | null;
+          };
+        }>(
           "/auth/bootstrap",
           {
             signal: controller.signal,
@@ -36,8 +43,11 @@ export default function App() {
         if (controller.signal.aborted) return;
         setUser(response.data.user);
         setBranding(response.data.branding ?? null);
+        setImpersonation(response.data.impersonation ?? null);
         if (response.data.user?.organization_id) {
           localStorage.setItem("fitflow.orgId", response.data.user.organization_id);
+        } else {
+          localStorage.removeItem("fitflow.orgId");
         }
       } catch (error) {
         if (isAbortError(error) || controller.signal.aborted) return;
@@ -85,7 +95,7 @@ export default function App() {
       <div className="flex min-h-screen">
         <Sidebar />
         <div className="flex flex-1 flex-col">
-          <Topbar user={user} userLoaded={userLoaded} />
+          <Topbar user={user} userLoaded={userLoaded} impersonation={impersonation} />
           <main className="flex-1 overflow-auto px-8 py-8">
             <div className="mx-auto max-w-7xl space-y-6">
               <Suspense fallback={<div className="text-slate-500">Loading…</div>}>
