@@ -43,6 +43,7 @@
                         <th>Locations</th>
                         <th>Plans</th>
                         <th>Last payment ref</th>
+                        <th>Admin</th>
                         <th>Created</th>
                         <th></th>
                     </tr>
@@ -62,18 +63,31 @@
                             <td>{{ $org['locations'] }}</td>
                             <td>{{ $org['plans'] }}</td>
                             <td>{{ $org['last_payment'] ?? '—' }}</td>
+                            <td>
+                                @if($org['primary_admin'])
+                                    <div>{{ $org['primary_admin']['name'] }}</div>
+                                    <div style="color:#94a3b8;font-size:.8rem;">{{ $org['primary_admin']['email'] }}</div>
+                                @else
+                                    <div style="color:#94a3b8;">No admin yet</div>
+                                @endif
+                            </td>
                             <td>{{ optional($org['created_at'])->format('M d, Y') }}</td>
                             <td>
                                 <form method="POST" action="{{ route('master.impersonate') }}">
                                     @csrf
                                     <input type="hidden" name="organization_id" value="{{ $org['id'] }}">
-                                    <button type="submit" style="background:#2f63ff;border:none;border-radius:.7rem;padding:.45rem 1rem;font-size:.8rem;font-weight:600;color:#fff;cursor:pointer;">Impersonate</button>
+                                    @if($org['primary_admin'])
+                                        <input type="hidden" name="user_id" value="{{ $org['primary_admin']['id'] }}">
+                                        <button type="submit" style="background:#2f63ff;border:none;border-radius:.7rem;padding:.45rem 1rem;font-size:.8rem;font-weight:600;color:#fff;cursor:pointer;">Impersonate</button>
+                                    @else
+                                        <button type="button" disabled style="background:rgba(148,163,184,.2);border:none;border-radius:.7rem;padding:.45rem 1rem;font-size:.8rem;font-weight:600;color:#94a3b8;cursor:not-allowed;">No admin</button>
+                                    @endif
                                 </form>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" style="text-align:center;color:#94a3b8;">No workspaces provisioned yet.</td>
+                            <td colspan="9" style="text-align:center;color:#94a3b8;">No workspaces provisioned yet.</td>
                         </tr>
                     @endforelse
                 </tbody>

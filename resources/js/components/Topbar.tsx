@@ -57,6 +57,7 @@ export default function Topbar({ user, userLoaded, impersonation }: TopbarProps)
 
   function handleStopImpersonate() {
     if (stopImpersonateFormRef.current) {
+      localStorage.removeItem("fitflow.orgId");
       stopImpersonateFormRef.current.requestSubmit();
     }
   }

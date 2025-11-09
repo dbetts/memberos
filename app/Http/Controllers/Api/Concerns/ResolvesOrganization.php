@@ -11,16 +11,21 @@ trait ResolvesOrganization
 {
     protected function resolveOrganization(Request $request): Organization
     {
-        $organizationId = $request->header('X-Organization-Id') ?? $request->query('organization_id');
+        $user = Auth::user();
+        $requestedId = $request->header('X-Organization-Id') ?? $request->query('organization_id');
 
-        if ($organizationId) {
-            $organization = Organization::find($organizationId);
+        if ($requestedId) {
+            $organization = Organization::find($requestedId);
             if ($organization) {
-                return $organization;
+                $userOrgId = $user?->organization_id;
+                $isMasterWithoutOrg = $user && ! $userOrgId && ($user->is_master ?? false);
+
+                if (! $userOrgId || $userOrgId === $organization->id || $isMasterWithoutOrg) {
+                    return $organization;
+                }
             }
         }
 
-        $user = Auth::user();
         if ($user && $user->organization_id) {
             $organization = Organization::find($user->organization_id);
             if ($organization) {
