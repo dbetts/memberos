@@ -2,20 +2,50 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\Concerns\ResolvesOrganization;
 use App\Http\Controllers\Controller;
+use App\Models\Organization;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class AuthenticatedUserController extends Controller
 {
+    use ResolvesOrganization;
+
     public function show(Request $request): JsonResponse
     {
         $user = $request->user();
         abort_unless($user, 401);
 
         return response()->json(['data' => $this->transformUser($user)]);
+    }
+
+    public function bootstrap(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        abort_unless($user, 401);
+
+        $branding = null;
+
+        try {
+            $organization = $this->resolveOrganization($request);
+            $branding = $this->transformBranding($organization);
+        } catch (ModelNotFoundException $exception) {
+            if ($user->organization_id) {
+                throw $exception;
+            }
+        }
+
+        return response()->json([
+            'data' => [
+                'user' => $this->transformUser($user),
+                'branding' => $branding,
+            ],
+        ]);
     }
 
     public function update(Request $request): JsonResponse
@@ -81,6 +111,21 @@ class AuthenticatedUserController extends Controller
                 'postal' => $address['postal'] ?? '',
                 'country' => $address['country'] ?? '',
             ],
+        ];
+    }
+
+    protected function transformBranding(Organization $organization): array
+    {
+        return [
+            'id' => $organization->id,
+            'name' => $organization->name,
+            'subdomain' => $organization->subdomain,
+            'custom_domain' => $organization->custom_domain,
+            'support_email' => $organization->support_email,
+            'primary_color' => $organization->primary_color,
+            'accent_color' => $organization->accent_color,
+            'logo_url' => $organization->logo_path ? Storage::disk('public')->url($organization->logo_path) : null,
+            'branding_overrides' => $organization->branding_overrides,
         ];
     }
 }

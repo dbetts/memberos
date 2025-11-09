@@ -36,6 +36,7 @@ use App\Http\Controllers\Api\SettingsOverviewController;
 Route::middleware(['auth'])->prefix('api/v1')->group(function (): void {
     Route::get('auth/me', [AuthenticatedUserController::class, 'show']);
     Route::put('auth/me', [AuthenticatedUserController::class, 'update']);
+    Route::get('auth/bootstrap', [AuthenticatedUserController::class, 'bootstrap']);
 
     Route::get('dashboard/kpis', [DashboardController::class, 'index']);
     Route::get('dashboard/filters', [DashboardController::class, 'filters']);

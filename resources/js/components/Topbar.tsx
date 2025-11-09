@@ -2,21 +2,18 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Bell, Search, LogOut, User } from "lucide-react";
 import Toggle from "./Toggle";
-import { apiFetch, isAbortError } from "../api/client";
 import { useBranding } from "../context/BrandingContext";
+import type { AuthenticatedUser } from "../types/auth";
 
-type AuthenticatedUser = {
-  name: string;
-  email: string;
-  organization_id?: string | null;
+type TopbarProps = {
+  user: AuthenticatedUser | null;
+  userLoaded: boolean;
 };
 
-export default function Topbar() {
+export default function Topbar({ user, userLoaded }: TopbarProps) {
   const { branding, brandingLoaded } = useBranding();
   const [dark, setDark] = useState(false);
-  const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [userLoaded, setUserLoaded] = useState(false);
   const accent = branding?.accent_color ?? "var(--brand-accent)";
   const primary = branding?.primary_color ?? "var(--brand-primary)";
   const avatarRef = useRef<HTMLDivElement | null>(null);
@@ -24,29 +21,6 @@ export default function Topbar() {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
   }, [dark]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    apiFetch<{ data: AuthenticatedUser }>("/auth/me", { signal: controller.signal })
-      .then((response) => {
-        setUser(response.data);
-        if (response.data.organization_id) {
-          localStorage.setItem("fitflow.orgId", response.data.organization_id);
-        }
-      })
-      .catch((error) => {
-        if (isAbortError(error)) return;
-        setUser(null);
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) {
-          setUserLoaded(true);
-        }
-      });
-
-    return () => controller.abort();
-  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

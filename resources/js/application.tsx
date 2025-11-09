@@ -6,6 +6,7 @@ import { routes } from "./routes";
 import type { BrandingSettings } from "./types/branding";
 import { apiFetch, isAbortError } from "./api/client";
 import { BrandingProvider } from "./context/BrandingContext";
+import type { AuthenticatedUser } from "./types/auth";
 
 export default function App() {
   const location = useLocation();
@@ -16,29 +17,42 @@ export default function App() {
   );
   const [branding, setBranding] = useState<BrandingSettings | null>(null);
   const [brandingLoaded, setBrandingLoaded] = useState(false);
+  const [user, setUser] = useState<AuthenticatedUser | null>(null);
+  const [userLoaded, setUserLoaded] = useState(false);
 
   useEffect(() => {
-    if (isPublicRoute || brandingLoaded) return;
+    if (isPublicRoute) return;
 
     const controller = new AbortController();
 
-    async function loadBranding() {
+    async function loadBootstrap() {
       try {
-        const response = await apiFetch<{ data: BrandingSettings }>("/organizations/branding", {
-          signal: controller.signal,
-        });
-        setBranding(response.data);
-        setBrandingLoaded(true);
+        const response = await apiFetch<{ data: { user: AuthenticatedUser; branding: BrandingSettings | null } }>(
+          "/auth/bootstrap",
+          {
+            signal: controller.signal,
+          }
+        );
+        if (controller.signal.aborted) return;
+        setUser(response.data.user);
+        setBranding(response.data.branding ?? null);
+        if (response.data.user?.organization_id) {
+          localStorage.setItem("fitflow.orgId", response.data.user.organization_id);
+        }
       } catch (error) {
-        if (isAbortError(error)) return;
-        setBrandingLoaded(true);
+        if (isAbortError(error) || controller.signal.aborted) return;
+      } finally {
+        if (!controller.signal.aborted) {
+          setBrandingLoaded(true);
+          setUserLoaded(true);
+        }
       }
     }
 
-    loadBranding();
+    loadBootstrap();
 
     return () => controller.abort();
-  }, [isPublicRoute, brandingLoaded]);
+  }, [isPublicRoute]);
 
   useEffect(() => {
     if (branding?.primary_color) {
@@ -71,7 +85,7 @@ export default function App() {
       <div className="flex min-h-screen">
         <Sidebar />
         <div className="flex flex-1 flex-col">
-          <Topbar />
+          <Topbar user={user} userLoaded={userLoaded} />
           <main className="flex-1 overflow-auto px-8 py-8">
             <div className="mx-auto max-w-7xl space-y-6">
               <Suspense fallback={<div className="text-slate-500">Loading…</div>}>
