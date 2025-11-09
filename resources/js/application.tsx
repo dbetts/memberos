@@ -67,7 +67,7 @@ export default function App() {
   }
 
   return (
-    <BrandingProvider value={{ branding, setBranding }}>
+    <BrandingProvider value={{ branding, setBranding, brandingLoaded }}>
       <div className="flex min-h-screen">
         <Sidebar />
         <div className="flex flex-1 flex-col">

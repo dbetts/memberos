@@ -60,7 +60,13 @@ export default function Capacity() {
   return (
     <div className="grid gap-6">
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <BarStat data={fillData} title="Class fill %" xKey="cls" yKey="fill" />
+        <BarStat
+          data={fillData}
+          title="Class fill %"
+          xKey="cls"
+          yKey="fill"
+          emptyMessage="No upcoming sessions in this window."
+        />
         <Card title="Waitlist & no‑shows" subtitle="Predicted vs actual">
           <div className="grid grid-cols-2 gap-3">
             <div className="glass p-4">

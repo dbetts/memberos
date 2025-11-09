@@ -4,6 +4,7 @@ import type { BrandingSettings } from "../types/branding";
 type BrandingContextValue = {
   branding: BrandingSettings | null;
   setBranding: (value: BrandingSettings | null) => void;
+  brandingLoaded: boolean;
 };
 
 const BrandingContext = createContext<BrandingContextValue | undefined>(undefined);

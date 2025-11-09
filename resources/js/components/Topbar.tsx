@@ -12,10 +12,11 @@ type AuthenticatedUser = {
 };
 
 export default function Topbar() {
-  const { branding } = useBranding();
+  const { branding, brandingLoaded } = useBranding();
   const [dark, setDark] = useState(false);
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userLoaded, setUserLoaded] = useState(false);
   const accent = branding?.accent_color ?? "var(--brand-accent)";
   const primary = branding?.primary_color ?? "var(--brand-primary)";
   const avatarRef = useRef<HTMLDivElement | null>(null);
@@ -37,6 +38,11 @@ export default function Topbar() {
       .catch((error) => {
         if (isAbortError(error)) return;
         setUser(null);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setUserLoaded(true);
+        }
       });
 
     return () => controller.abort();
@@ -108,7 +114,11 @@ export default function Topbar() {
           </button>
           <div className="text-right">
             <p className="text-sm font-semibold text-slate-900">{user?.name ?? "Studio Admin"}</p>
-            <p className="text-xs text-slate-500">{branding?.name ?? user?.email ?? "Owner"}</p>
+            {userLoaded && brandingLoaded ? (
+              <p className="text-xs text-slate-500">{branding?.name ?? user?.email ?? "Owner"}</p>
+            ) : (
+              <div className="mt-1 h-3 w-24 animate-pulse rounded bg-slate-200" aria-hidden="true" />
+            )}
           </div>
           <div className="relative" ref={avatarRef}>
             <button
