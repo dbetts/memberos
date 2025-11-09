@@ -9,7 +9,7 @@ use App\Http\Controllers\PublicLeadCaptureController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', LandingController::class);
-Route::view('/app', 'app');
+Route::view('/app/{any?}', 'app')->where('any', '.*');
 Route::get('/subscribe', fn () => view('subscribe', ['monthly_price' => number_format(99.95, 2)]));
 
 Route::get('/lead/capture', [PublicLeadCaptureController::class, 'form']);
@@ -32,5 +32,3 @@ Route::middleware('auth')->group(function (): void {
 });
 
 require __DIR__.'/tenant.php';
-
-Route::fallback(fn () => view('app'));
