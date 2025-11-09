@@ -3,7 +3,7 @@ export default function Toggle({ checked, onChange }: { checked: boolean; onChan
         <button
             aria-pressed={checked}
             onClick={() => onChange(!checked)}
-            className={`w-11 h-6 rounded-full transition relative ${
+            className={`w-14 h-6 rounded-full transition relative ${
                 checked ? "bg-brand-500" : "bg-slate-300"
             }`}
         >

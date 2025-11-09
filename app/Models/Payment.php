@@ -43,4 +43,9 @@ class Payment extends Model
     {
         return $this->belongsTo(Organization::class);
     }
+
+    public function membershipPlan(): BelongsTo
+    {
+        return $this->belongsTo(MembershipPlan::class);
+    }
 }

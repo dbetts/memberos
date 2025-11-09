@@ -1,42 +1,42 @@
 {
-  "_Badge-DrshgMGW.js": {
-    "file": "assets/Badge-DrshgMGW.js",
+  "_Badge-Ct2h2tLc.js": {
+    "file": "assets/Badge-Ct2h2tLc.js",
     "name": "Badge",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_Button-Bf92miJK.js": {
-    "file": "assets/Button-Bf92miJK.js",
+  "_Button-BWIka2oa.js": {
+    "file": "assets/Button-BWIka2oa.js",
     "name": "Button",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_Card-Y_QGroTA.js": {
-    "file": "assets/Card-Y_QGroTA.js",
+  "_Card-DFoN1MQX.js": {
+    "file": "assets/Card-DFoN1MQX.js",
     "name": "Card",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_ChartCard-DgSuhzWL.js": {
-    "file": "assets/ChartCard-DgSuhzWL.js",
+  "_ChartCard-CdTB5MOJ.js": {
+    "file": "assets/ChartCard-CdTB5MOJ.js",
     "name": "ChartCard",
     "imports": [
       "resources/js/app.tsx",
-      "_Card-Y_QGroTA.js"
+      "_Card-DFoN1MQX.js"
     ]
   },
-  "_Table-CRIv6QFn.js": {
-    "file": "assets/Table-CRIv6QFn.js",
+  "_Table-Cffwhz2N.js": {
+    "file": "assets/Table-Cffwhz2N.js",
     "name": "Table",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-KbcDMNDp.css",
+    "file": "assets/app-DSYOhZZC.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -45,7 +45,7 @@
     "src": "resources/img/logo.png"
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-BlVi2sXA.js",
+    "file": "assets/app-Cb0ONkw7.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
@@ -54,142 +54,158 @@
       "resources/js/pages/Retention.tsx",
       "resources/js/pages/Capacity.tsx",
       "resources/js/pages/CRM.tsx",
+      "resources/js/pages/Members.tsx",
       "resources/js/pages/Coach.tsx",
       "resources/js/pages/Playbooks.tsx",
       "resources/js/pages/Settings.tsx",
       "resources/js/pages/Profile.tsx"
     ],
     "css": [
-      "assets/app-KbcDMNDp.css"
+      "assets/app-DSYOhZZC.css"
     ],
     "assets": [
       "assets/logo-dhlZLrAp.png"
     ]
   },
   "resources/js/pages/CRM.tsx": {
-    "file": "assets/CRM-Dia9GMYw.js",
+    "file": "assets/CRM-D6713Jaj.js",
     "name": "CRM",
     "src": "resources/js/pages/CRM.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-Y_QGroTA.js",
-      "_Table-CRIv6QFn.js",
-      "_Button-Bf92miJK.js"
+      "_Card-DFoN1MQX.js",
+      "_Table-Cffwhz2N.js",
+      "_Button-BWIka2oa.js"
     ],
     "css": [
-      "assets/app-KbcDMNDp.css"
+      "assets/app-DSYOhZZC.css"
     ]
   },
   "resources/js/pages/Capacity.tsx": {
-    "file": "assets/Capacity-YaXENc5K.js",
+    "file": "assets/Capacity-BQg5Yj2w.js",
     "name": "Capacity",
     "src": "resources/js/pages/Capacity.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-Y_QGroTA.js",
-      "_Table-CRIv6QFn.js",
-      "_Badge-DrshgMGW.js",
-      "_ChartCard-DgSuhzWL.js"
+      "_Card-DFoN1MQX.js",
+      "_Table-Cffwhz2N.js",
+      "_Badge-Ct2h2tLc.js",
+      "_ChartCard-CdTB5MOJ.js"
     ],
     "css": [
-      "assets/app-KbcDMNDp.css"
+      "assets/app-DSYOhZZC.css"
     ]
   },
   "resources/js/pages/Coach.tsx": {
-    "file": "assets/Coach-DTPzrOd2.js",
+    "file": "assets/Coach-C-a4kM16.js",
     "name": "Coach",
     "src": "resources/js/pages/Coach.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-Y_QGroTA.js",
-      "_Table-CRIv6QFn.js",
-      "_Badge-DrshgMGW.js",
-      "_Button-Bf92miJK.js"
+      "_Card-DFoN1MQX.js",
+      "_Table-Cffwhz2N.js",
+      "_Badge-Ct2h2tLc.js",
+      "_Button-BWIka2oa.js"
     ],
     "css": [
-      "assets/app-KbcDMNDp.css"
+      "assets/app-DSYOhZZC.css"
     ]
   },
   "resources/js/pages/Dashboard.tsx": {
-    "file": "assets/Dashboard-DEIfRC8O.js",
+    "file": "assets/Dashboard-DkHfmpFC.js",
     "name": "Dashboard",
     "src": "resources/js/pages/Dashboard.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-Y_QGroTA.js",
-      "_Badge-DrshgMGW.js",
-      "_Table-CRIv6QFn.js",
-      "_Button-Bf92miJK.js",
-      "_ChartCard-DgSuhzWL.js"
+      "_Card-DFoN1MQX.js",
+      "_Badge-Ct2h2tLc.js",
+      "_Table-Cffwhz2N.js",
+      "_Button-BWIka2oa.js",
+      "_ChartCard-CdTB5MOJ.js"
     ],
     "css": [
-      "assets/app-KbcDMNDp.css"
+      "assets/app-DSYOhZZC.css"
+    ]
+  },
+  "resources/js/pages/Members.tsx": {
+    "file": "assets/Members-DqyF2myd.js",
+    "name": "Members",
+    "src": "resources/js/pages/Members.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_Card-DFoN1MQX.js",
+      "_Button-BWIka2oa.js",
+      "_Badge-Ct2h2tLc.js"
+    ],
+    "css": [
+      "assets/app-DSYOhZZC.css"
     ]
   },
   "resources/js/pages/Playbooks.tsx": {
-    "file": "assets/Playbooks-BIXgW9RS.js",
+    "file": "assets/Playbooks-CDkEVO4d.js",
     "name": "Playbooks",
     "src": "resources/js/pages/Playbooks.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-Y_QGroTA.js",
-      "_Table-CRIv6QFn.js",
-      "_Badge-DrshgMGW.js",
-      "_Button-Bf92miJK.js"
+      "_Card-DFoN1MQX.js",
+      "_Table-Cffwhz2N.js",
+      "_Badge-Ct2h2tLc.js",
+      "_Button-BWIka2oa.js"
     ],
     "css": [
-      "assets/app-KbcDMNDp.css"
+      "assets/app-DSYOhZZC.css"
     ]
   },
   "resources/js/pages/Profile.tsx": {
-    "file": "assets/Profile-BmqccjYX.js",
+    "file": "assets/Profile-DpKWwvuH.js",
     "name": "Profile",
     "src": "resources/js/pages/Profile.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-Y_QGroTA.js",
-      "_Button-Bf92miJK.js"
+      "_Card-DFoN1MQX.js",
+      "_Button-BWIka2oa.js"
     ],
     "css": [
-      "assets/app-KbcDMNDp.css"
+      "assets/app-DSYOhZZC.css"
     ]
   },
   "resources/js/pages/Retention.tsx": {
-    "file": "assets/Retention-DI_nbo-s.js",
+    "file": "assets/Retention-DXxyPZYi.js",
     "name": "Retention",
     "src": "resources/js/pages/Retention.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-Y_QGroTA.js",
-      "_Table-CRIv6QFn.js",
-      "_Badge-DrshgMGW.js",
-      "_Button-Bf92miJK.js"
+      "_Card-DFoN1MQX.js",
+      "_Table-Cffwhz2N.js",
+      "_Badge-Ct2h2tLc.js",
+      "_Button-BWIka2oa.js"
     ],
     "css": [
-      "assets/app-KbcDMNDp.css"
+      "assets/app-DSYOhZZC.css"
     ]
   },
   "resources/js/pages/Settings.tsx": {
-    "file": "assets/Settings-BWr3O42s.js",
+    "file": "assets/Settings-DIy_fCsH.js",
     "name": "Settings",
     "src": "resources/js/pages/Settings.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-Y_QGroTA.js",
-      "_Button-Bf92miJK.js",
-      "_Table-CRIv6QFn.js",
-      "_Badge-DrshgMGW.js"
+      "_Card-DFoN1MQX.js",
+      "_Button-BWIka2oa.js",
+      "_Table-Cffwhz2N.js",
+      "_Badge-Ct2h2tLc.js"
     ],
     "css": [
-      "assets/app-KbcDMNDp.css"
+      "assets/app-DSYOhZZC.css"
     ]
   }
 }

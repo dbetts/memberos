@@ -6,11 +6,15 @@ use App\Http\Controllers\Api\Concerns\ResolvesOrganization;
 use App\Http\Controllers\Controller;
 use App\Models\Member;
 use App\Models\MemberAccount;
+use App\Models\Payment;
+use App\Models\Booking;
+use App\Models\CheckIn;
 use App\Services\Retention\RiskScoringService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Carbon;
 
 class MemberController extends Controller
 {
@@ -24,19 +28,28 @@ class MemberController extends Controller
     {
         $organization = $this->resolveOrganization($request);
         $perPage = min(100, max(1, (int) $request->query('per_page', 25)));
+        $sort = $request->query('sort', 'name');
+        $direction = strtolower($request->query('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         $query = Member::query()
-            ->with('riskScore')
-            ->where('organization_id', $organization->id)
-            ->orderBy('last_name')
-            ->orderBy('first_name');
+            ->with(['riskScore', 'membershipPlan'])
+            ->where('organization_id', $organization->id);
 
         if ($search = $request->query('search')) {
             $query->where(function ($q) use ($search): void {
-                $q->where('first_name', 'like', "%$search%")
-                    ->orWhere('last_name', 'like', "%$search%")
-                    ->orWhere('status', 'like', "%$search%")
-                    ->orWhere('preferred_contact_channel', 'like', "%$search%");
+                $q->where('first_name', 'ilike', "%$search%")
+                    ->orWhere('last_name', 'ilike', "%$search%")
+                    ->orWhere('status', 'ilike', "%$search%")
+                    ->orWhere('preferred_contact_channel', 'ilike', "%$search%");
+
+                if (filter_var(strtolower($search), FILTER_VALIDATE_EMAIL)) {
+                    $q->orWhere('email_hash', hash('sha256', strtolower($search)));
+                }
+
+                $sanitized = preg_replace('/[^0-9+]/', '', $search);
+                if ($sanitized) {
+                    $q->orWhere('phone_hash', hash('sha256', $sanitized));
+                }
             });
         }
 
@@ -52,6 +65,32 @@ class MemberController extends Controller
             }
         }
 
+        switch ($sort) {
+            case 'status':
+                $query->orderBy('status', $direction)->orderBy('last_name')->orderBy('first_name');
+                break;
+            case 'joined_on':
+                $query->orderBy('joined_on', $direction)->orderBy('last_name')->orderBy('first_name');
+                break;
+            case 'plan':
+                $query->orderByRaw(
+                    "(select name from membership_plans where membership_plans.id = members.membership_plan_id) {$direction} nulls last"
+                )
+                    ->orderBy('last_name')
+                    ->orderBy('first_name');
+                break;
+            case 'risk':
+                $query->orderByRaw(
+                    "(select score from risk_scores where risk_scores.member_id = members.id) {$direction} nulls last"
+                )
+                    ->orderBy('last_name')
+                    ->orderBy('first_name');
+                break;
+            default:
+                $query->orderBy('last_name', $direction)->orderBy('first_name', $direction);
+                break;
+        }
+
         $members = $query->paginate($perPage);
 
         return response()->json($members);
@@ -64,7 +103,101 @@ class MemberController extends Controller
 
         $member->load(['riskScore', 'homeLocation', 'membershipPlan']);
 
-        return response()->json(['data' => $member]);
+        $payments = Payment::with('membershipPlan')
+            ->where('member_id', $member->id)
+            ->orderByDesc('due_on')
+            ->limit(20)
+            ->get();
+
+        $now = Carbon::now();
+
+        $upcomingSessions = Booking::with(['session.location'])
+            ->where('bookings.member_id', $member->id)
+            ->join('class_sessions', 'class_sessions.id', '=', 'bookings.class_session_id')
+            ->where('class_sessions.starts_at', '>=', $now)
+            ->orderBy('class_sessions.starts_at')
+            ->select('bookings.*')
+            ->limit(6)
+            ->get();
+
+        $recentSessions = Booking::with(['session.location'])
+            ->where('bookings.member_id', $member->id)
+            ->join('class_sessions', 'class_sessions.id', '=', 'bookings.class_session_id')
+            ->where('class_sessions.starts_at', '<', $now)
+            ->orderByDesc('class_sessions.starts_at')
+            ->select('bookings.*')
+            ->limit(6)
+            ->get();
+
+        $checkIns = CheckIn::with('location')
+            ->where('member_id', $member->id)
+            ->orderByDesc('checked_in_at')
+            ->limit(20)
+            ->get();
+
+        $totalCheckIns = CheckIn::where('member_id', $member->id)->count();
+        $lastCheckIn = optional($checkIns->first())->checked_in_at;
+        $startDate = $member->joined_on ?? $member->created_at ?? $now;
+        $startCarbon = $startDate instanceof Carbon ? $startDate : Carbon::parse($startDate);
+        $weeksActive = max(1, $startCarbon->diffInWeeks($now) ?: 1);
+        $avgPerWeek = round($totalCheckIns / $weeksActive, 1);
+        $lifetimeValue = Payment::where('member_id', $member->id)
+            ->where('status', 'paid')
+            ->sum('amount_cents');
+
+        $billing = [
+            'plan_name' => $member->membershipPlan?->name,
+            'amount_cents' => $member->membershipPlan?->price_cents,
+            'currency' => $member->membershipPlan?->currency ?? 'USD',
+            'interval' => $member->membershipPlan?->billing_interval ?? 'monthly',
+            'status' => optional($payments->first())->status,
+            'next_due_on' => optional($payments->first())->due_on,
+        ];
+
+        $insights = [
+            [
+                'label' => 'Engagement tier',
+                'value' => $avgPerWeek >= 3 ? 'Power user' : ($avgPerWeek >= 1.5 ? 'Steady' : 'At-risk'),
+                'detail' => sprintf(
+                    'Averages %.1f classes/week and last checked in %s.',
+                    $avgPerWeek,
+                    $lastCheckIn ? $lastCheckIn->diffForHumans($now, ['parts' => 1]) : 'N/A'
+                ),
+            ],
+            [
+                'label' => 'Billing health',
+                'value' => $billing['status'] ? ucfirst($billing['status']) : 'Unknown',
+                'detail' => $billing['next_due_on']
+                    ? 'Next renewal ' . Carbon::parse($billing['next_due_on'])->toFormattedDateString()
+                    : 'No upcoming invoice on file.',
+            ],
+            [
+                'label' => 'Suggested play',
+                'value' => $avgPerWeek >= 2 ? 'Reward loyalty' : 'Send reactivation cue',
+                'detail' => $avgPerWeek >= 2
+                    ? 'Offer a milestone perk at 12 visits (common in Trainerize/PushPress workflows).'
+                    : 'Automate a freeze-rescue SMS + coach follow-up (Mindbody-style).',
+            ],
+        ];
+
+        return response()->json([
+            'data' => [
+                'member' => $member,
+                'payments' => $payments,
+                'billing' => $billing,
+                'metrics' => [
+                    'lifetime_value_cents' => $lifetimeValue,
+                    'avg_classes_per_week' => $avgPerWeek,
+                    'total_check_ins' => $totalCheckIns,
+                    'last_check_in' => $lastCheckIn,
+                    'streak_days' => $lastCheckIn ? $lastCheckIn->diffInDays($now) : null,
+                ],
+                'upcoming_sessions' => $upcomingSessions,
+                'recent_sessions' => $recentSessions,
+                'check_ins' => $checkIns,
+                'insights' => $insights,
+            ],
+        ]);
     }
 
     public function updateConsents(Request $request, Member $member): JsonResponse

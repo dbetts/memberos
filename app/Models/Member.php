@@ -51,6 +51,18 @@ class Member extends Model
         'quiet_hours_override' => 'bool',
     ];
 
+    protected $hidden = [
+        'email_encrypted',
+        'email_hash',
+        'phone_encrypted',
+        'phone_hash',
+    ];
+
+    protected $appends = [
+        'email',
+        'phone',
+    ];
+
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
@@ -89,5 +101,31 @@ class Member extends Model
     public function checkIns(): HasMany
     {
         return $this->hasMany(CheckIn::class);
+    }
+
+    public function getEmailAttribute(): ?string
+    {
+        if (! $this->email_encrypted) {
+            return null;
+        }
+
+        try {
+            return decrypt($this->email_encrypted);
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    public function getPhoneAttribute(): ?string
+    {
+        if (! $this->phone_encrypted) {
+            return null;
+        }
+
+        try {
+            return decrypt($this->phone_encrypted);
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 }

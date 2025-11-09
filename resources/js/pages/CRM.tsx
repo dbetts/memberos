@@ -11,6 +11,7 @@ interface LeadRow {
   stage: string;
   source: string | null;
   updated_at: string;
+  actions: string;
 }
 
 type AnalyticsResponse = {
@@ -148,7 +149,7 @@ export default function CRM() {
         </div>
         {copied && <p className="mt-2 text-xs text-emerald-600">Copied! Paste it into your marketing pages.</p>}
       </Card>
-      <Card title="Add member manually" subtitle="One-off enrollments with optional portal login">
+      <Card title="Add member" subtitle="One-off enrollments with optional portal login">
         <form className="grid gap-4 md:grid-cols-2" onSubmit={handleMemberCreate}>
           <label className="text-sm">
             First name
@@ -220,8 +221,8 @@ export default function CRM() {
             <Button type="submit">Create member</Button>
             {memberSuccess && <span className="text-sm text-emerald-600">{memberSuccess}</span>}
           </div>
-        </form>
-      </Card>
+      </form>
+    </Card>
       {analytics && (
         <Card title="Funnel" subtitle="Lead quality & throughput">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

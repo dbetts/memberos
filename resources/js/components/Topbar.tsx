@@ -74,10 +74,10 @@ export default function Topbar({ user, userLoaded, impersonation }: TopbarProps)
               placeholder="Search members, classes, or automations"
             />
           </div>
-          <div className="hidden lg:flex items-center gap-2 text-xs text-slate-500">
+          {/*<div className="hidden lg:flex items-center gap-2 text-xs text-slate-500">
             Dark mode
             <Toggle checked={dark} onChange={setDark} />
-          </div>
+          </div>*/}
         </div>
         <div className="flex items-center gap-5">
           {impersonation?.active && (
