@@ -31,9 +31,6 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/master-control', \App\Http\Controllers\MasterDashboardController::class)->name('master.dashboard');
 });
 
-Route::middleware('auth')->prefix('api/v1')->group(function (): void {
-    Route::get('auth/me', [AuthenticatedUserController::class, 'show']);
-    Route::put('auth/me', [AuthenticatedUserController::class, 'update']);
-});
+require __DIR__.'/tenant.php';
 
 Route::fallback(fn () => view('app'));
