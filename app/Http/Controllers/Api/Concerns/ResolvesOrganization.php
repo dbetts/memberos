@@ -28,12 +28,6 @@ trait ResolvesOrganization
             }
         }
 
-        $organization = Organization::first();
-
-        if (! $organization) {
-            throw (new ModelNotFoundException())->setModel(Organization::class);
-        }
-
-        return $organization;
+        throw (new ModelNotFoundException())->setModel(Organization::class);
     }
 }
