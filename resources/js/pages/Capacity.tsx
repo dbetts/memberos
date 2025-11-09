@@ -3,7 +3,7 @@ import Card from "../components/Card";
 import Table from "../components/Table";
 import Badge from "../components/Badge";
 import { BarStat } from "../components/ChartCard";
-import { apiFetch } from "../api/client";
+import { apiFetch, isAbortError } from "../api/client";
 
 type SessionRow = {
   id: string;
@@ -25,26 +25,27 @@ export default function Capacity() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let active = true;
+    const controller = new AbortController();
 
     async function load() {
       try {
         setLoading(true);
-        const response = await apiFetch<{ data: SessionRow[] }>("/capacity/schedule?range=7d");
-        if (!active) return;
-        setSessions(response.data ?? []);
+        const response = await apiFetch<{ data: { sessions: SessionRow[] } }>("/capacity/overview?range=7d", {
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted) return;
+        setSessions(response.data.sessions ?? []);
+        setError(null);
       } catch (err) {
-        if (!active) return;
+        if (isAbortError(err) || controller.signal.aborted) return;
         setError(err instanceof Error ? err.message : "Failed to load schedule");
       } finally {
-        if (active) setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
 
     load();
-    return () => {
-      active = false;
-    };
+    return () => controller.abort();
   }, []);
 
   const fillData = useMemo(

@@ -4,7 +4,8 @@ import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import { routes } from "./routes";
 import type { BrandingSettings } from "./types/branding";
-import { apiFetch } from "./api/client";
+import { apiFetch, isAbortError } from "./api/client";
+import { BrandingProvider } from "./context/BrandingContext";
 
 export default function App() {
   const location = useLocation();
@@ -17,19 +18,26 @@ export default function App() {
   const [brandingLoaded, setBrandingLoaded] = useState(false);
 
   useEffect(() => {
+    if (isPublicRoute || brandingLoaded) return;
+
+    const controller = new AbortController();
+
     async function loadBranding() {
       try {
-        const response = await apiFetch<{ data: BrandingSettings }>("/organizations/branding");
+        const response = await apiFetch<{ data: BrandingSettings }>("/organizations/branding", {
+          signal: controller.signal,
+        });
         setBranding(response.data);
         setBrandingLoaded(true);
-      } catch {
+      } catch (error) {
+        if (isAbortError(error)) return;
         setBrandingLoaded(true);
       }
     }
 
-    if (!isPublicRoute && !brandingLoaded) {
-      loadBranding();
-    }
+    loadBranding();
+
+    return () => controller.abort();
   }, [isPublicRoute, brandingLoaded]);
 
   useEffect(() => {
@@ -59,18 +67,20 @@ export default function App() {
   }
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar branding={branding} />
-      <div className="flex flex-1 flex-col">
-        <Topbar branding={branding} />
-        <main className="flex-1 overflow-auto px-8 py-8">
-          <div className="mx-auto max-w-7xl space-y-6">
-            <Suspense fallback={<div className="text-slate-500">Loading…</div>}>
-              {renderedRoutes}
-            </Suspense>
-          </div>
-        </main>
+    <BrandingProvider value={{ branding, setBranding }}>
+      <div className="flex min-h-screen">
+        <Sidebar />
+        <div className="flex flex-1 flex-col">
+          <Topbar />
+          <main className="flex-1 overflow-auto px-8 py-8">
+            <div className="mx-auto max-w-7xl space-y-6">
+              <Suspense fallback={<div className="text-slate-500">Loading…</div>}>
+                {renderedRoutes}
+              </Suspense>
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </BrandingProvider>
   );
 }

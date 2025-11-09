@@ -3,7 +3,7 @@ import Card from "../components/Card";
 import Table from "../components/Table";
 import Badge from "../components/Badge";
 import Button from "../components/Button";
-import { apiFetch } from "../api/client";
+import { apiFetch, isAbortError } from "../api/client";
 
 interface RosterResponse {
   heatmap: Record<string, number>;
@@ -22,6 +22,11 @@ interface ClassTypeOption {
   name: string;
 }
 
+interface CoachOverview {
+  class_types: ClassTypeOption[];
+  roster: RosterResponse;
+}
+
 export default function Coach() {
   const [classTypes, setClassTypes] = useState<ClassTypeOption[]>([]);
   const [selectedClass, setSelectedClass] = useState<string>("");
@@ -35,31 +40,41 @@ export default function Coach() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function load() {
+    const controller = new AbortController();
+
+    async function load(classType = "") {
       try {
-        const [types, rosterRes] = await Promise.all([
-          apiFetch<{ data: ClassTypeOption[] }>("/admin/class-types"),
-          apiFetch<{ data: RosterResponse }>("/coach/roster"),
-        ]);
-        setClassTypes(types.data ?? []);
-        setRoster(rosterRes.data);
+        setLoading(true);
+        const endpoint = classType ? `/coach/overview?class_type=${encodeURIComponent(classType)}` : "/coach/overview";
+        const response = await apiFetch<{ data: CoachOverview }>(endpoint, {
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted) return;
+        setClassTypes(response.data.class_types ?? []);
+        setRoster(response.data.roster);
+        setSelectedMembers([]);
+        setError(null);
       } catch (err) {
+        if (isAbortError(err) || controller.signal.aborted) return;
         setError(err instanceof Error ? err.message : "Failed to load coach console");
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
     load();
+    return () => {
+      controller.abort();
+      setSelectedMembers([]);
+    };
   }, []);
 
   async function applyFilter(classType: string) {
     setSelectedClass(classType);
-    setLoading(true);
     try {
-      const rosterRes = await apiFetch<{ data: RosterResponse }>(
-        classType ? `/coach/roster?class_type=${classType}` : "/coach/roster"
-      );
-      setRoster(rosterRes.data);
+      setLoading(true);
+      const endpoint = classType ? `/coach/overview?class_type=${encodeURIComponent(classType)}` : "/coach/overview";
+      const response = await apiFetch<{ data: CoachOverview }>(endpoint);
+      setRoster(response.data.roster);
       setSelectedMembers([]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load roster");

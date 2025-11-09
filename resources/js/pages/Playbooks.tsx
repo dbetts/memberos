@@ -3,7 +3,7 @@ import Card from "../components/Card";
 import Table from "../components/Table";
 import Badge from "../components/Badge";
 import Button from "../components/Button";
-import { apiFetch } from "../api/client";
+import { apiFetch, isAbortError } from "../api/client";
 
 interface PlaybookRow {
   id: string;
@@ -22,6 +22,11 @@ interface TemplateRow {
   content_html?: string | null;
 }
 
+interface PlaybooksOverview {
+  playbooks: PlaybookRow[];
+  templates: TemplateRow[];
+}
+
 export default function Playbooks() {
   const [playbooks, setPlaybooks] = useState<PlaybookRow[]>([]);
   const [templates, setTemplates] = useState<TemplateRow[]>([]);
@@ -29,31 +34,28 @@ export default function Playbooks() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let active = true;
+    const controller = new AbortController();
 
     async function load() {
       try {
         setLoading(true);
-        const [playbookRes, templateRes] = await Promise.all([
-          apiFetch<{ data: PlaybookRow[] }>("/playbooks"),
-          apiFetch<{ data: TemplateRow[] }>("/templates"),
-        ]);
-
-        if (!active) return;
-        setPlaybooks(playbookRes.data ?? []);
-        setTemplates(templateRes.data ?? []);
+        const response = await apiFetch<{ data: PlaybooksOverview }>("/playbooks/overview", {
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted) return;
+        setPlaybooks(response.data.playbooks ?? []);
+        setTemplates(response.data.templates ?? []);
+        setError(null);
       } catch (err) {
-        if (!active) return;
+        if (isAbortError(err) || controller.signal.aborted) return;
         setError(err instanceof Error ? err.message : "Failed to load playbooks");
       } finally {
-        if (active) setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
 
     load();
-    return () => {
-      active = false;
-    };
+    return () => controller.abort();
   }, []);
 
   return (

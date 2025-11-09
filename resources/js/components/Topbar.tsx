@@ -2,15 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Bell, Search, LogOut, User } from "lucide-react";
 import Toggle from "./Toggle";
-import type { BrandingSettings } from "../types/branding";
-import { apiFetch } from "../api/client";
+import { apiFetch, isAbortError } from "../api/client";
+import { useBranding } from "../context/BrandingContext";
 
 type AuthenticatedUser = {
   name: string;
   email: string;
+  organization_id?: string | null;
 };
 
-export default function Topbar({ branding }: { branding?: BrandingSettings | null }) {
+export default function Topbar() {
+  const { branding } = useBranding();
   const [dark, setDark] = useState(false);
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -23,9 +25,21 @@ export default function Topbar({ branding }: { branding?: BrandingSettings | nul
   }, [dark]);
 
   useEffect(() => {
-    apiFetch<{ data: AuthenticatedUser }>("/auth/me")
-      .then((response) => setUser(response.data))
-      .catch(() => setUser(null));
+    const controller = new AbortController();
+
+    apiFetch<{ data: AuthenticatedUser }>("/auth/me", { signal: controller.signal })
+      .then((response) => {
+        setUser(response.data);
+        if (response.data.organization_id) {
+          localStorage.setItem("fitflow.orgId", response.data.organization_id);
+        }
+      })
+      .catch((error) => {
+        if (isAbortError(error)) return;
+        setUser(null);
+      });
+
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {

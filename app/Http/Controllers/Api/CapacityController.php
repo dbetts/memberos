@@ -26,10 +26,23 @@ class CapacityController extends Controller
     public function schedule(Request $request): JsonResponse
     {
         $organization = $this->resolveOrganization($request);
-        $range = $request->query('range', '3d');
+        $range = $request->query('range', '7d');
         $data = $this->capacityService->schedule($organization, $range);
 
         return response()->json(['data' => $data]);
+    }
+
+    public function overview(Request $request): JsonResponse
+    {
+        $organization = $this->resolveOrganization($request);
+        $range = $request->query('range', '7d');
+        $sessions = $this->capacityService->schedule($organization, $range);
+
+        return response()->json([
+            'data' => [
+                'sessions' => $sessions,
+            ],
+        ]);
     }
 
     public function confirmBooking(Request $request, Booking $booking): JsonResponse

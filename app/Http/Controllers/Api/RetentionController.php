@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\Concerns\ResolvesOrganization;
 use App\Http\Controllers\Controller;
+use App\Models\FreezeRequest;
 use App\Models\Member;
 use App\Models\Playbook;
 use App\Services\Retention\RetentionSettingsService;
@@ -32,6 +33,50 @@ class RetentionController extends Controller
 
         return response()->json([
             'data' => $heatmap,
+        ]);
+    }
+
+    public function overview(Request $request): JsonResponse
+    {
+        $organization = $this->resolveOrganization($request);
+        $limit = (int) $request->query('limit', 10);
+
+        $heatmap = $this->riskScoringService->buildHeatmap($organization);
+
+        $roster = $this->riskScoringService->fetchAtRiskMembers($organization, $limit)
+            ->map(function ($riskScore) {
+                $member = $riskScore->member;
+
+                return [
+                    'member_id' => $riskScore->member_id,
+                    'score' => $riskScore->score,
+                    'reasons' => $riskScore->reasons,
+                    'member' => [
+                        'name' => $member ? trim($member->first_name . ' ' . $member->last_name) : '',
+                        'status' => $member->status ?? 'unknown',
+                        'last_check_in_days' => $member ? $this->resolveDaysSinceLastCheckIn($member) : null,
+                    ],
+                ];
+            });
+
+        $playbooks = Playbook::where('organization_id', $organization->id)
+            ->orderByDesc('created_at')
+            ->limit(20)
+            ->get();
+
+        $freezeRequests = FreezeRequest::with('member')
+            ->where('organization_id', $organization->id)
+            ->orderByDesc('requested_on')
+            ->limit(50)
+            ->get();
+
+        return response()->json([
+            'data' => [
+                'heatmap' => $heatmap,
+                'at_risk' => $roster,
+                'playbooks' => $playbooks,
+                'freeze_requests' => $freezeRequests,
+            ],
         ]);
     }
 

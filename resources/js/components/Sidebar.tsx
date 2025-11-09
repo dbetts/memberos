@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import clsx from "clsx";
 import { Gauge, Users, CalendarCheck, Bot, Settings, LineChart, Target } from "lucide-react";
 import BrandMark from "./BrandMark";
-import type { BrandingSettings } from "../types/branding";
+import { useBranding } from "../context/BrandingContext";
 
 const items = [
   { to: "/", icon: LineChart, label: "Dashboard" },
@@ -14,7 +14,8 @@ const items = [
   { to: "/settings", icon: Settings, label: "Settings" },
 ];
 
-export default function Sidebar({ branding }: { branding?: BrandingSettings | null }) {
+export default function Sidebar() {
+  const { branding } = useBranding();
   const primary = branding?.primary_color ?? "#050b27";
   const accent = branding?.accent_color ?? "#091643";
 

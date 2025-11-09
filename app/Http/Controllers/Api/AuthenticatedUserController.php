@@ -72,6 +72,7 @@ class AuthenticatedUserController extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'phone' => $user->phone,
+            'organization_id' => $user->organization_id,
             'address' => [
                 'line1' => $address['line1'] ?? '',
                 'line2' => $address['line2'] ?? '',

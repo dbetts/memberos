@@ -10,6 +10,9 @@ use App\Http\Controllers\Api\CommunicationComplianceController;
 use App\Http\Controllers\Api\CommunicationPolicyController;
 use App\Http\Controllers\Api\CrmAnalyticsController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\CrmOverviewController;
+use App\Http\Controllers\Api\CoachOverviewController;
+use App\Http\Controllers\Api\PlaybooksOverviewController;
 use App\Http\Controllers\Api\FreezeRequestController;
 use App\Http\Controllers\Api\GraphqlController;
 use App\Http\Controllers\Api\IdentityReviewController;
@@ -28,6 +31,7 @@ use App\Http\Controllers\Api\RetentionController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\StaffProfileController;
 use App\Http\Controllers\Api\AuthenticatedUserController;
+use App\Http\Controllers\Api\SettingsOverviewController;
 
 Route::middleware(['auth'])->prefix('api/v1')->group(function (): void {
     Route::get('auth/me', [AuthenticatedUserController::class, 'show']);
@@ -35,6 +39,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function (): void {
 
     Route::get('dashboard/kpis', [DashboardController::class, 'index']);
     Route::get('dashboard/filters', [DashboardController::class, 'filters']);
+    Route::get('dashboard/overview', [DashboardController::class, 'overview']);
 
     Route::get('members', [MemberController::class, 'index']);
     Route::get('members/{member}', [MemberController::class, 'show']);
@@ -51,6 +56,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function (): void {
 
     Route::get('retention/heatmap', [RetentionController::class, 'heatmap']);
     Route::get('retention/at-risk', [RetentionController::class, 'atRiskRoster']);
+    Route::get('retention/overview', [RetentionController::class, 'overview']);
     Route::post('retention/recalculate', [RetentionController::class, 'recalculate']);
     Route::get('retention/settings', [RetentionController::class, 'showSettings']);
     Route::put('retention/settings', [RetentionController::class, 'updateSettings']);
@@ -60,6 +66,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function (): void {
     Route::post('retention/members/{member}/freeze-requests', [FreezeRequestController::class, 'store']);
     Route::put('retention/freeze-requests/{freezeRequest}', [FreezeRequestController::class, 'update']);
 
+    Route::get('playbooks/overview', PlaybooksOverviewController::class);
     Route::apiResource('playbooks', PlaybookController::class);
     Route::post('playbooks/{playbook}/activate', [PlaybookController::class, 'activate']);
     Route::post('playbooks/{playbook}/pause', [PlaybookController::class, 'pause']);
@@ -89,6 +96,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function (): void {
     Route::delete('security/mfa/methods/{method}', [MfaPreferenceController::class, 'destroyMethod']);
 
     Route::get('capacity/schedule', [CapacityController::class, 'schedule']);
+    Route::get('capacity/overview', [CapacityController::class, 'overview']);
     Route::post('capacity/bookings/{booking}/confirm', [CapacityController::class, 'confirmBooking']);
     Route::post('capacity/waitlist/backfill', [CapacityController::class, 'backfill']);
 
@@ -99,6 +107,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function (): void {
     Route::put('crm/tasks/{task}', [LeadTaskController::class, 'update']);
     Route::post('crm/leads/{lead}/convert', LeadConversionController::class);
     Route::get('crm/analytics', CrmAnalyticsController::class);
+    Route::get('crm/overview', CrmOverviewController::class);
 
     Route::get('admin/locations', [AdminLocationController::class, 'index']);
     Route::put('admin/locations/{location}', [AdminLocationController::class, 'update']);
@@ -113,6 +122,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function (): void {
     Route::get('coach/roster', [CoachController::class, 'roster']);
     Route::post('coach/nudges', [CoachController::class, 'nudge']);
     Route::post('coach/members/{member}/outcomes', [CoachController::class, 'storeOutcome']);
+    Route::get('coach/overview', CoachOverviewController::class);
 
     Route::get('observability/events', [ObservabilityController::class, 'events']);
     Route::post('observability/events', [ObservabilityController::class, 'storeEvent']);
@@ -126,4 +136,6 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function (): void {
     Route::post('compliance/sms', [CommunicationComplianceController::class, 'storeSmsRegistration']);
 
     Route::post('graphql', GraphqlController::class);
+
+    Route::get('settings/overview', SettingsOverviewController::class);
 });

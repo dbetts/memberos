@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import Card from "../components/Card";
 import Table from "../components/Table";
 import Button from "../components/Button";
-import { apiFetch } from "../api/client";
+import { apiFetch, isAbortError } from "../api/client";
 
 interface LeadRow {
   id: string;
@@ -47,28 +47,26 @@ export default function CRM() {
       : "/public/leads";
 
   useEffect(() => {
-    let active = true;
+    const controller = new AbortController();
     async function load() {
       try {
         setLoading(true);
-        const [leadRes, analyticsRes] = await Promise.all([
-          apiFetch<{ data: LeadRow[] }>("/crm/leads"),
-          apiFetch<{ data: AnalyticsResponse }>("/crm/analytics"),
-        ]);
-        if (!active) return;
-        setLeads(leadRes.data ?? []);
-        setAnalytics(analyticsRes.data ?? null);
+        const response = await apiFetch<{ data: { leads: LeadRow[]; analytics: AnalyticsResponse } }>("/crm/overview", {
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted) return;
+        setLeads(response.data.leads ?? []);
+        setAnalytics(response.data.analytics ?? null);
+        setError(null);
       } catch (err) {
-        if (!active) return;
+        if (isAbortError(err) || controller.signal.aborted) return;
         setError(err instanceof Error ? err.message : "Failed to load leads");
       } finally {
-        if (active) setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
     load();
-    return () => {
-      active = false;
-    };
+    return () => controller.abort();
   }, []);
 
   async function convertLead(id: string) {

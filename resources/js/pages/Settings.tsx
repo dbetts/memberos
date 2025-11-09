@@ -4,8 +4,9 @@ import Button from "../components/Button";
 import Toggle from "../components/Toggle";
 import Table from "../components/Table";
 import Badge from "../components/Badge";
-import { apiFetch } from "../api/client";
+import { apiFetch, isAbortError } from "../api/client";
 import type { BrandingSettings } from "../types/branding";
+import { useBranding } from "../context/BrandingContext";
 
 interface IntegrationRow {
   id: string;
@@ -95,6 +96,21 @@ type SmsRegistration = {
   status: string;
 };
 
+type SettingsOverview = {
+  organization_id: string;
+  integrations: IntegrationRow[];
+  policy: CommunicationPolicy | null;
+  mfa: MfaPreferences | null;
+  locations: AdminLocation[];
+  class_types: ClassType[];
+  staff: StaffProfile[];
+  events: ObservabilityEvent[];
+  release_notes: ReleaseNote[];
+  slo: SloMetrics | null;
+  domains: CommunicationDomain[];
+  sms_registrations: SmsRegistration[];
+};
+
 const sampleImportPayload = {
   locations: [
     {
@@ -127,6 +143,7 @@ const sampleImportPayload = {
 };
 
 export default function Settings() {
+  const { branding, setBranding } = useBranding();
   const [integrations, setIntegrations] = useState<IntegrationRow[]>([]);
   const [policy, setPolicy] = useState<CommunicationPolicy | null>(null);
   const [mfa, setMfa] = useState<MfaPreferences | null>(null);
@@ -152,7 +169,6 @@ export default function Settings() {
   const [domainForm, setDomainForm] = useState({ domain: "", spf_record: "", dkim_selector: "", dkim_value: "" });
   const [smsRegistrations, setSmsRegistrations] = useState<SmsRegistration[]>([]);
   const [smsForm, setSmsForm] = useState({ brand_name: "", campaign_name: "" });
-  const [brandingSettings, setBrandingSettings] = useState<BrandingSettings | null>(null);
   const [brandingForm, setBrandingForm] = useState({
     name: "",
     support_email: "",
@@ -182,102 +198,78 @@ export default function Settings() {
   const [importError, setImportError] = useState<string | null>(null);
 
   useEffect(() => {
-    let active = true;
-
+    const controller = new AbortController();
     async function load() {
       try {
         setLoading(true);
-        const [
-          integrationRes,
-          policyRes,
-          mfaRes,
-          locationsRes,
-          classTypesRes,
-          staffRes,
-          eventsRes,
-          notesRes,
-          sloRes,
-          domainsRes,
-          smsRes,
-          brandingRes,
-        ] = await Promise.all([
-          apiFetch<{ data: IntegrationRow[] }>("/integrations"),
-          apiFetch<{ data: CommunicationPolicy }>("/communications/policy"),
-          apiFetch<{ data: MfaPreferences }>("/security/mfa/preferences"),
-          apiFetch<{ data: AdminLocation[] }>("/admin/locations"),
-          apiFetch<{ data: ClassType[] }>("/admin/class-types"),
-          apiFetch<{ data: StaffProfile[] }>("/admin/staff"),
-          apiFetch<{ data: ObservabilityEvent[] }>("/observability/events"),
-          apiFetch<{ data: ReleaseNote[] }>("/observability/release-notes"),
-          apiFetch<{ data: SloMetrics }>("/observability/slo"),
-          apiFetch<{ data: CommunicationDomain[] }>("/compliance/domains"),
-          apiFetch<{ data: SmsRegistration[] }>("/compliance/sms"),
-          apiFetch<{ data: BrandingSettings }>("/organizations/branding"),
-        ]);
-
-        if (!active) return;
-        setIntegrations(integrationRes.data ?? []);
-        setPolicy(policyRes.data ?? null);
-        setMfa(mfaRes.data ?? null);
-        const policyData = policyRes.data ?? null;
-        setStopKeywords(policyData?.enforce_stop_keywords ?? true);
-        if (policyData) {
-          setQuietStart(policyData.quiet_hours_start);
-          setQuietEnd(policyData.quiet_hours_end);
-          setDailyCap(policyData.default_daily_cap);
-          setWeeklyCap(policyData.default_weekly_cap);
-          setTimezoneStrategy(policyData.timezone_strategy);
+        setError(null);
+        const response = await apiFetch<{ data: SettingsOverview }>("/settings/overview", {
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted) return;
+        const data = response.data;
+        if (data.organization_id) {
+          localStorage.setItem("fitflow.orgId", data.organization_id);
         }
-        const adminLocations = (locationsRes.data ?? []).map((loc) => ({
+        setIntegrations(data.integrations ?? []);
+        setPolicy(data.policy ?? null);
+        setMfa(data.mfa ?? null);
+        if (data.policy) {
+          setStopKeywords(data.policy.enforce_stop_keywords ?? true);
+          setQuietStart(data.policy.quiet_hours_start);
+          setQuietEnd(data.policy.quiet_hours_end);
+          setDailyCap(data.policy.default_daily_cap);
+          setWeeklyCap(data.policy.default_weekly_cap);
+          setTimezoneStrategy(data.policy.timezone_strategy);
+        }
+        const adminLocations = (data.locations ?? []).map((loc) => ({
           ...loc,
           hoursText: JSON.stringify(loc.hours ?? { mon: "06:00-20:00" }, null, 2),
           depositText: JSON.stringify(loc.deposit_policy ?? { amount: 0 }, null, 2),
         }));
         setLocationsAdmin(adminLocations);
-        setClassTypes(classTypesRes.data ?? []);
-        setStaffProfiles(staffRes.data ?? []);
-        setEvents(eventsRes.data ?? []);
-        setNotes(notesRes.data ?? []);
-        setSlo(sloRes.data ?? null);
-        setDomains(domainsRes.data ?? []);
-        setSmsRegistrations(smsRes.data ?? []);
-        const brand = brandingRes.data ?? null;
-        setBrandingSettings(brand);
-        if (brand) {
-          setBrandingForm({
-            name: brand.name ?? "",
-            support_email: brand.support_email ?? "",
-            primary_color: brand.primary_color ?? "#4b79ff",
-            accent_color: brand.accent_color ?? "#2f63ff",
-          });
-          setDomainSettings({
-            subdomain: brand.subdomain ?? "",
-            custom_domain: brand.custom_domain ?? "",
-          });
-          setSmtpForm((prev) => ({
-            ...prev,
-            host: brand.smtp?.host ?? "",
-            port: brand.smtp?.port ?? 587,
-            username: brand.smtp?.username ?? "",
-            encryption: brand.smtp?.encryption ?? "tls",
-            from_email: brand.smtp?.from_email ?? brand.support_email ?? "",
-            from_name: brand.smtp?.from_name ?? brand.name ?? "",
-            password: "",
-          }));
-        }
+        setClassTypes(data.class_types ?? []);
+        setStaffProfiles(data.staff ?? []);
+        setEvents(data.events ?? []);
+        setNotes(data.release_notes ?? []);
+        setSlo(data.slo ?? null);
+        setDomains(data.domains ?? []);
+        setSmsRegistrations(data.sms_registrations ?? []);
       } catch (err) {
-        if (!active) return;
+        if (isAbortError(err) || controller.signal.aborted) return;
         setError(err instanceof Error ? err.message : "Failed to load settings");
       } finally {
-        if (active) setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
-
     load();
-    return () => {
-      active = false;
-    };
+    return () => controller.abort();
   }, []);
+
+  useEffect(() => {
+    if (branding) {
+      setBrandingForm({
+        name: branding.name ?? "",
+        support_email: branding.support_email ?? "",
+        primary_color: branding.primary_color ?? "#4b79ff",
+        accent_color: branding.accent_color ?? "#2f63ff",
+      });
+      setDomainSettings({
+        subdomain: branding.subdomain ?? "",
+        custom_domain: branding.custom_domain ?? "",
+      });
+      setSmtpForm((prev) => ({
+        ...prev,
+        host: branding.smtp?.host ?? "",
+        port: branding.smtp?.port ?? 587,
+        username: branding.smtp?.username ?? "",
+        encryption: branding.smtp?.encryption ?? "tls",
+        from_email: branding.smtp?.from_email ?? branding.support_email ?? "",
+        from_name: branding.smtp?.from_name ?? branding.name ?? "",
+        password: "",
+      }));
+    }
+  }, [branding]);
 
   async function saveBrandingSettings(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -287,7 +279,7 @@ export default function Settings() {
         method: "PUT",
         body: JSON.stringify(brandingForm),
       });
-      setBrandingSettings(response.data);
+      setBranding(response.data);
       setBrandingNotice("Branding updated.");
     } catch (err) {
       setBrandingNotice(err instanceof Error ? err.message : "Unable to update branding.");
@@ -532,8 +524,8 @@ export default function Settings() {
         <div className="mt-6 border-t border-slate-100 pt-4">
           <p className="text-sm font-semibold text-slate-700">Logo</p>
           <div className="mt-3 flex flex-wrap items-center gap-4">
-            {brandingSettings?.logo_url && (
-              <img src={brandingSettings.logo_url} alt="Brand logo" className="h-16 w-16 rounded-2xl border border-slate-200 bg-white object-contain" />
+            {branding?.logo_url && (
+              <img src={branding.logo_url} alt="Brand logo" className="h-16 w-16 rounded-2xl border border-slate-200 bg-white object-contain" />
             )}
             <label className="text-sm font-medium text-brand-600 cursor-pointer">
               <input type="file" className="hidden" accept="image/*" onChange={handleLogoChange} disabled={logoUploading} />
@@ -610,7 +602,7 @@ export default function Settings() {
                 className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
                 value={smtpForm.password}
                 onChange={(event) => setSmtpForm((prev) => ({ ...prev, password: event.target.value }))}
-                placeholder={brandingSettings?.smtp?.has_password ? "••••••••" : ""}
+                placeholder={branding?.smtp?.has_password ? "••••••••" : ""}
               />
             </label>
             <label className="text-sm">

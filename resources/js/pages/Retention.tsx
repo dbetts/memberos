@@ -4,7 +4,7 @@ import Table from "../components/Table";
 import Badge from "../components/Badge";
 import Modal from "../components/Modal";
 import Button from "../components/Button";
-import { apiFetch } from "../api/client";
+import { apiFetch, isAbortError } from "../api/client";
 
 type HeatmapResponse = { low: number; medium: number; high: number; critical: number };
 type RosterRow = {
@@ -34,6 +34,13 @@ type FreezeRequest = {
   reason?: string | null;
 };
 
+type RetentionOverview = {
+  heatmap: HeatmapResponse;
+  at_risk: RosterRow[];
+  playbooks: PlaybookRow[];
+  freeze_requests: FreezeRequest[];
+};
+
 const defaultHeatmap: HeatmapResponse = { low: 0, medium: 0, high: 0, critical: 0 };
 
 export default function Retention() {
@@ -54,35 +61,30 @@ export default function Retention() {
   const [winBackCount, setWinBackCount] = useState<number | null>(null);
 
   useEffect(() => {
-    let active = true;
+    const controller = new AbortController();
 
     async function load() {
       try {
         setLoading(true);
-        const [heatmapRes, rosterRes, playbookRes, freezeRes] = await Promise.all([
-          apiFetch<{ data: HeatmapResponse }>("/retention/heatmap"),
-          apiFetch<{ data: RosterRow[] }>("/retention/at-risk?limit=10"),
-          apiFetch<{ data: PlaybookRow[] }>("/playbooks"),
-          apiFetch<{ data: FreezeRequest[] }>("/retention/freeze-requests"),
-        ]);
-
-        if (!active) return;
-        setHeatmap(heatmapRes.data ?? defaultHeatmap);
-        setRoster(rosterRes.data ?? []);
-        setPlaybooks(playbookRes.data ?? []);
-        setFreezeRequests(freezeRes.data ?? []);
+        const response = await apiFetch<{ data: RetentionOverview }>("/retention/overview", {
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted) return;
+        setHeatmap(response.data.heatmap ?? defaultHeatmap);
+        setRoster(response.data.at_risk ?? []);
+        setPlaybooks(response.data.playbooks ?? []);
+        setFreezeRequests(response.data.freeze_requests ?? []);
+        setError(null);
       } catch (err) {
-        if (!active) return;
+        if (isAbortError(err) || controller.signal.aborted) return;
         setError(err instanceof Error ? err.message : "Failed to load retention data");
       } finally {
-        if (active) setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
 
     load();
-    return () => {
-      active = false;
-    };
+    return () => controller.abort();
   }, []);
 
   const riskBand = useMemo(
@@ -142,8 +144,8 @@ export default function Retention() {
       });
       setFreezeMemberId("");
       setFreezeReason("");
-      const freezeRes = await apiFetch<{ data: FreezeRequest[] }>("/retention/freeze-requests");
-      setFreezeRequests(freezeRes.data ?? []);
+      const overview = await apiFetch<{ data: RetentionOverview }>("/retention/overview");
+      setFreezeRequests(overview.data.freeze_requests ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to log freeze request");
     }

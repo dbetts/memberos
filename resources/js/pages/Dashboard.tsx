@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Info } from "lucide-react";
 import Card from "../components/Card";
 import Badge from "../components/Badge";
 import Table from "../components/Table";
 import Button from "../components/Button";
 import { LineStat } from "../components/ChartCard";
-import { apiFetch } from "../api/client";
+import { apiFetch, isAbortError } from "../api/client";
 import { retentionSeries, classes } from "../data/mock";
 
 export type DashboardMetric = { key: string; label: string; value: string; delta?: string; good?: boolean };
@@ -29,6 +29,12 @@ type FilterOptions = {
   join_months: string[];
 };
 
+type DashboardOverview = {
+  filters: FilterOptions;
+  kpis: DashboardMetric[];
+  at_risk: AtRiskRow[];
+};
+
 export default function Dashboard() {
   const [metrics, setMetrics] = useState<DashboardMetric[]>([]);
   const [atRisk, setAtRisk] = useState<AtRiskRow[]>([]);
@@ -44,61 +50,36 @@ export default function Dashboard() {
     join_month: "",
   });
 
-  const loadMetrics = useCallback(async () => {
-    const params = new URLSearchParams();
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) params.append(key, value);
-    });
-
-    const query = params.toString() ? `?${params.toString()}` : "";
-    const [kpiResponse, riskResponse] = await Promise.all([
-      apiFetch<{ data: DashboardMetric[] }>(`/dashboard/kpis${query}`),
-      apiFetch<{ data: AtRiskRow[] }>("/retention/at-risk?limit=8"),
-    ]);
-    setMetrics(kpiResponse.data);
-    setAtRisk(riskResponse.data);
-  }, [filters]);
-
   useEffect(() => {
-    let active = true;
+    const controller = new AbortController();
 
     async function load() {
       try {
-        const filterRes = await apiFetch<{ data: FilterOptions }>("/dashboard/filters");
-        if (active) setFilterOptions(filterRes.data);
+        setLoading(true);
+        const params = new URLSearchParams();
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value) params.append(key, value);
+        });
+        const query = params.toString() ? `?${params.toString()}` : "";
+        const response = await apiFetch<{ data: DashboardOverview }>(`/dashboard/overview${query}`, {
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted) return;
+        setFilterOptions(response.data.filters);
+        setMetrics(response.data.kpis ?? []);
+        setAtRisk(response.data.at_risk ?? []);
+        setError(null);
       } catch (err) {
-        if (!active) return;
+        if (isAbortError(err) || controller.signal.aborted) return;
         setError(err instanceof Error ? err.message : "Failed to load dashboard");
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
 
     load();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let active = true;
-
-    async function run() {
-      try {
-        setLoading(true);
-        await loadMetrics();
-        if (active) setError(null);
-      } catch (err) {
-        if (!active) return;
-        setError(err instanceof Error ? err.message : "Failed to load dashboard");
-      } finally {
-        if (active) setLoading(false);
-      }
-    }
-
-    run();
-    return () => {
-      active = false;
-    };
-  }, [loadMetrics]);
+    return () => controller.abort();
+  }, [filters]);
 
   const resolveRiskBand = useMemo(
     () => (score: number) => {

@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import Card from "../components/Card";
 import Button from "../components/Button";
-import { apiFetch } from "../api/client";
+import { apiFetch, isAbortError } from "../api/client";
 
 type ProfilePayload = {
   name: string;
@@ -31,16 +31,21 @@ export default function Profile() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let active = true;
-    apiFetch<{ data: ProfilePayload }>("/auth/me")
+    const controller = new AbortController();
+    apiFetch<{ data: ProfilePayload }>("/auth/me", { signal: controller.signal })
       .then((response) => {
-        if (!active) return;
+        if (controller.signal.aborted) return;
         setForm(response.data);
       })
-      .catch(() => setError("Unable to load profile."))
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (isAbortError(err) || controller.signal.aborted) return;
+        setError("Unable to load profile.");
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
     return () => {
-      active = false;
+      controller.abort();
     };
   }, []);
 
