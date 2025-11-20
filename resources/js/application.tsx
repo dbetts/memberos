@@ -7,6 +7,8 @@ import type { BrandingSettings } from "./types/branding";
 import { apiFetch, isAbortError } from "./api/client";
 import { BrandingProvider } from "./context/BrandingContext";
 import type { AuthenticatedUser, ImpersonationState } from "./types/auth";
+import { initialBranding } from "./branding-bootstrap";
+import { readBootstrapData } from "./bootstrap-data";
 
 export default function App() {
   const location = useLocation();
@@ -15,11 +17,15 @@ export default function App() {
     () => publicPrefixes.some((prefix) => location.pathname.startsWith(prefix)),
     [location.pathname]
   );
-  const [branding, setBranding] = useState<BrandingSettings | null>(null);
-  const [brandingLoaded, setBrandingLoaded] = useState(false);
-  const [user, setUser] = useState<AuthenticatedUser | null>(null);
-  const [userLoaded, setUserLoaded] = useState(false);
-  const [impersonation, setImpersonation] = useState<ImpersonationState | null>(null);
+  const bootstrap = readBootstrapData();
+  const bootstrapBranding = bootstrap?.branding ?? initialBranding();
+  const [branding, setBranding] = useState<BrandingSettings | null>(() => bootstrapBranding);
+  const [brandingLoaded, setBrandingLoaded] = useState(() => bootstrapBranding !== null);
+  const [user, setUser] = useState<AuthenticatedUser | null>(() => bootstrap?.user ?? null);
+  const [userLoaded, setUserLoaded] = useState(() => Boolean(bootstrap?.user));
+  const [impersonation, setImpersonation] = useState<ImpersonationState | null>(
+    () => bootstrap?.impersonation ?? null
+  );
 
   useEffect(() => {
     if (isPublicRoute) return;
@@ -44,11 +50,6 @@ export default function App() {
         setUser(response.data.user);
         setBranding(response.data.branding ?? null);
         setImpersonation(response.data.impersonation ?? null);
-        if (response.data.user?.organization_id) {
-          localStorage.setItem("fitflow.orgId", response.data.user.organization_id);
-        } else {
-          localStorage.removeItem("fitflow.orgId");
-        }
       } catch (error) {
         if (isAbortError(error) || controller.signal.aborted) return;
       } finally {
@@ -63,6 +64,14 @@ export default function App() {
 
     return () => controller.abort();
   }, [isPublicRoute]);
+
+  useEffect(() => {
+    if (user?.organization_id) {
+      localStorage.setItem("fitflow.orgId", user.organization_id);
+    } else {
+      localStorage.removeItem("fitflow.orgId");
+    }
+  }, [user?.organization_id]);
 
   useEffect(() => {
     if (branding?.primary_color) {

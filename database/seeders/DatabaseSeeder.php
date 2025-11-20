@@ -22,6 +22,7 @@ use App\Models\User;
 use App\Models\WaitlistEntry;
 use App\Services\Security\RoleService;
 use Carbon\CarbonImmutable;
+use Database\Seeders\WorkoutProgramSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -383,6 +384,10 @@ class DatabaseSeeder extends Seeder
             'primary_template_id' => $winbackTemplate->id,
         ]);
 
-        $this->call(MasterAccountsSeeder::class);
+        $this->call([
+            MasterAccountsSeeder::class,
+            ExerciseCsvSeeder::class,
+            WorkoutProgramSeeder::class,
+        ]);
     }
 }

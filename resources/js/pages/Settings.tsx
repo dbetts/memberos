@@ -297,7 +297,7 @@ export default function Settings() {
         method: "POST",
         body: formData,
       });
-      setBrandingSettings(response.data);
+      setBranding(response.data);
     } catch (err) {
       setBrandingNotice(err instanceof Error ? err.message : "Logo upload failed.");
     } finally {
@@ -314,7 +314,7 @@ export default function Settings() {
         method: "PUT",
         body: JSON.stringify(domainSettings),
       });
-      setBrandingSettings(response.data);
+      setBranding(response.data);
       setDomainNotice("Domain preferences saved.");
     } catch (err) {
       setDomainNotice(err instanceof Error ? err.message : "Unable to save domain preferences.");
@@ -329,7 +329,7 @@ export default function Settings() {
         method: "PUT",
         body: JSON.stringify(smtpForm),
       });
-      setBrandingSettings(response.data);
+      setBranding(response.data);
       setSmtpNotice("SMTP settings updated.");
       setSmtpForm((prev) => ({ ...prev, password: "" }));
     } catch (err) {

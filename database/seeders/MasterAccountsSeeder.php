@@ -16,9 +16,9 @@ class MasterAccountsSeeder extends Seeder
 {
     public function run(): void
     {
-        $masterPassword = env('MASTER_CONTROL_PASSWORD', 'MasterControl#2024!');
-        $ownerPassword = env('OWNER_PORTAL_PASSWORD', 'OwnerPortal#2024!');
-        $memberPassword = env('MEMBER_PORTAL_PASSWORD', 'MemberPortal#2024!');
+        $masterPassword = env('MASTER_CONTROL_PASSWORD', 'enclosed');
+        $ownerPassword = env('OWNER_PORTAL_PASSWORD', 'enclosed');
+        $memberPassword = env('MEMBER_PORTAL_PASSWORD', 'enclosed');
 
         $organization = Organization::firstOrCreate(
             ['slug' => 'blueaxis-demo'],

@@ -24,7 +24,12 @@ class LatencyMonitor
 
         $organizationId = null;
         if (Schema::hasTable('organizations')) {
-            $organizationId = $request->header('X-Organization-Id') ?? Organization::value('id');
+            $candidate = $request->header('X-Organization-Id');
+            if ($candidate && Organization::whereKey($candidate)->exists()) {
+                $organizationId = $candidate;
+            } else {
+                $organizationId = Organization::value('id');
+            }
         }
 
         if ($organizationId && $request->method() === 'GET' && Schema::hasTable('performance_samples')) {

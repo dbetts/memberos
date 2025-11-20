@@ -1,42 +1,49 @@
 {
-  "_Badge-Ct2h2tLc.js": {
-    "file": "assets/Badge-Ct2h2tLc.js",
+  "_Badge-BoFgYBhh.js": {
+    "file": "assets/Badge-BoFgYBhh.js",
     "name": "Badge",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_Button-BWIka2oa.js": {
-    "file": "assets/Button-BWIka2oa.js",
+  "_Button-B8xAM9d-.js": {
+    "file": "assets/Button-B8xAM9d-.js",
     "name": "Button",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_Card-DFoN1MQX.js": {
-    "file": "assets/Card-DFoN1MQX.js",
+  "_Card-BFdNOff2.js": {
+    "file": "assets/Card-BFdNOff2.js",
     "name": "Card",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_ChartCard-CdTB5MOJ.js": {
-    "file": "assets/ChartCard-CdTB5MOJ.js",
+  "_ChartCard-CNemb98Y.js": {
+    "file": "assets/ChartCard-CNemb98Y.js",
     "name": "ChartCard",
     "imports": [
       "resources/js/app.tsx",
-      "_Card-DFoN1MQX.js"
+      "_Card-BFdNOff2.js"
     ]
   },
-  "_Table-Cffwhz2N.js": {
-    "file": "assets/Table-Cffwhz2N.js",
+  "_Modal-BzAUJiXP.js": {
+    "file": "assets/Modal-BzAUJiXP.js",
+    "name": "Modal",
+    "imports": [
+      "resources/js/app.tsx"
+    ]
+  },
+  "_Table-kSwXt9f3.js": {
+    "file": "assets/Table-kSwXt9f3.js",
     "name": "Table",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-DSYOhZZC.css",
+    "file": "assets/app-bTM55l06.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -45,7 +52,7 @@
     "src": "resources/img/logo.png"
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-Cb0ONkw7.js",
+    "file": "assets/app-CbgyjgSJ.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
@@ -55,157 +62,205 @@
       "resources/js/pages/Capacity.tsx",
       "resources/js/pages/CRM.tsx",
       "resources/js/pages/Members.tsx",
+      "resources/js/pages/WorkoutBuilder.tsx",
+      "resources/js/pages/WorkoutEditor.tsx",
+      "resources/js/pages/Team.tsx",
       "resources/js/pages/Coach.tsx",
       "resources/js/pages/Playbooks.tsx",
       "resources/js/pages/Settings.tsx",
       "resources/js/pages/Profile.tsx"
     ],
     "css": [
-      "assets/app-DSYOhZZC.css"
+      "assets/app-bTM55l06.css"
     ],
     "assets": [
       "assets/logo-dhlZLrAp.png"
     ]
   },
   "resources/js/pages/CRM.tsx": {
-    "file": "assets/CRM-D6713Jaj.js",
+    "file": "assets/CRM-BzPZZh0Y.js",
     "name": "CRM",
     "src": "resources/js/pages/CRM.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-DFoN1MQX.js",
-      "_Table-Cffwhz2N.js",
-      "_Button-BWIka2oa.js"
+      "_Card-BFdNOff2.js",
+      "_Table-kSwXt9f3.js",
+      "_Button-B8xAM9d-.js"
     ],
     "css": [
-      "assets/app-DSYOhZZC.css"
+      "assets/app-bTM55l06.css"
     ]
   },
   "resources/js/pages/Capacity.tsx": {
-    "file": "assets/Capacity-BQg5Yj2w.js",
+    "file": "assets/Capacity-C2kzFfpS.js",
     "name": "Capacity",
     "src": "resources/js/pages/Capacity.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-DFoN1MQX.js",
-      "_Table-Cffwhz2N.js",
-      "_Badge-Ct2h2tLc.js",
-      "_ChartCard-CdTB5MOJ.js"
+      "_Card-BFdNOff2.js",
+      "_Table-kSwXt9f3.js",
+      "_Badge-BoFgYBhh.js",
+      "_ChartCard-CNemb98Y.js"
     ],
     "css": [
-      "assets/app-DSYOhZZC.css"
+      "assets/app-bTM55l06.css"
     ]
   },
   "resources/js/pages/Coach.tsx": {
-    "file": "assets/Coach-C-a4kM16.js",
+    "file": "assets/Coach-BY1YQWld.js",
     "name": "Coach",
     "src": "resources/js/pages/Coach.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-DFoN1MQX.js",
-      "_Table-Cffwhz2N.js",
-      "_Badge-Ct2h2tLc.js",
-      "_Button-BWIka2oa.js"
+      "_Card-BFdNOff2.js",
+      "_Table-kSwXt9f3.js",
+      "_Badge-BoFgYBhh.js",
+      "_Button-B8xAM9d-.js"
     ],
     "css": [
-      "assets/app-DSYOhZZC.css"
+      "assets/app-bTM55l06.css"
     ]
   },
   "resources/js/pages/Dashboard.tsx": {
-    "file": "assets/Dashboard-DkHfmpFC.js",
+    "file": "assets/Dashboard-Vi-ygHMH.js",
     "name": "Dashboard",
     "src": "resources/js/pages/Dashboard.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-DFoN1MQX.js",
-      "_Badge-Ct2h2tLc.js",
-      "_Table-Cffwhz2N.js",
-      "_Button-BWIka2oa.js",
-      "_ChartCard-CdTB5MOJ.js"
+      "_Card-BFdNOff2.js",
+      "_Badge-BoFgYBhh.js",
+      "_Table-kSwXt9f3.js",
+      "_Button-B8xAM9d-.js",
+      "_ChartCard-CNemb98Y.js"
     ],
     "css": [
-      "assets/app-DSYOhZZC.css"
+      "assets/app-bTM55l06.css"
     ]
   },
   "resources/js/pages/Members.tsx": {
-    "file": "assets/Members-DqyF2myd.js",
+    "file": "assets/Members-CwvnAIy3.js",
     "name": "Members",
     "src": "resources/js/pages/Members.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-DFoN1MQX.js",
-      "_Button-BWIka2oa.js",
-      "_Badge-Ct2h2tLc.js"
+      "_Card-BFdNOff2.js",
+      "_Button-B8xAM9d-.js",
+      "_Badge-BoFgYBhh.js"
     ],
     "css": [
-      "assets/app-DSYOhZZC.css"
+      "assets/app-bTM55l06.css"
     ]
   },
   "resources/js/pages/Playbooks.tsx": {
-    "file": "assets/Playbooks-CDkEVO4d.js",
+    "file": "assets/Playbooks-D79jqzTm.js",
     "name": "Playbooks",
     "src": "resources/js/pages/Playbooks.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-DFoN1MQX.js",
-      "_Table-Cffwhz2N.js",
-      "_Badge-Ct2h2tLc.js",
-      "_Button-BWIka2oa.js"
+      "_Card-BFdNOff2.js",
+      "_Table-kSwXt9f3.js",
+      "_Badge-BoFgYBhh.js",
+      "_Button-B8xAM9d-.js"
     ],
     "css": [
-      "assets/app-DSYOhZZC.css"
+      "assets/app-bTM55l06.css"
     ]
   },
   "resources/js/pages/Profile.tsx": {
-    "file": "assets/Profile-DpKWwvuH.js",
+    "file": "assets/Profile-YioiOUBX.js",
     "name": "Profile",
     "src": "resources/js/pages/Profile.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-DFoN1MQX.js",
-      "_Button-BWIka2oa.js"
+      "_Card-BFdNOff2.js",
+      "_Button-B8xAM9d-.js"
     ],
     "css": [
-      "assets/app-DSYOhZZC.css"
+      "assets/app-bTM55l06.css"
     ]
   },
   "resources/js/pages/Retention.tsx": {
-    "file": "assets/Retention-DXxyPZYi.js",
+    "file": "assets/Retention-CroM-hHw.js",
     "name": "Retention",
     "src": "resources/js/pages/Retention.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-DFoN1MQX.js",
-      "_Table-Cffwhz2N.js",
-      "_Badge-Ct2h2tLc.js",
-      "_Button-BWIka2oa.js"
+      "_Card-BFdNOff2.js",
+      "_Table-kSwXt9f3.js",
+      "_Badge-BoFgYBhh.js",
+      "_Modal-BzAUJiXP.js",
+      "_Button-B8xAM9d-.js"
     ],
     "css": [
-      "assets/app-DSYOhZZC.css"
+      "assets/app-bTM55l06.css"
     ]
   },
   "resources/js/pages/Settings.tsx": {
-    "file": "assets/Settings-DIy_fCsH.js",
+    "file": "assets/Settings-AbdqjgeI.js",
     "name": "Settings",
     "src": "resources/js/pages/Settings.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Card-DFoN1MQX.js",
-      "_Button-BWIka2oa.js",
-      "_Table-Cffwhz2N.js",
-      "_Badge-Ct2h2tLc.js"
+      "_Card-BFdNOff2.js",
+      "_Button-B8xAM9d-.js",
+      "_Table-kSwXt9f3.js",
+      "_Badge-BoFgYBhh.js"
     ],
     "css": [
-      "assets/app-DSYOhZZC.css"
+      "assets/app-bTM55l06.css"
+    ]
+  },
+  "resources/js/pages/Team.tsx": {
+    "file": "assets/Team-BnUzze7y.js",
+    "name": "Team",
+    "src": "resources/js/pages/Team.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_Card-BFdNOff2.js",
+      "_Button-B8xAM9d-.js",
+      "_Table-kSwXt9f3.js"
+    ],
+    "css": [
+      "assets/app-bTM55l06.css"
+    ]
+  },
+  "resources/js/pages/WorkoutBuilder.tsx": {
+    "file": "assets/WorkoutBuilder-DG2emY5P.js",
+    "name": "WorkoutBuilder",
+    "src": "resources/js/pages/WorkoutBuilder.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_Card-BFdNOff2.js",
+      "_Button-B8xAM9d-.js",
+      "_Modal-BzAUJiXP.js"
+    ],
+    "css": [
+      "assets/app-bTM55l06.css"
+    ]
+  },
+  "resources/js/pages/WorkoutEditor.tsx": {
+    "file": "assets/WorkoutEditor-DglZ2XoE.js",
+    "name": "WorkoutEditor",
+    "src": "resources/js/pages/WorkoutEditor.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_Card-BFdNOff2.js",
+      "_Button-B8xAM9d-.js"
+    ],
+    "css": [
+      "assets/app-bTM55l06.css"
     ]
   }
 }

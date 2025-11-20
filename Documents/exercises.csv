@@ -1,0 +1,924 @@
+Name,Type,Category,Modality
+Back Squat,Strength,Lower Body,Barbell
+Front Squat,Strength,Lower Body,Barbell
+Overhead Squat,Strength,Lower Body,Barbell
+Pause Back Squat,Strength,Lower Body,Barbell
+Tempo Back Squat (3-0-1),Strength,Lower Body,Barbell
+Box Squat,Strength,Lower Body,Barbell
+Safety Bar Squat,Strength,Lower Body,Barbell
+Zercher Squat,Strength,Lower Body,Barbell
+Anderson Squat,Strength,Lower Body,Barbell
+Pin Squat,Strength,Lower Body,Barbell
+Goblet Squat,Strength,Lower Body,Kettlebell
+Bulgarian Split Squat,Strength,Lower Body,Dumbbell
+Rear-Foot-Elevated Split Squat,Strength,Lower Body,Dumbbell
+Front-Foot-Elevated Split Squat,Strength,Lower Body,Dumbbell
+Walking Lunge,Strength,Lower Body,Barbell
+Reverse Lunge,Strength,Lower Body,Dumbbell
+Forward Lunge,Strength,Lower Body,Barbell
+Lateral Lunge,Strength,Lower Body,Bodyweight
+Cossack Squat,Strength,Lower Body,Bodyweight
+Pistol Squat,Skill Work,Lower Body,Bodyweight
+Assisted Pistol Squat,Skill Work,Lower Body,Band
+Box Pistol Squat,Skill Work,Lower Body,Bodyweight
+Air Squat,Metcon,Lower Body,Bodyweight
+Jump Squat,Metcon,Lower Body,Plyometric
+Tuck Jump,Metcon,Lower Body,Plyometric
+Wall Ball Shot,Metcon,Full Body,Medicine Ball
+Thruster,Metcon,Full Body,Barbell
+Cluster,Metcon,Full Body,Barbell
+Squat Clean Thruster,Metcon,Full Body,Barbell
+Deadlift Conventional,Strength,Posterior Chain,Barbell
+Sumo Deadlift,Strength,Posterior Chain,Barbell
+Deficit Deadlift,Strength,Posterior Chain,Barbell
+Block Pull Deadlift,Strength,Posterior Chain,Barbell
+Snatch-Grip Deadlift,Strength,Posterior Chain,Barbell
+Trap Bar Deadlift,Strength,Posterior Chain,Trap Bar
+Romanian Deadlift,Strength,Posterior Chain,Barbell
+Stiff-Leg Deadlift,Strength,Posterior Chain,Barbell
+Single-Leg RDL Dumbbell,Strength,Posterior Chain,Dumbbell
+Single-Leg RDL Barbell,Strength,Posterior Chain,Barbell
+Good Morning,Strength,Posterior Chain,Barbell
+Seated Good Morning,Strength,Posterior Chain,Barbell
+Nordic Hamstring Curl,Strength,Posterior Chain,Bodyweight
+Glute-Ham Raise,Strength,Posterior Chain,GHD
+Reverse Hyper,Strength,Posterior Chain,Machine
+Hip Thrust,Strength,Posterior Chain,Barbell
+Single-Leg Hip Thrust,Strength,Posterior Chain,Bodyweight
+Kas Glute Bridge,Strength,Posterior Chain,Barbell
+B-Stance Hip Thrust,Strength,Posterior Chain,Barbell
+Barbell Glute Bridge,Strength,Posterior Chain,Barbell
+Bench Press Flat,Strength,Upper Push,Barbell
+Close-Grip Bench Press,Strength,Upper Push,Barbell
+Wide-Grip Bench Press,Strength,Upper Push,Barbell
+Pause Bench Press,Strength,Upper Push,Barbell
+Spoto Press,Strength,Upper Push,Barbell
+Incline Bench Press,Strength,Upper Push,Barbell
+Decline Bench Press,Strength,Upper Push,Barbell
+Floor Press,Strength,Upper Push,Barbell
+Pin Press,Strength,Upper Push,Barbell
+Board Press,Strength,Upper Push,Barbell
+Slingshot Bench Press,Strength,Upper Push,Barbell
+Dumbbell Bench Press,Strength,Upper Push,Dumbbell
+Incline Dumbbell Press,Strength,Upper Push,Dumbbell
+Decline Dumbbell Press,Strength,Upper Push,Dumbbell
+Neutral-Grip DB Press,Strength,Upper Push,Dumbbell
+Overhead Press Strict,Strength,Upper Push,Barbell
+Seated Overhead Press,Strength,Upper Push,Barbell
+Behind-the-Neck Press,Strength,Upper Push,Barbell
+Push Press,Metcon,Upper Push,Barbell
+Split Jerk,Skill Work,Upper Push,Barbell
+Power Jerk,Skill Work,Upper Push,Barbell
+Viking Press,Strength,Upper Push,Strongman
+Log Clean & Press,Strength,Upper Push,Strongman
+Axle Press,Strength,Upper Push,Strongman
+Z Press,Strength,Upper Push,Barbell
+Landmine Press Single-Arm,Strength,Upper Push,Landmine
+Handstand Push-Up Strict,Strength,Upper Push,Bodyweight
+Handstand Push-Up Kipping,Skill Work,Upper Push,Gymnastics
+Deficit HSPU,Skill Work,Upper Push,Gymnastics
+Pike Push-Up,Strength,Upper Push,Bodyweight
+Ring Dip,Strength,Upper Push,Rings
+Bar Dip,Strength,Upper Push,Bodyweight
+Weighted Dip,Strength,Upper Push,Bodyweight
+Korean Dip,Skill Work,Upper Push,Rings
+Bench Dip,Strength,Upper Push,Bodyweight
+Pull-Up Strict,Strength,Upper Pull,Bodyweight
+Chin-Up Strict,Strength,Upper Pull,Bodyweight
+Neutral-Grip Pull-Up,Strength,Upper Pull,Bodyweight
+Kipping Pull-Up,Metcon,Upper Pull,Gymnastics
+Butterfly Pull-Up,Metcon,Upper Pull,Gymnastics
+Chest-to-Bar Pull-Up,Metcon,Upper Pull,Gymnastics
+Archer Pull-Up,Skill Work,Upper Pull,Bodyweight
+Typewriter Pull-Up,Skill Work,Upper Pull,Bodyweight
+Weighted Pull-Up,Strength,Upper Pull,Bodyweight
+Muscle-Up Bar Strict,Skill Work,Upper Pull,Gymnastics
+Muscle-Up Bar Kipping,Skill Work,Upper Pull,Gymnastics
+Muscle-Up Ring,Skill Work,Upper Pull,Rings
+Bent-Over Row Barbell,Strength,Upper Pull,Barbell
+Pendlay Row,Strength,Upper Pull,Barbell
+Yates Row,Strength,Upper Pull,Barbell
+Single-Arm DB Row,Strength,Upper Pull,Dumbbell
+Chest-Supported DB Row,Strength,Upper Pull,Dumbbell
+Seated Cable Row,Strength,Upper Pull,Cable
+T-Bar Row,Strength,Upper Pull,Barbell
+Landmine Row,Strength,Upper Pull,Landmine
+Meadows Row,Strength,Upper Pull,Landmine
+Face Pull,Strength,Upper Pull,Cable
+Rear Delt Fly,Strength,Upper Pull,Dumbbell
+Snatch,Skill Work,Olympic Lift,Barbell
+Power Snatch,Skill Work,Olympic Lift,Barbell
+Hang Snatch,Skill Work,Olympic Lift,Barbell
+Snatch Balance,Skill Work,Olympic Lift,Barbell
+Overhead Squat Snatch Balance,Skill Work,Olympic Lift,Barbell
+Snatch Pull,Strength,Olympic Lift,Barbell
+Clean,Skill Work,Olympic Lift,Barbell
+Power Clean,Skill Work,Olympic Lift,Barbell
+Hang Clean,Skill Work,Olympic Lift,Barbell
+Clean & Jerk,Skill Work,Olympic Lift,Barbell
+Kettlebell Swing Russian,Metcon,Posterior Chain,Kettlebell
+Kettlebell Swing American,Metcon,Posterior Chain,Kettlebell
+Kettlebell Snatch,Metcon,Full Body,Kettlebell
+Kettlebell Clean & Jerk,Metcon,Full Body,Kettlebell
+Turkish Get-Up,Skill Work,Full Body,Kettlebell
+Double KB Front Squat,Strength,Lower Body,Kettlebell
+Double KB Press,Strength,Upper Push,Kettlebell
+Bottom-Up KB Press,Skill Work,Upper Push,Kettlebell
+Burpee,Metcon,Full Body,Bodyweight
+Burpee Box Jump Over,Metcon,Full Body,Plyometric
+Burpee Pull-Up,Metcon,Full Body,Gymnastics
+Burpee Bar Muscle-Up,Skill Work,Full Body,Gymnastics
+Double-Under,Skill Work,Coordination,Jump Rope
+Triple-Under,Skill Work,Coordination,Jump Rope
+Rope Climb Legless,Skill Work,Upper Pull,Gymnastics
+Rope Climb L-Sit,Skill Work,Upper Pull,Gymnastics
+Pegboard Climb,Skill Work,Upper Pull,Gymnastics
+Toes-to-Bar,Metcon,Core,Gymnastics
+Strict Toes-to-Bar,Strength,Core,Gymnastics
+Knees-to-Elbow,Metcon,Core,Gymnastics
+Hanging Leg Raise,Strength,Core,Gymnastics
+L-Sit Hold,Skill Work,Core,Gymnastics
+V-Up,Metcon,Core,Bodyweight
+Hollow Rock,Metcon,Core,Bodyweight
+Arch Hold,Skill Work,Core,Gymnastics
+Handstand Walk,Skill Work,Coordination,Gymnastics
+Freestanding HS Hold,Skill Work,Coordination,Gymnastics
+Farmer Carry,Metcon,Full Body,Carry
+Sandbag Carry,Metcon,Full Body,Carry
+Yoke Walk,Metcon,Full Body,Strongman
+Zercher Carry,Metcon,Full Body,Strongman
+Husafell Carry,Metcon,Full Body,Strongman
+Sled Push,Metcon,Lower Body,Strongman
+Sled Pull,Metcon,Posterior Chain,Strongman
+Tire Flip,Metcon,Full Body,Strongman
+Atlas Stone Lift,Strength,Full Body,Strongman
+Atlas Stone to Shoulder,Strength,Full Body,Strongman
+Keg Toss,Metcon,Full Body,Strongman
+Plank Front,Strength,Core,Bodyweight
+Side Plank,Strength,Core,Bodyweight
+Plank Shoulder Taps,Metcon,Core,Bodyweight
+Bear Crawl,Metcon,Full Body,Bodyweight
+Crab Walk,Metcon,Full Body,Bodyweight
+Inchworm,Metcon,Full Body,Bodyweight
+Mountain Climber,Metcon,Full Body,Bodyweight
+Row Concept2,Metcon,Full Body,Cardio
+Assault Bike,Metcon,Full Body,Cardio
+SkiErg,Metcon,Full Body,Cardio
+Run Outdoor,Metcon,Full Body,Cardio
+Shuttle Sprint,Metcon,Full Body,Cardio
+Battle Ropes Double Slam,Metcon,Full Body,Conditioning
+Box Jump,Metcon,Lower Body,Plyometric
+Depth Jump,Metcon,Lower Body,Plyometric
+Broad Jump,Metcon,Lower Body,Plyometric
+Lateral Bound,Metcon,Lower Body,Plyometric
+Single-Leg Box Jump,Metcon,Lower Body,Plyometric
+Dead Bug,Strength,Core,Bodyweight
+Bird Dog,Strength,Core,Bodyweight
+AbMat Sit-Up,Metcon,Core,Bodyweight
+GHD Sit-Up,Metcon,Core,GHD
+Russian Twist,Metcon,Core,Medicine Ball
+Barbell Curl,Strength,Upper Pull,Barbell
+EZ-Bar Curl,Strength,Upper Pull,Barbell
+Hammer Curl,Strength,Upper Pull,Dumbbell
+Concentration Curl,Strength,Upper Pull,Dumbbell
+Preacher Curl,Strength,Upper Pull,Machine
+Cable Curl,Strength,Upper Pull,Cable
+Tricep Kickback,Strength,Upper Push,Dumbbell
+Skull Crusher,Strength,Upper Push,EZ-Bar
+Overhead Tricep Extension,Strength,Upper Push,Dumbbell
+Close-Grip Bench Press,Strength,Upper Push,Barbell
+Tricep Pushdown,Strength,Upper Push,Cable
+Lateral Raise,Strength,Upper Push,Dumbbell
+Front Raise,Strength,Upper Push,Dumbbell
+Rear Delt Fly DB,Strength,Upper Pull,Dumbbell
+Rear Delt Fly Machine,Strength,Upper Pull,Machine
+Upright Row,Strength,Upper Pull,Barbell
+Calf Raise Standing,Strength,Lower Body,Machine
+Seated Calf Raise,Strength,Lower Body,Machine
+Donkey Calf Raise,Strength,Lower Body,Machine
+Single-Leg Calf Raise,Strength,Lower Body,Bodyweight
+Jump Rope Single-Under,Metcon,Coordination,Jump Rope
+Foam Roll Quads,Cool-down,Mobility,Self-Myofascial
+Foam Roll IT Band,Cool-down,Mobility,Self-Myofascial
+Foam Roll T-Spine,Cool-down,Mobility,Self-Myofascial
+Foam Roll Lats,Cool-down,Mobility,Self-Myofascial
+Lacrosse Ball Glutes,Cool-down,Mobility,Self-Myofascial
+Lacrosse Ball Pec,Cool-down,Mobility,Self-Myofascial
+Couch Stretch,Cool-down,Mobility,Bodyweight
+Pigeon Pose,Cool-down,Mobility,Bodyweight
+90/90 Hip Stretch,Cool-down,Mobility,Bodyweight
+Frog Stretch,Cool-down,Mobility,Bodyweight
+Samson Stretch,Cool-down,Mobility,Bodyweight
+World’s Greatest Stretch,Cool-down,Mobility,Bodyweight
+Thread-the-Needle,Cool-down,Mobility,Bodyweight
+Child’s Pose,Cool-down,Mobility,Bodyweight
+Cat-Cow Pose,Cool-down,Mobility,Bodyweight
+Downward Dog,Cool-down,Mobility,Bodyweight
+Banded Ankle Distraction,Cool-down,Mobility,Band
+Banded Shoulder Distraction,Cool-down,Mobility,Band
+Banded Hamstring Stretch,Cool-down,Mobility,Band
+Jefferson Curl,Strength,Posterior Chain,Barbell
+Snatch-Grip RDL,Strength,Posterior Chain,Barbell
+Dimel Deadlift,Strength,Posterior Chain,Barbell
+Rack Pull,Strength,Posterior Chain,Barbell
+Pause Deadlift,Strength,Posterior Chain,Barbell
+Tempo Deadlift,Strength,Posterior Chain,Barbell
+Sumo Block Pull,Strength,Posterior Chain,Barbell
+Banded Deadlift,Strength,Posterior Chain,Barbell/Band
+Chain Deadlift,Strength,Posterior Chain,Barbell/Chain
+Pause Front Squat,Strength,Lower Body,Barbell
+1¼ Front Squat,Strength,Lower Body,Barbell
+Front Squat + Jerk,Metcon,Full Body,Barbell
+Overhead Squat Hold,Skill Work,Lower Body,Barbell
+Sots Press,Skill Work,Upper Push,Barbell
+Klokov Press,Skill Work,Upper Push,Barbell
+Snatch Push Press,Skill Work,Upper Push,Barbell
+Overhead Carry,Metcon,Upper Push,Barbell
+Waiter Walk,Metcon,Upper Push,Kettlebell
+Single-Arm Overhead Lunge,Strength,Lower Body,Barbell
+Zercher Lunge,Strength,Lower Body,Barbell
+Overhead Lunge,Strength,Lower Body,Barbell
+Single-Arm KB Thruster,Metcon,Full Body,Kettlebell
+Devil Press,Metcon,Full Body,Dumbbell
+Man Maker,Metcon,Full Body,Dumbbell
+Renegade Row,Strength,Upper Pull,Dumbbell
+Plank Row,Strength,Upper Pull,Dumbbell
+Ring Row,Strength,Upper Pull,Rings
+Inverted Row,Strength,Upper Pull,Bodyweight
+Supinated Inverted Row,Strength,Upper Pull,Bodyweight
+Archer Row,Skill Work,Upper Pull,Rings
+Strict Ring Muscle-Up Transition,Skill Work,Upper Pull,Rings
+False-Grip Ring Pull-Up,Skill Work,Upper Pull,Rings
+Ring Support Hold,Skill Work,Upper Push,Rings
+Ring Dip Support Hold,Skill Work,Upper Push,Rings
+L-Sit on Parallettes,Skill Work,Core,Gymnastics
+Manna Progression,Skill Work,Core,Gymnastics
+Tuck Planche Hold,Skill Work,Upper Push,Gymnastics
+Planche Lean,Skill Work,Upper Push,Bodyweight
+Frog Stand,Skill Work,Coordination,Bodyweight
+Crow Pose,Skill Work,Coordination,Bodyweight
+Strict HSPU to L-Sit,Skill Work,Full Body,Gymnastics
+90-Degree Push-Up,Skill Work,Upper Push,Bodyweight
+Clapping Push-Up,Metcon,Upper Push,Plyometric
+Plyo Push-Up,Metcon,Upper Push,Plyometric
+Superman Pull-Up,Skill Work,Upper Pull,Gymnastics
+Kipping Butterfly Chest-to-Bar,Metcon,Upper Pull,Gymnastics
+Bar Muscle-Up Transition Drill,Skill Work,Upper Pull,Gymnastics
+Strict Bar Muscle-Up,Skill Work,Upper Pull,Gymnastics
+Banded Strict Muscle-Up,Skill Work,Upper Pull,Band
+Strict Ring Muscle-Up,Skill Work,Upper Pull,Rings
+Kipping Ring Muscle-Up,Skill Work,Upper Pull,Rings
+Deficit Kipping HSPU,Skill Work,Upper Push,Gymnastics
+Seated DB Press,Strength,Upper Push,Dumbbell
+Arnold Press,Strength,Upper Push,Dumbbell
+Landmine Press Double,Strength,Upper Push,Landmine
+Single-Arm Landmine Press,Strength,Upper Push,Landmine
+Kneeling Landmine Press,Strength,Upper Push,Landmine
+Half-Kneeling Landmine Press,Strength,Upper Push,Landmine
+Jam Press,Strength,Upper Push,Landmine
+Meadows Press,Strength,Upper Push,Landmine
+Single-Arm DB Snatch,Metcon,Full Body,Dumbbell
+Barbell Snatch Pull,Strength,Olympic Lift,Barbell
+Snatch High Pull,Strength,Olympic Lift,Barbell
+Muscle Snatch,Skill Work,Olympic Lift,Barbell
+Hang Muscle Snatch,Skill Work,Olympic Lift,Barbell
+Power Clean + Jerk,Skill Work,Olympic Lift,Barbell
+Hang Clean + Jerk,Skill Work,Olympic Lift,Barbell
+Block Clean,Skill Work,Olympic Lift,Barbell
+Clean Pull,Strength,Olympic Lift,Barbell
+Clean High Pull,Strength,Olympic Lift,Barbell
+Muscle Clean,Skill Work,Olympic Lift,Barbell
+Hang Muscle Clean,Skill Work,Olympic Lift,Barbell
+Split Squat (Barbell),Strength,Lower Body,Barbell
+Heel-Elevated Goblet Squat,Strength,Lower Body,Kettlebell
+Double KB Front Rack Lunge,Strength,Lower Body,Kettlebell
+KB Goblet Reverse Lunge,Strength,Lower Body,Kettlebell
+KB Goblet Lateral Lunge,Strength,Lower Body,Kettlebell
+KB Overhead Reverse Lunge,Strength,Lower Body,Kettlebell
+Single-Arm KB Swing,Metcon,Posterior Chain,Kettlebell
+Alternating KB Swing,Metcon,Posterior Chain,Kettlebell
+KB Clean,Metcon,Full Body,Kettlebell
+KB Clean + Press,Metcon,Full Body,Kettlebell
+KB Clean + Jerk,Metcon,Full Body,Kettlebell
+Long Cycle KB Clean & Jerk,Metcon,Full Body,Kettlebell
+KB Windmill,Skill Work,Core,Kettlebell
+KB Bent Press,Skill Work,Upper Push,Kettlebell
+KB Side Press,Skill Work,Upper Push,Kettlebell
+KB Strict Press,Strength,Upper Push,Kettlebell
+KB Push Press,Metcon,Upper Push,Kettlebell
+KB Jerk,Metcon,Upper Push,Kettlebell
+Double KB Push Press,Metcon,Upper Push,Kettlebell
+Double KB Jerk,Metcon,Upper Push,Kettlebell
+KB Farmer Carry,Metcon,Full Body,Kettlebell
+KB Suitcase Carry,Metcon,Full Body,Kettlebell
+KB Rack Carry,Metcon,Full Body,Kettlebell
+KB Overhead Carry,Metcon,Full Body,Kettlebell
+KB Waiter Carry,Metcon,Full Body,Kettlebell
+KB Bottom-Up Carry,Skill Work,Full Body,Kettlebell
+Sandbag Clean,Metcon,Full Body,Sandbag
+Sandbag Squat,Strength,Lower Body,Sandbag
+Sandbag Bear Hug Carry,Metcon,Full Body,Sandbag
+Sandbag Over Shoulder,Metcon,Full Body,Sandbag
+D-Ball Over Bar,Metcon,Full Body,Strongman
+Keg Clean & Press,Strength,Full Body,Strongman
+Circus DB Press,Strength,Upper Push,Strongman
+Frame Carry,Metcon,Full Body,Strongman
+Duck Walk,Metcon,Lower Body,Strongman
+Conan’s Wheel,Metcon,Full Body,Strongman
+Car Flip,Metcon,Full Body,Strongman
+Hand-Over-Hand Pull,Metcon,Full Body,Strongman
+Fingal’s Fingers,Metcon,Full Body,Strongman
+Stone of Steel Load,Strength,Full Body,Strongman
+McGlashen Stones,Strength,Full Body,Strongman
+Hercules Hold,Metcon,Full Body,Strongman
+Pillar Hold,Metcon,Full Body,Strongman
+Leg Press,Strength,Lower Body,Machine
+Hack Squat Machine,Strength,Lower Body,Machine
+Belt Squat,Strength,Lower Body,Machine
+Pendulum Squat,Strength,Lower Body,Machine
+V-Squat Machine,Strength,Lower Body,Machine
+Smith Machine Squat,Strength,Lower Body,Machine
+Smith Machine Front Squat,Strength,Lower Body,Machine
+Smith Machine RDL,Strength,Posterior Chain,Machine
+Lying Leg Curl,Strength,Posterior Chain,Machine
+Seated Leg Curl,Strength,Posterior Chain,Machine
+Cable Pull-Through,Strength,Posterior Chain,Cable
+Glute Kickback,Strength,Posterior Chain,Cable
+Hip Abduction Machine,Strength,Posterior Chain,Machine
+Hip Adduction Machine,Strength,Lower Body,Machine
+Cable Crunch,Strength,Core,Cable
+Woodchopper High-to-Low,Metcon,Core,Cable
+Woodchopper Low-to-High,Metcon,Core,Cable
+Pallof Press,Strength,Core,Cable
+Landmine Rotation,Metcon,Core,Landmine
+Landmine Anti-Rotation Press,Strength,Core,Landmine
+T-Bar Swing,Metcon,Core,T-Bar
+Battle Ropes Alternating Waves,Metcon,Full Body,Conditioning
+Battle Ropes Double Slams,Metcon,Full Body,Conditioning
+Battle Ropes Snakes,Metcon,Full Body,Conditioning
+Sled Drag Backward,Metcon,Lower Body,Strongman
+Sled Drag Forward,Metcon,Lower Body,Strongman
+Prowler Push,Metcon,Full Body,Strongman
+Treadmill Run,Metcon,Full Body,Cardio
+Stair Climber,Metcon,Lower Body,Cardio
+Versa Climber,Metcon,Full Body,Cardio
+Jacob’s Ladder,Metcon,Full Body,Cardio
+Rower Damper 10 Sprint,Metcon,Full Body,Cardio
+BikeErg,Metcon,Full Body,Cardio
+Echo Bike,Metcon,Full Body,Cardio
+C2 Bike,Metcon,Full Body,Cardio
+Shuttle Run 25m,Metcon,Full Body,Cardio
+Suicide Sprint,Metcon,Full Body,Cardio
+Burpee Over Bar,Metcon,Full Body,Bodyweight
+Burpee Over DB,Metcon,Full Body,Dumbbell
+Burpee + Tuck Jump,Metcon,Full Body,Plyometric
+Lateral Burpee Over Bar,Metcon,Full Body,Plyometric
+Strict Pull-Up Negative,Strength,Upper Pull,Bodyweight
+Banded Pull-Up,Strength,Upper Pull,Band
+Jumping Pull-Up,Metcon,Upper Pull,Bodyweight
+Kipping Pull-Up Negative,Skill Work,Upper Pull,Gymnastics
+CTB Pull-Up Strict,Strength,Upper Pull,Bodyweight
+Weighted CTB Pull-Up,Strength,Upper Pull,Bodyweight
+Mixed-Grip Pull-Up,Strength,Upper Pull,Bodyweight
+Towel Pull-Up,Strength,Upper Pull,Towel
+Fat-Bar Pull-Up,Strength,Upper Pull,Bodyweight
+Wide-Grip Pull-Up,Strength,Upper Pull,Bodyweight
+Close-Grip Chin-Up,Strength,Upper Pull,Bodyweight
+Commando Pull-Up,Strength,Upper Pull,Bodyweight
+One-Arm Pull-Up Progression,Skill Work,Upper Pull,Bodyweight
+L-Sit Pull-Up,Skill Work,Upper Pull,Gymnastics
+L-Sit Chin-Up,Skill Work,Upper Pull,Gymnastics
+Toes-to-Bar Strict,Strength,Core,Gymnastics
+Toes-to-Rings,Skill Work,Core,Rings
+Windshield Wiper,Metcon,Core,Gymnastics
+Dragon Flag,Skill Work,Core,Bodyweight
+Front Lever Hold,Skill Work,Upper Pull,Gymnastics
+Front Lever Raise,Skill Work,Upper Pull,Gymnastics
+Back Lever Hold,Skill Work,Upper Pull,Gymnastics
+Tuck Front Lever,Skill Work,Upper Pull,Gymnastics
+Ice Cream Maker,Skill Work,Upper Pull,Gymnastics
+Korean Dip,Skill Work,Upper Push,Rings
+Russian Dip,Skill Work,Upper Push,Rings
+Ring Support to Dip,Skill Work,Upper Push,Rings
+Archer Push-Up,Skill Work,Upper Push,Bodyweight
+One-Arm Push-Up Progression,Skill Work,Upper Push,Bodyweight
+Diamond Push-Up,Strength,Upper Push,Bodyweight
+Hindu Push-Up,Metcon,Upper Push,Bodyweight
+Deficit Push-Up,Strength,Upper Push,Bodyweight
+Ring Push-Up,Strength,Upper Push,Rings
+Weighted Push-Up,Strength,Upper Push,Bodyweight
+Plyo Ring Push-Up,Metcon,Upper Push,Rings
+Superman Push-Up,Skill Work,Upper Push,Bodyweight
+Aztec Push-Up,Metcon,Upper Push,Plyometric
+Single-Leg Squat to Box,Strength,Lower Body,Bodyweight
+Shrimp Squat,Skill Work,Lower Body,Bodyweight
+Skater Squat,Strength,Lower Body,Bodyweight
+Curtsy Lunge,Strength,Lower Body,Bodyweight
+Jump Lunge,Metcon,Lower Body,Plyometric
+Alternating Jump Lunge,Metcon,Lower Body,Plyometric
+Step-Up,Strength,Lower Body,Box
+Weighted Step-Up,Strength,Lower Body,Dumbbell
+Lateral Step-Up,Strength,Lower Body,Box
+Box Jump Over,Metcon,Lower Body,Plyometric
+Seated Box Jump,Metcon,Lower Body,Plyometric
+Single-Leg Hop,Metcon,Lower Body,Plyometric
+Bound,Metcon,Lower Body,Plyometric
+Depth Drop to Jump,Metcon,Lower Body,Plyometric
+Pogo Jump,Metcon,Lower Body,Plyometric
+Ankle Bounce,Metcon,Lower Body,Bodyweight
+Wall-Facing HS Hold,Skill Work,Coordination,Gymnastics
+HS Shoulder Taps,Skill Work,Upper Push,Gymnastics
+HS Pirouette,Skill Work,Coordination,Gymnastics
+Stalder Press,Skill Work,Full Body,Gymnastics
+Press to Handstand,Skill Work,Upper Push,Gymnastics
+Parallette HS Push-Up,Skill Work,Upper Push,Gymnastics
+Parallette Tuck Sit,Skill Work,Core,Gymnastics
+Parallette Straddle Sit,Skill Work,Core,Gymnastics
+Single Bar Dip,Strength,Upper Push,Bodyweight
+Parallel Bar Support Hold,Skill Work,Upper Push,Gymnastics
+Parallel Bar L-Sit,Skill Work,Core,Gymnastics
+Parallel Bar Swing,Skill Work,Full Body,Gymnastics
+HeSPU (Headstand Push-Up),Strength,Upper Push,Bodyweight
+Frogstand to Headstand,Skill Work,Coordination,Bodyweight
+Strict Muscle-Up Negative,Skill Work,Upper Pull,Rings
+Banded Muscle-Up Transition,Skill Work,Upper Pull,Band
+High Ring Transition Drill,Skill Work,Upper Pull,Rings
+Low Ring Muscle-Up,Skill Work,Upper Pull,Rings
+Fat Grip Muscle-Up,Skill Work,Upper Pull,Rings
+Weighted Ring Muscle-Up,Skill Work,Upper Pull,Rings
+Deficit Deadlift 2",Strength,Posterior Chain,Barbell
+Deficit Deadlift 4",Strength,Posterior Chain,Barbell
+Rack Pull Below Knee,Strength,Posterior Chain,Barbell
+Rack Pull Above Knee,Strength,Posterior Chain,Barbell
+Banded Sumo Deadlift,Strength,Posterior Chain,Barbell/Band
+Reverse Band Deadlift,Strength,Posterior Chain,Barbell/Band
+Paused Sumo Deadlift,Strength,Posterior Chain,Barbell
+Tempo RDL 40X0,Strength,Posterior Chain,Barbell
+Snatch Deadlift,Strength,Posterior Chain,Barbell
+Clean Deadlift,Strength,Posterior Chain,Barbell
+Banded Good Morning,Strength,Posterior Chain,Band
+Single-Leg Glute Bridge Hold,Strength,Posterior Chain,Bodyweight
+Fire Hydrant,Strength,Posterior Chain,Bodyweight
+Clamshell,Strength,Posterior Chain,Band
+Monster Walk,Strength,Posterior Chain,Band
+Banded Hip Thrust,Strength,Posterior Chain,Band
+American Deadlift,Strength,Posterior Chain,Barbell
+Jefferson Deadlift,Strength,Posterior Chain,Barbell
+Suitcase Deadlift,Strength,Posterior Chain,Barbell/DB
+Single-Arm Deadlift,Strength,Posterior Chain,Dumbbell
+KB Sumo Deadlift,Strength,Posterior Chain,Kettlebell
+Double KB Deadlift,Strength,Posterior Chain,Kettlebell
+KB Deadlift High Pull,Metcon,Posterior Chain,Kettlebell
+KB Sumo Deadlift High Pull,Metcon,Posterior Chain,Kettlebell
+KB Goblet Clean,Metcon,Full Body,Kettlebell
+KB Double Clean,Metcon,Full Body,Kettlebell
+KB Rack Squat,Strength,Lower Body,Kettlebell
+KB Front Rack Lunge,Strength,Lower Body,Kettlebell
+KB Pistol,Skill Work,Lower Body,Kettlebell
+KB Overhead Squat,Skill Work,Lower Body,Kettlebell
+KB Sots Press,Skill Work,Upper Push,Kettlebell
+KB Thruster,Metcon,Full Body,Kettlebell
+KB Cluster,Metcon,Full Body,Kettlebell
+KB Devil Press,Metcon,Full Body,Kettlebell
+KB Renegade Row,Strength,Upper Pull,Kettlebell
+KB Alternating Row,Strength,Upper Pull,Kettlebell
+KB Upright Row,Strength,Upper Pull,Kettlebell
+KB High Pull,Metcon,Posterior Chain,Kettlebell
+KB Figure-8,Metcon,Core,Kettlebell
+KB Around the World,Metcon,Core,Kettlebell
+KB Halo,Metcon,Upper Push,Kettlebell
+KB Slingshot,Metcon,Upper Push,Kettlebell
+DB Snatch,Metcon,Full Body,Dumbbell
+DB Clean,Metcon,Full Body,Dumbbell
+DB Hang Clean,Metcon,Full Body,Dumbbell
+DB Power Clean,Metcon,Full Body,Dumbbell
+DB Squat Clean,Metcon,Full Body,Dumbbell
+DB Thruster,Metcon,Full Body,Dumbbell
+DB Cluster,Metcon,Full Body,Dumbbell
+DB Push Press,Metcon,Upper Push,Dumbbell
+DB Push Jerk,Metcon,Upper Push,Dumbbell
+DB Split Jerk,Metcon,Upper Push,Dumbbell
+DB Front Squat,Strength,Lower Body,Dumbbell
+DB Goblet Squat,Strength,Lower Body,Dumbbell
+DB Bulgarian Split Squat,Strength,Lower Body,Dumbbell
+DB Reverse Lunge,Strength,Lower Body,Dumbbell
+DB Walking Lunge,Strength,Lower Body,Dumbbell
+DB Step-Up,Strength,Lower Body,Dumbbell
+DB Romanian Deadlift,Strength,Posterior Chain,Dumbbell
+DB Single-Leg RDL,Strength,Posterior Chain,Dumbbell
+DB Bent-Over Row,Strength,Upper Pull,Dumbbell
+DB Single-Arm Row,Strength,Upper Pull,Dumbbell
+DB Chest-Supported Row,Strength,Upper Pull,Dumbbell
+DB Rear Delt Fly,Strength,Upper Pull,Dumbbell
+DB Upright Row,Strength,Upper Pull,Dumbbell
+DB Curl,Strength,Upper Pull,Dumbbell
+DB Hammer Curl,Strength,Upper Pull,Dumbbell
+DB Zottman Curl,Strength,Upper Pull,Dumbbell
+DB Concentration Curl,Strength,Upper Pull,Dumbbell
+DB Tricep Extension,Strength,Upper Push,Dumbbell
+DB Overhead Tricep Extension,Strength,Upper Push,Dumbbell
+DB Tate Press,Strength,Upper Push,Dumbbell
+DB Floor Press,Strength,Upper Push,Dumbbell
+DB Svend Press,Strength,Upper Push,Dumbbell
+DB Pullover,Strength,Upper Pull,Dumbbell
+DB Squeeze Press,Strength,Upper Push,Dumbbell
+DB Fly,Strength,Upper Push,Dumbbell
+Incline DB Fly,Strength,Upper Push,Dumbbell
+Cable Fly High,Strength,Upper Push,Cable
+Cable Fly Mid,Strength,Upper Push,Cable
+Cable Fly Low,Strength,Upper Push,Cable
+Pec Deck Fly,Strength,Upper Push,Machine
+Lat Pulldown Wide,Strength,Upper Pull,Cable
+Lat Pulldown Close,Strength,Upper Pull,Cable
+Lat Pulldown Neutral,Strength,Upper Pull,Cable
+Lat Pulldown Reverse,Strength,Upper Pull,Cable
+Straight-Arm Pulldown,Strength,Upper Pull,Cable
+V-Bar Pulldown,Strength,Upper Pull,Cable
+Rope Pulldown,Strength,Upper Pull,Cable
+Single-Arm Cable Row,Strength,Upper Pull,Cable
+Cable Row Neutral,Strength,Upper Pull,Cable
+Cable Row Wide,Strength,Upper Pull,Cable
+High Row,Strength,Upper Pull,Cable
+Low Row,Strength,Upper Pull,Cable
+Cable Curl 21s,Strength,Upper Pull,Cable
+Cable Overhead Curl,Strength,Upper Pull,Cable
+Cable Tricep Pushdown Rope,Strength,Upper Push,Cable
+Cable Tricep Pushdown Bar,Strength,Upper Push,Cable
+Cable Overhead Tricep Extension,Strength,Upper Push,Cable
+Cable Face Pull,Strength,Upper Pull,Cable
+Cable Rear Delt Row,Strength,Upper Pull,Cable
+Cable Upright Row,Strength,Upper Pull,Cable
+Cable Shrug,Strength,Upper Pull,Cable
+Cable Lateral Raise,Strength,Upper Push,Cable
+Cable Front Raise,Strength,Upper Push,Cable
+Cable Egyptian Lateral Raise,Strength,Upper Push,Cable
+Leg Extension,Strength,Lower Body,Machine
+Leg Press Horizontal,Strength,Lower Body,Machine
+Leg Press 45 Degree,Strength,Lower Body,Machine
+Single-Leg Press,Strength,Lower Body,Machine
+Bulgarian Split Squat Smith,Strength,Lower Body,Machine
+Hip Thrust Machine,Strength,Posterior Chain,Machine
+Glute Drive Machine,Strength,Posterior Chain,Machine
+Abductor Machine,Strength,Posterior Chain,Machine
+Adductor Machine,Strength,Lower Body,Machine
+Tibia Raise,Strength,Lower Body,Machine
+Seated Calf Raise Smith,Strength,Lower Body,Machine
+Standing Calf Raise Machine,Strength,Lower Body,Machine
+Chest Press Machine,Strength,Upper Push,Machine
+Incline Chest Press Machine,Strength,Upper Push,Machine
+Decline Chest Press Machine,Strength,Upper Push,Machine
+Pec Deck,Strength,Upper Push,Machine
+Shoulder Press Machine,Strength,Upper Push,Machine
+Lateral Raise Machine,Strength,Upper Push,Machine
+Rear Delt Machine,Strength,Upper Pull,Machine
+Row Machine,Strength,Upper Pull,Machine
+Hammer Strength Row,Strength,Upper Pull,Machine
+Hammer Strength Chest Press,Strength,Upper Push,Machine
+Hammer Strength Iso Row,Strength,Upper Pull,Machine
+Hammer Strength Shoulder Press,Strength,Upper Push,Machine
+Tricep Dip Machine,Strength,Upper Push,Machine
+Bicep Curl Machine,Strength,Upper Pull,Machine
+Preacher Curl Machine,Strength,Upper Pull,Machine
+Ab Crunch Machine,Strength,Core,Machine
+Roman Chair Knee Raise,Strength,Core,Machine
+Back Extension 45 Degree,Strength,Posterior Chain,Machine
+GHD Back Extension,Strength,Posterior Chain,GHD
+Weighted Back Extension,Strength,Posterior Chain,Bodyweight
+Reverse Crunch,Strength,Core,Bodyweight
+Hanging Knee Raise Strict,Strength,Core,Gymnastics
+Bicycle Crunch,Metcon,Core,Bodyweight
+Flutter Kick,Metcon,Core,Bodyweight
+Scissor Kick,Metcon,Core,Bodyweight
+Heel Taps,Metcon,Core,Bodyweight
+Sit-Up,Metcon,Core,Bodyweight
+Butterfly Sit-Up,Metcon,Core,Bodyweight
+Anchored Sit-Up,Metcon,Core,Bodyweight
+Janda Sit-Up,Strength,Core,Bodyweight
+Jackknife,Metcon,Core,Bodyweight
+Plank Hip Dip,Metcon,Core,Bodyweight
+Plank Reach,Metcon,Core,Bodyweight
+Plank Saw,Metcon,Core,Bodyweight
+Side Plank Hip Lift,Strength,Core,Bodyweight
+Copenhagen Plank,Strength,Core,Bodyweight
+Star Plank,Strength,Core,Bodyweight
+Bear Crawl Hold,Strength,Full Body,Bodyweight
+Wall Walk,Skill Work,Upper Push,Gymnastics
+Inchworm to Push-Up,Metcon,Full Body,Bodyweight
+Spiderman Crawl,Metcon,Full Body,Bodyweight
+Lateral Bear Crawl,Metcon,Full Body,Bodyweight
+Frog Jump,Metcon,Lower Body,Plyometric
+Squat Jump 180,Metcon,Lower Body,Plyometric
+Tuck Jump Hold Landing,Metcon,Lower Body,Plyometric
+Single-Leg Tuck Jump,Metcon,Lower Body,Plyometric
+Star Jump,Metcon,Full Body,Plyometric
+Burpee Long Jump,Metcon,Full Body,Plyometric
+Squat Hold,Strength,Lower Body,Bodyweight
+Wall Sit,Strength,Lower Body,Bodyweight
+Isometric Lunge Hold,Strength,Lower Body,Bodyweight
+Horse Stance Hold,Strength,Lower Body,Bodyweight
+Goblet Squat Hold,Strength,Lower Body,Kettlebell
+Overhead Squat Hold,Strength,Lower Body,Barbell
+Front Rack Hold,Strength,Lower Body,Barbell
+Zercher Hold,Strength,Lower Body,Barbell
+Double KB Front Rack Hold,Strength,Lower Body,Kettlebell
+Bottom of Squat Hold,Strength,Lower Body,Bodyweight
+Pistol Hold Bottom,Skill Work,Lower Body,Bodyweight
+Handstand Hold Against Wall,Skill Work,Coordination,Gymnastics
+Handstand Hold Freestanding,Skill Work,Coordination,Gymnastics
+Hollow Body Hold,Strength,Core,Bodyweight
+Superman Hold,Strength,Posterior Chain,Bodyweight
+Arch Body Hold,Strength,Posterior Chain,Bodyweight
+Dead Hang,Strength,Upper Pull,Bodyweight
+Active Hang,Strength,Upper Pull,Bodyweight
+Scap Pull-Up,Strength,Upper Pull,Bodyweight
+Scap Push-Up,Strength,Upper Push,Bodyweight
+Band Pull-Apart,Strength,Upper Pull,Band
+Banded Face Pull,Strength,Upper Pull,Band
+Banded Overhead Press,Strength,Upper Push,Band
+Banded Tricep Extension,Strength,Upper Push,Band
+Banded Good Morning,Strength,Posterior Chain,Band
+Banded Squat,Strength,Lower Body,Band
+Banded Leg Curl,Strength,Posterior Chain,Band
+Banded Hip Thrust,Strength,Posterior Chain,Band
+Banded Abduction,Strength,Posterior Chain,Band
+Banded March,Strength,Lower Body,Band
+Jump Rope Double-Under Practice,Skill Work,Coordination,Jump Rope
+Jump Rope Crossover,Skill Work,Coordination,Jump Rope
+Jump Rope Side Swing,Skill Work,Coordination,Jump Rope
+Jump Rope High Knees,Metcon,Coordination,Jump Rope
+Runners Skip,Metcon,Lower Body,Plyometric
+High Knee Run,Metcon,Full Body,Cardio
+Butt Kick Run,Metcon,Full Body,Cardio
+A-Skip,Metcon,Lower Body,Cardio
+B-Skip,Metcon,Lower Body,Cardio
+Carioca,Metcon,Full Body,Cardio
+Lateral Shuffle,Metcon,Full Body,Cardio
+Backpedal,Metcon,Full Body,Cardio
+Karaoke Grape Vine,Metcon,Full Body,Cardio
+Power Skip,Metcon,Lower Body,Plyometric
+Single-Leg Deadlift Reach,Strength,Posterior Chain,Bodyweight
+Warrior Balance,Strength,Lower Body,Bodyweight
+Tree Pose,Strength,Lower Body,Bodyweight
+Single-Leg Glute Bridge Hold,Strength,Posterior Chain,Bodyweight
+Single-Leg RDL Hold,Strength,Posterior Chain,Bodyweight
+Quadruped Limb Raise,Strength,Core,Bodyweight
+Supine Limb Raise,Strength,Core,Bodyweight
+Turkish Get-Up Half,Skill Work,Full Body,Kettlebell
+Turkish Get-Up Sit-Up,Skill Work,Full Body,Kettlebell
+Arm Bar,Skill Work,Upper Push,Kettlebell
+Bent Press,Skill Work,Upper Push,Kettlebell
+Double KB Clean,Metcon,Full Body,Kettlebell
+Double KB Snatch,Metcon,Full Body,Kettlebell
+Double KB Swing,Metcon,Posterior Chain,Kettlebell
+Double KB Thruster,Metcon,Full Body,Kettlebell
+Double KB Push Press,Metcon,Upper Push,Kettlebell
+Double KB Jerk,Metcon,Upper Push,Kettlebell
+Double KB Front Squat,Strength,Lower Body,Kettlebell
+Double KB Overhead Press,Strength,Upper Push,Kettlebell
+Double KB Renegade Row,Strength,Upper Pull,Kettlebell
+Double KB Bent-Over Row,Strength,Upper Pull,Kettlebell
+KB See-Saw Press,Strength,Upper Push,Kettlebell
+KB Alternating Press,Strength,Upper Push,Kettlebell
+KB Floor Press,Strength,Upper Push,Kettlebell
+KB Single-Leg RDL,Strength,Posterior Chain,Kettlebell
+KB Goblet Squat Pulse,Strength,Lower Body,Kettlebell
+KB Goblet Hold March,Strength,Lower Body,Kettlebell
+KB Rack Hold March,Strength,Lower Body,Kettlebell
+KB Overhead Hold March,Strength,Lower Body,Kettlebell
+KB Bottom-Up Waiter Walk,Skill Work,Upper Push,Kettlebell
+KB Double Overhead Walk,Metcon,Upper Push,Kettlebell
+KB Rack + Overhead Mixed Walk,Metcon,Full Body,Kettlebell
+Sandbag Get-Up,Skill Work,Full Body,Sandbag
+Sandbag Zercher Squat,Strength,Lower Body,Sandbag
+Sandbag Front Squat,Strength,Lower Body,Sandbag
+Sandbag Back Squat,Strength,Lower Body,Sandbag
+Sandbag Shouldering,Metcon,Full Body,Sandbag
+Sandbag Load to Platform,Metcon,Full Body,Sandbag
+Sandbag Hug Squat,Strength,Lower Body,Sandbag
+D-Ball Clean,Metcon,Full Body,D-Ball
+D-Ball Over Shoulder,Metcon,Full Body,D-Ball
+D-Ball Carry,Metcon,Full Body,D-Ball
+Stone to Platform,Strength,Full Body,Strongman
+Odd Object Carry Medley,Metcon,Full Body,Strongman
+Yoke + Farmer + Frame Medley,Metcon,Full Body,Strongman
+Log Viper Press,Strength,Upper Push,Strongman
+Log Strict Press,Strength,Upper Push,Strongman
+Log Push Press,Metcon,Upper Push,Strongman
+Log Clean Each Rep,Metcon,Upper Push,Strongman
+Axle Clean Each Rep,Metcon,Upper Push,Strongman
+Axle Continental Clean,Strength,Upper Push,Strongman
+Axle Deadlift,Strength,Posterior Chain,Strongman
+Circus Dumbbell Clean,Skill Work,Upper Push,Strongman
+Block Press,Strength,Upper Push,Strongman
+Keg Carry,Metcon,Full Body,Strongman
+Keg Load,Metcon,Full Body,Strongman
+Super Yoke,Metcon,Full Body,Strongman
+Heavy Prowler Push,Metcon,Full Body,Strongman
+Heavy Sled Pull,Metcon,Full Body,Strongman
+Arm-Over-Arm Pull,Metcon,Full Body,Strongman
+Tug of War Pull,Metcon,Full Body,Strongman
+Mastodon Carry,Metcon,Full Body,Strongman
+Crucifix Hold,Metcon,Upper Push,Strongman
+Sandbag Zercher Carry,Metcon,Full Body,Sandbag
+Sandbag Overhead Carry,Metcon,Full Body,Sandbag
+Sandbag Shoulder Carry,Metcon,Full Body,Sandbag
+Yoke Press,Strength,Upper Push,Strongman
+Yoke Zercher Squat,Strength,Lower Body,Strongman
+Frame Deadlift,Strength,Posterior Chain,Strongman
+Hummer Tire Deadlift,Strength,Posterior Chain,Strongman
+Silver Dollar Deadlift,Strength,Posterior Chain,Strongman
+Car Deadlift,Strength,Posterior Chain,Strongman
+Vehicle Pull,Metcon,Full Body,Strongman
+Truck Pull,Metcon,Full Body,Strongman
+Airplane Pull,Metcon,Full Body,Strongman
+Barrel Load,Metcon,Full Body,Strongman
+Natural Stone Lift,Strength,Full Body,Strongman
+Odd-Object Ground-to-Overhead,Metcon,Full Body,Strongman
+Duck Walk with Weight,Metcon,Lower Body,Strongman
+Farmer Bomb,Metcon,Full Body,Carry
+Overhead Axle Hold,Strength,Upper Push,Strongman
+Double Overhand Axle Deadlift,Strength,Posterior Chain,Strongman
+Viking Press Reps,Metcon,Upper Push,Strongman
+Circus DB Clean Each Rep,Skill Work,Upper Push,Strongman
+Block Clean,Skill Work,Full Body,Strongman
+Block Clean & Press,Strength,Upper Push,Strongman
+Keg Over Bar,Metcon,Full Body,Strongman
+Bag Over Bar,Metcon,Full Body,Sandbag
+Stone Over Bar,Metcon,Full Body,Strongman
+Loading Medley,Metcon,Full Body,Strongman
+Max Distance Farmer Carry,Metcon,Full Body,Carry
+Max Distance Yoke Walk,Metcon,Full Body,Strongman
+Max Distance Sandbag Carry,Metcon,Full Body,Sandbag
+Max Distance Overhead Carry,Metcon,Upper Push,Strongman
+Max Distance Sled Push,Metcon,Full Body,Strongman
+Max Distance Hand-Over-Hand Pull,Metcon,Full Body,Strongman
+Max Atlas Stone Reps,Strength,Full Body,Strongman
+Max Log Clean & Press,Strength,Upper Push,Strongman
+Max Axle Deadlift,Strength,Posterior Chain,Strongman
+Max Tire Flip,Metcon,Full Body,Strongman
+Max Keg Toss,Metcon,Full Body,Strongman
+Max Circus DB,Strength,Upper Push,Strongman
+Strict Curl,Strength,Upper Pull,Barbell
+Cheat Curl,Strength,Upper Pull,Barbell
+21s Curl,Strength,Upper Pull,Barbell
+Drag Curl,Strength,Upper Pull,Barbell
+Bayesian Curl,Strength,Upper Pull,Cable
+Incline DB Curl,Strength,Upper Pull,Dumbbell
+Spider Curl,Strength,Upper Pull,Bodyweight
+Pinwheel Curl,Strength,Upper Pull,Dumbbell
+Close-Grip EZ-Bar Curl,Strength,Upper Pull,EZ-Bar
+Wide-Grip EZ-Bar Curl,Strength,Upper Pull,EZ-Bar
+Rope Hammer Curl,Strength,Upper Pull,Cable
+Dips Forward Lean,Strength,Upper Push,Bodyweight
+Dips Upright,Strength,Upper Push,Bodyweight
+Tricep Dips Static Hold,Strength,Upper Push,Bodyweight
+Bench Dips Weighted,Strength,Upper Push,Bodyweight
+JM Press,Strength,Upper Push,Barbell
+Rolling Tricep Extension,Strength,Upper Push,Dumbbell
+Band Tricep Pushdown,Strength,Upper Push,Band
+Band Overhead Tricep Extension,Strength,Upper Push,Band
+Plate Overhead Tricep Extension,Strength,Upper Push,Plate
+Neck Curl,Strength,Core,Plate
+Neck Extension,Strength,Core,Plate
+Wrist Curl,Strength,Forearms,Barbell
+Reverse Wrist Curl,Strength,Forearms,Barbell
+Wrist Roller,Strength,Forearms,Specialty
+Farmer Hold,Strength,Forearms,Carry
+Plate Pinch Hold,Strength,Forearms,Plate
+Thick Grip Deadlift,Strength,Posterior Chain,Fat Grip
+Axle Shrugs,Strength,Upper Pull,Strongman
+DB Shrugs,Strength,Upper Pull,Dumbbell
+Behind-the-Back Shrug,Strength,Upper Pull,Barbell
+Overhead Shrug,Strength,Upper Pull,Barbell
+Neck Harness Extension,Strength,Core,Specialty
+Sled Face Pull,Strength,Upper Pull,Sled
+Sled Row,Strength,Upper Pull,Sled
+Sled Chest Press,Strength,Upper Push,Sled
+Sled Tricep Extension,Strength,Upper Push,Sled
+Sled Curl,Strength,Upper Pull,Sled
+Battle Ropes Inside Circles,Metcon,Full Body,Conditioning
+Battle Ropes Outside Circles,Metcon,Full Body,Conditioning
+Battle Ropes Jumping Jacks,Metcon,Full Body,Conditioning
+Battle Ropes Side-to-Side,Metcon,Full Body,Conditioning
+Sledgehammer Swing,Metcon,Full Body,Conditioning
+Tire Slam,Metcon,Full Body,Conditioning
+Mace 360,Metcon,Full Body,Mace
+Mace 10-to-2,Metcon,Full Body,Mace
+Mace Shovel,Metcon,Full Body,Mace
+Mace Tire Slam,Metcon,Full Body,Mace
+Steel Mace Flow,Skill Work,Full Body,Mace
+Clubbell Swing,Metcon,Full Body,Clubbell
+Clubbell Mill,Metcon,Full Body,Clubbell
+Clubbell Shield Cast,Metcon,Full Body,Clubbell
+Indian Club Swing,Metcon,Upper Push,Indian Club
+Persian Mil,Strength,Upper Push,Clubbell
+Heavy Club Get-Up,Skill Work,Full Body,Clubbell
+ViPR Tilt,Metcon,Full Body,ViPR
+ViPR Shovel,Metcon,Full Body,ViPR
+ViPR Lunge + Twist,Metcon,Full Body,ViPR
+Landmine Twist,Metcon,Core,Landmine
+Landmine Reverse Lunge,Strength,Lower Body,Landmine
+Landmine Single-Leg RDL,Strength,Posterior Chain,Landmine
+Landmine Squat,Strength,Lower Body,Landmine
+Landmine Deadlift,Strength,Posterior Chain,Landmine
+Landmine Clean,Metcon,Full Body,Landmine
+Landmine Jerk,Metcon,Upper Push,Landmine
+Landmine Thruster,Metcon,Full Body,Landmine
+Landmine Shoulder-to-Shoulder Press,Strength,Upper Push,Landmine
+Half-Kneeling Landmine Press,Strength,Upper Push,Landmine
+Tall-Kneeling Landmine Press,Strength,Upper Push,Landmine
+Landmine Belt Squat,Strength,Lower Body,Landmine
+Landmine Hack Squat,Strength,Lower Body,Landmine
+Landmine Goblet Squat,Strength,Lower Body,Landmine
+Landmine RDL to Row,Strength,Posterior Chain,Landmine
+Landmine Row to Waist,Strength,Upper Pull,Landmine
+Single-Arm Landmine Row,Strength,Upper Pull,Landmine
+Meadows Row Heavy,Strength,Upper Pull,Landmine
+T-Bar Neutral-Grip Row,Strength,Upper Pull,T-Bar
+T-Bar Wide-Grip Row,Strength,Upper Pull,T-Bar
+Corner T-Bar Row,Strength,Upper Pull,T-Bar
+Plate-Loaded T-Bar Row,Strength,Upper Pull,Machine
+Gripper Close,Strength,Forearms,Gripper
+Gripper Hold,Strength,Forearms,Gripper
+Captains of Crush,Strength,Forearms,Gripper
+Hub Pinch,Strength,Forearms,Hub
+Block Weight Lift,Strength,Forearms,Block
+Blob Lift,Strength,Forearms,Blob
+Saxon Bend,Strength,Core,Plate
+Plate Overhead Walk,Metcon,Upper Push,Plate
+Plate Pinch Carry,Metcon,Forearms,Plate
+Plate Steering Wheel,Metcon,Core,Plate
+Plate 8s,Metcon,Core,Plate
+Neck Plate Curl,Strength,Core,Plate
+Neck Plate Extension,Strength,Core,Plate
+Wrist Roller Up & Down,Strength,Forearms,Specialty
+Fat Bar Hold,Strength,Forearms,Fat Grip
+Thick Bar Curl,Strength,Upper Pull,Fat Grip
+Thick Bar Bench Press,Strength,Upper Push,Fat Grip
+Thick Bar Deadlift,Strength,Posterior Chain,Fat Grip
+Thick Bar Row,Strength,Upper Pull,Fat Grip
+Apollon’s Axle Overhead Press,Strength,Upper Push,Strongman
+Double Overhand Axle Hold,Strength,Posterior Chain,Strongman
+Rolling Thunder Deadlift,Strength,Posterior Chain,Specialty
+One-Arm Hang,Strength,Upper Pull,Bodyweight
+One-Arm Dead Hang,Strength,Upper Pull,Bodyweight
+Towel Dead Hang,Strength,Upper Pull,Towel
+Towel Pull-Up,Strength,Upper Pull,Towel
+Towel Chin-Up,Strength,Upper Pull,Towel
+Towel Rope Climb,Skill Work,Upper Pull,Towel
+Gi Pull-Up,Strength,Upper Pull,Gi
+Eagle Loop Pull-Up,Strength,Upper Pull,Specialty
+Canvas Pull-Up,Strength,Upper Pull,Specialty
+Rope Pull-Up,Strength,Upper Pull,Rope
+Peg Pull-Up,Strength,Upper Pull,Pegboard
+Cliffhanger Pull-Up,Skill Work,Upper Pull,Bodyweight
+90-Degree Pull-Up Hold,Strength,Upper Pull,Bodyweight
+Frenchies Pull-Up,Skill Work,Upper Pull,Bodyweight
+Archer Pull-Up Negative,Skill Work,Upper Pull,Bodyweight
+One-Arm Pull-Up Negative,Skill Work,Upper Pull,Bodyweight
+One-Arm Chin-Up,Skill Work,Upper Pull,Bodyweight
+Front Lever Row,Skill Work,Upper Pull,Gymnastics
+Back Lever Row,Skill Work,Upper Pull,Gymnastics
+Human Flag,Skill Work,Full Body,Gymnastics
+Human Flag Hold,Skill Work,Full Body,Gymnastics
+Human Flag Raise,Skill Work,Full Body,Gymnastics
+Victorian Cross,Skill Work,Upper Push,Gymnastics
+Maltese Hold,Skill Work,Upper Push,Gymnastics
+Planche Push-Up,Skill Work,Upper Push,Gymnastics
+Planche Hold,Skill Work,Upper Push,Gymnastics
+Straddle Planche,Skill Work,Upper Push,Gymnastics
+Full Planche,Skill Work,Upper Push,Gymnastics
+90-Degree HSPU,Skill Work,Upper Push,Gymnastics
+One-Arm Handstand Hold,Skill Work,Coordination,Gymnastics
+One-Arm HSPU,Skill Work,Upper Push,Gymnastics
+Stalder Hold,Skill Work,Core,Gymnastics
+Manna Hold,Skill Work,Core,Gymnastics
+V-Sit Hold,Skill Work,Core,Gymnastics
+Straddle V-Sit,Skill Work,Core,Gymnastics
+Free Hip Circle,Skill Work,Full Body,Gymnastics
+Back Lever to Inverted Hang,Skill Work,Upper Pull,Gymnastics
+Skin the Cat,Skill Work,Full Body,Gymnastics
+German Hang,Skill Work,Mobility,Gymnastics
+Shoulder Stand,Skill Work,Core,Gymnastics
+Felge Backward,Skill Work,Full Body,Gymnastics
+Felge Forward,Skill Work,Full Body,Gymnastics
+Ring Flies,Strength,Upper Push,Rings
+Ring Fly to Dip,Strength,Upper Push,Rings
+Ring Swings,Skill Work,Full Body,Rings
+Ring Support to L-Sit,Skill Work,Core,Rings
+Ring Tuck to L-Sit,Skill Work,Core,Rings
+Ring Straddle to L-Sit,Skill Work,Core,Rings
+Ring L-Sit to Shoulder Stand,Skill Work,Core,Rings
+Ring L-Sit Pull-Through,Skill Work,Core,Rings
+Ring L-Sit to Inverted Hang,Skill Work,Core,Rings
+Ring Rollout,Strength,Core,Rings
+Parallette Shoot-Through,Metcon,Full Body,Gymnastics
+Parallette Swing to Handstand,Skill Work,Upper Push,Gymnastics
+Parallette L-Sit to Handstand,Skill Work,Upper Push,Gymnastics
+Parallette Press to Handstand,Skill Work,Upper Push,Gymnastics
+Parallette Straddle Press,Skill Work,Upper Push,Gymnastics
+Parallette Tuck Press,Skill Work,Upper Push,Gymnastics
+Parallette Pass-Through,Metcon,Full Body,Gymnastics
+Parallette Swivel Hips,Metcon,Core,Gymnastics
+Parallette Frog Stand,Skill Work,Coordination,Gymnastics
+Parallette Crow to Handstand,Skill Work,Upper Push,Gymnastics

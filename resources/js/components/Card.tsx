@@ -10,7 +10,7 @@ export default function Card({
     children: React.ReactNode;
 }) {
     return (
-        <section className="card relative overflow-hidden">
+        <section className="card relative !rounded-t-none">
             <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-400 via-brand-600 to-brand-500" />
             <div className="flex flex-wrap items-center justify-between gap-4 px-6 pt-6">
                 <div>

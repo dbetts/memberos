@@ -32,6 +32,10 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\StaffProfileController;
 use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\SettingsOverviewController;
+use App\Http\Controllers\Api\OrganizationUserController;
+use App\Http\Controllers\Api\WorkoutProgramController;
+use App\Http\Controllers\Api\WorkoutItemController;
+use App\Http\Controllers\Api\ExerciseController;
 
 Route::middleware(['auth'])->prefix('api/v1')->group(function (): void {
     Route::get('auth/me', [AuthenticatedUserController::class, 'show']);
@@ -139,4 +143,26 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function (): void {
     Route::post('graphql', GraphqlController::class);
 
     Route::get('settings/overview', SettingsOverviewController::class);
+
+    Route::prefix('workouts')->group(function (): void {
+        Route::get('exercises', [ExerciseController::class, 'index']);
+        Route::post('exercises', [ExerciseController::class, 'store']);
+        Route::get('programs', [WorkoutProgramController::class, 'index']);
+        Route::post('programs', [WorkoutProgramController::class, 'store']);
+        Route::get('programs/{program}/calendar', [WorkoutProgramController::class, 'calendar']);
+
+        Route::post('sessions/{session}/items', [WorkoutItemController::class, 'store']);
+        Route::get('items/{item}', [WorkoutItemController::class, 'show']);
+        Route::put('items/{item}', [WorkoutItemController::class, 'update']);
+        Route::delete('items/{item}', [WorkoutItemController::class, 'destroy']);
+        Route::post('items/{item}/move', [WorkoutItemController::class, 'move']);
+        Route::post('items/{item}/duplicate', [WorkoutItemController::class, 'duplicate']);
+    });
+
+    Route::prefix('team')->group(function (): void {
+        Route::get('users', [OrganizationUserController::class, 'index']);
+        Route::post('users', [OrganizationUserController::class, 'store']);
+        Route::put('users/{user}', [OrganizationUserController::class, 'update']);
+        Route::delete('users/{user}', [OrganizationUserController::class, 'destroy']);
+    });
 });

@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import clsx from "clsx";
-import { Gauge, Users, CalendarCheck, Bot, Settings, LineChart, Target, UserCircle2 } from "lucide-react";
+import { Gauge, Users, CalendarCheck, Bot, Settings, LineChart, Target, UserCircle2, Dumbbell } from "lucide-react";
 import BrandMark from "./BrandMark";
 import { useBranding } from "../context/BrandingContext";
 
@@ -10,8 +10,10 @@ const items = [
   { to: "/capacity", icon: CalendarCheck, label: "Capacity" },
   { to: "/crm", icon: Gauge, label: "CRM" },
   { to: "/members", icon: UserCircle2, label: "Members" },
+  { to: "/workouts/builder", icon: Dumbbell, label: "Workout Builder" },
   { to: "/coach", icon: Target, label: "Coach" },
   { to: "/playbooks", icon: Bot, label: "Playbooks" },
+  { to: "/team", icon: UserCircle2, label: "Team" },
   { to: "/settings", icon: Settings, label: "Settings" },
 ];
 
