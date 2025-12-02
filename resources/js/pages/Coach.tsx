@@ -3,6 +3,8 @@ import Card from "../components/Card";
 import Table from "../components/Table";
 import Badge from "../components/Badge";
 import Button from "../components/Button";
+import TextInput from "../components/TextInput";
+import SelectInput from "../components/SelectInput";
 import { apiFetch, isAbortError } from "../api/client";
 
 interface RosterResponse {
@@ -100,8 +102,8 @@ export default function Coach() {
     <div className="grid gap-6">
       <Card title="Roster heatmap" subtitle="Sort by program/class">
         <div className="flex flex-wrap gap-3 mb-4">
-          <select
-            className="border rounded-lg px-3 py-2"
+          <SelectInput
+            className="w-auto border rounded-lg px-3 py-2"
             value={selectedClass}
             onChange={(event) => applyFilter(event.target.value)}
           >
@@ -111,7 +113,7 @@ export default function Coach() {
                 {type.name}
               </option>
             ))}
-          </select>
+          </SelectInput>
           <div className="flex gap-2 text-sm text-slate-500">
             {Object.entries(roster?.heatmap ?? {}).map(([band, count]) => (
               <span key={band}>
@@ -198,27 +200,27 @@ export default function Coach() {
             }
           }}
         >
-          <input
+          <TextInput
             className="border rounded-lg px-3 py-2"
             placeholder="Outcome title"
             value={outcomeTitle}
             onChange={(event) => setOutcomeTitle(event.target.value)}
             required
           />
-          <input
+          <TextInput
             className="border rounded-lg px-3 py-2"
             placeholder="Notes"
             value={outcomeNotes}
             onChange={(event) => setOutcomeNotes(event.target.value)}
           />
-          <select
+          <SelectInput
             className="border rounded-lg px-3 py-2"
             value={outcomeType}
             onChange={(event) => setOutcomeType(event.target.value)}
           >
             <option value="outcome">Outcome</option>
             <option value="goal">Goal</option>
-          </select>
+          </SelectInput>
           <div className="md:col-span-3 flex justify-between items-center text-sm text-slate-500">
             <span>{selectedMembers[0] ? `Logging for ${selectedMembers[0]}` : "Select a member above"}</span>
             <Button type="submit" disabled={selectedMembers.length === 0}>

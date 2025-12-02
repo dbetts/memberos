@@ -22,11 +22,20 @@ class WorkoutItem extends Model
         'athlete_notes',
         'color',
         'position',
+        'exercise_id',
+        'exercise_type',
+        'measurement_type',
+        'measurement',
+        'rest_seconds',
+        'is_scored',
         'metadata',
     ];
 
     protected $casts = [
         'metadata' => 'array',
+        'measurement' => 'array',
+        'is_scored' => 'boolean',
+        'rest_seconds' => 'integer',
     ];
 
     public function session(): BelongsTo

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import Badge from "../components/Badge";
+import TextInput from "../components/TextInput";
+import SelectInput from "../components/SelectInput";
 import { apiFetch, isAbortError, type PaginatedResponse } from "../api/client";
 
 type MemberSortKey = "name" | "status" | "plan" | "joined_on" | "risk";
@@ -201,7 +203,7 @@ export default function Members() {
       <Card title="Members" subtitle="Full roster">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-1 items-center gap-3">
-            <input
+            <TextInput
               type="search"
               value={memberSearchDraft}
               onChange={(event) => setMemberSearchDraft(event.target.value)}
@@ -212,7 +214,7 @@ export default function Members() {
                 }
               }}
               placeholder="Search name, email, or phone"
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              className="w-full text-sm"
             />
             <Button type="button" onClick={applyMemberSearch}>
               Search
@@ -220,19 +222,19 @@ export default function Members() {
           </div>
           <div className="flex items-center gap-2 text-sm">
             Rows
-            <select
+            <SelectInput
               value={memberQuery.perPage}
               onChange={(event) =>
                 setMemberQuery((prev) => ({ ...prev, perPage: Number(event.target.value), page: 1 }))
               }
-              className="rounded-lg border border-slate-200 px-2 py-1 text-sm"
+              className="w-auto rounded-lg px-2 py-1 text-sm"
             >
               {[15, 25, 50, 100].map((size) => (
                 <option key={size} value={size}>
                   {size}
                 </option>
               ))}
-            </select>
+            </SelectInput>
           </div>
         </div>
         <div className="mt-4 overflow-x-auto">

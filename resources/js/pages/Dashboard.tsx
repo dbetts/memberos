@@ -4,6 +4,7 @@ import Card from "../components/Card";
 import Badge from "../components/Badge";
 import Table from "../components/Table";
 import Button from "../components/Button";
+import SelectInput from "../components/SelectInput";
 import { LineStat } from "../components/ChartCard";
 import { apiFetch, isAbortError } from "../api/client";
 import { retentionSeries, classes } from "../data/mock";
@@ -114,8 +115,8 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <label className="text-xs text-slate-500">
             Location
-            <select
-              className="mt-1 w-full border rounded-lg px-3 py-2"
+            <SelectInput
+              className="mt-1"
               value={filters.location_id}
               onChange={(event) => handleFilterChange("location_id", event.target.value)}
             >
@@ -125,12 +126,12 @@ export default function Dashboard() {
                   {location.name}
                 </option>
               ))}
-            </select>
+            </SelectInput>
           </label>
           <label className="text-xs text-slate-500">
             Class type
-            <select
-              className="mt-1 w-full border rounded-lg px-3 py-2"
+            <SelectInput
+              className="mt-1"
               value={filters.class_type}
               onChange={(event) => handleFilterChange("class_type", event.target.value)}
             >
@@ -140,12 +141,12 @@ export default function Dashboard() {
                   {classType}
                 </option>
               ))}
-            </select>
+            </SelectInput>
           </label>
           <label className="text-xs text-slate-500">
             Plan
-            <select
-              className="mt-1 w-full border rounded-lg px-3 py-2"
+            <SelectInput
+              className="mt-1"
               value={filters.plan_id}
               onChange={(event) => handleFilterChange("plan_id", event.target.value)}
             >
@@ -155,12 +156,12 @@ export default function Dashboard() {
                   {plan.name}
                 </option>
               ))}
-            </select>
+            </SelectInput>
           </label>
           <label className="text-xs text-slate-500">
             Instructor
-            <select
-              className="mt-1 w-full border rounded-lg px-3 py-2"
+            <SelectInput
+              className="mt-1"
               value={filters.instructor_id}
               onChange={(event) => handleFilterChange("instructor_id", event.target.value)}
             >
@@ -170,12 +171,12 @@ export default function Dashboard() {
                   {instructor.name}
                 </option>
               ))}
-            </select>
+            </SelectInput>
           </label>
           <label className="text-xs text-slate-500">
             Lead source
-            <select
-              className="mt-1 w-full border rounded-lg px-3 py-2"
+            <SelectInput
+              className="mt-1"
               value={filters.source}
               onChange={(event) => handleFilterChange("source", event.target.value)}
             >
@@ -185,12 +186,12 @@ export default function Dashboard() {
                   {source}
                 </option>
               ))}
-            </select>
+            </SelectInput>
           </label>
           <label className="text-xs text-slate-500">
             Join month
-            <select
-              className="mt-1 w-full border rounded-lg px-3 py-2"
+            <SelectInput
+              className="mt-1"
               value={filters.join_month}
               onChange={(event) => handleFilterChange("join_month", event.target.value)}
             >
@@ -200,7 +201,7 @@ export default function Dashboard() {
                   {month}
                 </option>
               ))}
-            </select>
+            </SelectInput>
           </label>
         </div>
         <div className="mt-4 flex justify-end">

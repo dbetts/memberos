@@ -4,6 +4,8 @@ import Button from "../components/Button";
 import Toggle from "../components/Toggle";
 import Table from "../components/Table";
 import Badge from "../components/Badge";
+import TextInput from "../components/TextInput";
+import SelectInput from "../components/SelectInput";
 import { apiFetch, isAbortError } from "../api/client";
 import type { BrandingSettings } from "../types/branding";
 import { useBranding } from "../context/BrandingContext";
@@ -484,34 +486,34 @@ export default function Settings() {
         <form className="grid gap-4 md:grid-cols-2" onSubmit={saveBrandingSettings}>
           <label className="text-sm">
             Brand name
-            <input
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+            <TextInput
+              className="mt-1"
               value={brandingForm.name}
               onChange={(event) => setBrandingForm((prev) => ({ ...prev, name: event.target.value }))}
             />
           </label>
           <label className="text-sm">
             Support email
-            <input
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+            <TextInput
+              className="mt-1"
               value={brandingForm.support_email}
               onChange={(event) => setBrandingForm((prev) => ({ ...prev, support_email: event.target.value }))}
             />
           </label>
           <label className="text-sm">
             Primary color
-            <input
+            <TextInput
               type="color"
-              className="mt-1 h-11 w-full rounded-xl border border-slate-200"
+              className="mt-1 h-11"
               value={brandingForm.primary_color}
               onChange={(event) => setBrandingForm((prev) => ({ ...prev, primary_color: event.target.value }))}
             />
           </label>
           <label className="text-sm">
             Accent color
-            <input
+            <TextInput
               type="color"
-              className="mt-1 h-11 w-full rounded-xl border border-slate-200"
+              className="mt-1 h-11"
               value={brandingForm.accent_color}
               onChange={(event) => setBrandingForm((prev) => ({ ...prev, accent_color: event.target.value }))}
             />
@@ -528,7 +530,13 @@ export default function Settings() {
               <img src={branding.logo_url} alt="Brand logo" className="h-16 w-16 rounded-2xl border border-slate-200 bg-white object-contain" />
             )}
             <label className="text-sm font-medium text-brand-600 cursor-pointer">
-              <input type="file" className="hidden" accept="image/*" onChange={handleLogoChange} disabled={logoUploading} />
+              <TextInput
+                type="file"
+                className="hidden border-0 p-0"
+                accept="image/*"
+                onChange={handleLogoChange}
+                disabled={logoUploading}
+              />
               {logoUploading ? "Uploading…" : "Upload logo"}
             </label>
           </div>
@@ -541,8 +549,8 @@ export default function Settings() {
             <label className="text-sm">
               FitFlow subdomain
               <div className="mt-1 flex items-center gap-2">
-                <input
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2"
+                <TextInput
+                  className="w-full"
                   value={domainSettings.subdomain}
                   onChange={(event) => setDomainSettings((prev) => ({ ...prev, subdomain: event.target.value }))}
                   placeholder="mygym"
@@ -552,8 +560,8 @@ export default function Settings() {
             </label>
             <label className="text-sm">
               Custom domain
-              <input
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              <TextInput
+                className="mt-1"
                 value={domainSettings.custom_domain}
                 onChange={(event) => setDomainSettings((prev) => ({ ...prev, custom_domain: event.target.value }))}
                 placeholder="members.yourclub.com"
@@ -570,8 +578,8 @@ export default function Settings() {
           <form className="grid gap-4" onSubmit={saveSmtpSettings}>
             <label className="text-sm">
               Host
-              <input
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              <TextInput
+                className="mt-1"
                 value={smtpForm.host}
                 onChange={(event) => setSmtpForm((prev) => ({ ...prev, host: event.target.value }))}
                 required
@@ -579,9 +587,9 @@ export default function Settings() {
             </label>
             <label className="text-sm">
               Port
-              <input
+              <TextInput
                 type="number"
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+                className="mt-1"
                 value={smtpForm.port}
                 onChange={(event) => setSmtpForm((prev) => ({ ...prev, port: Number(event.target.value) }))}
                 required
@@ -589,17 +597,17 @@ export default function Settings() {
             </label>
             <label className="text-sm">
               Username
-              <input
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              <TextInput
+                className="mt-1"
                 value={smtpForm.username}
                 onChange={(event) => setSmtpForm((prev) => ({ ...prev, username: event.target.value }))}
               />
             </label>
             <label className="text-sm">
               Password
-              <input
+              <TextInput
                 type="password"
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+                className="mt-1"
                 value={smtpForm.password}
                 onChange={(event) => setSmtpForm((prev) => ({ ...prev, password: event.target.value }))}
                 placeholder={branding?.smtp?.has_password ? "••••••••" : ""}
@@ -607,8 +615,8 @@ export default function Settings() {
             </label>
             <label className="text-sm">
               Encryption
-              <select
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              <SelectInput
+                className="mt-1"
                 value={smtpForm.encryption}
                 onChange={(event) => setSmtpForm((prev) => ({ ...prev, encryption: event.target.value }))}
               >
@@ -616,20 +624,20 @@ export default function Settings() {
                 <option value="ssl">SSL</option>
                 <option value="starttls">STARTTLS</option>
                 <option value="none">None</option>
-              </select>
+              </SelectInput>
             </label>
             <label className="text-sm">
               From name
-              <input
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              <TextInput
+                className="mt-1"
                 value={smtpForm.from_name}
                 onChange={(event) => setSmtpForm((prev) => ({ ...prev, from_name: event.target.value }))}
               />
             </label>
             <label className="text-sm">
               From email
-              <input
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              <TextInput
+                className="mt-1"
                 value={smtpForm.from_email}
                 onChange={(event) => setSmtpForm((prev) => ({ ...prev, from_email: event.target.value }))}
               />
@@ -648,12 +656,12 @@ export default function Settings() {
             CSV headers supported: <code>first_name</code>, <code>last_name</code>, <code>email</code>, <code>phone</code>,{" "}
             <code>status</code>, <code>timezone</code>. We will provision member portal logins for any row containing an email.
           </p>
-          <input
+          <TextInput
             type="file"
             accept=".csv,text/csv"
             onChange={handleImportUpload}
             disabled={importUploading}
-            className="rounded-xl border border-dashed border-slate-300 px-4 py-6 text-sm text-slate-600"
+            className="rounded-xl border-dashed border-slate-300 px-4 py-6 text-sm text-slate-600"
           />
           {importError && <p className="text-sm text-rose-600">{importError}</p>}
           {importSummary && (
@@ -705,57 +713,57 @@ export default function Settings() {
           <div className="grid md:grid-cols-2 gap-6">
             <label className="text-sm">
               Quiet hours start
-              <input
+              <TextInput
                 name="quiet_hours_start"
                 type="time"
                 value={quietStart}
-                className="mt-1 w-full border rounded-lg px-3 py-2"
+                className="mt-1"
                 onChange={(event) => setQuietStart(event.target.value)}
               />
             </label>
             <label className="text-sm">
               Quiet hours end
-              <input
+              <TextInput
                 name="quiet_hours_end"
                 type="time"
                 value={quietEnd}
-                className="mt-1 w-full border rounded-lg px-3 py-2"
+                className="mt-1"
                 onChange={(event) => setQuietEnd(event.target.value)}
               />
             </label>
             <label className="text-sm">
               Daily send cap
-              <input
+              <TextInput
                 name="daily_cap"
                 type="number"
                 min={0}
                 value={dailyCap}
-                className="mt-1 w-full border rounded-lg px-3 py-2"
+                className="mt-1"
                 onChange={(event) => setDailyCap(Number(event.target.value))}
               />
             </label>
             <label className="text-sm">
               Weekly send cap
-              <input
+              <TextInput
                 name="weekly_cap"
                 type="number"
                 min={0}
                 value={weeklyCap}
-                className="mt-1 w-full border rounded-lg px-3 py-2"
+                className="mt-1"
                 onChange={(event) => setWeeklyCap(Number(event.target.value))}
               />
             </label>
             <label className="text-sm">
               Timezone strategy
-              <select
+              <SelectInput
                 name="timezone"
                 value={timezoneStrategy}
-                className="mt-1 w-full border rounded-lg px-3 py-2"
+                className="mt-1"
                 onChange={(event) => setTimezoneStrategy(event.target.value)}
               >
                 <option value="member_preference">Member timezone</option>
                 <option value="organization">Organization timezone</option>
-              </select>
+              </SelectInput>
             </label>
             <div className="text-sm flex items-center justify-between border rounded-lg px-4 py-3">
               <div>
@@ -818,9 +826,9 @@ export default function Settings() {
                   <div className="font-medium">{loc.name}</div>
                   <div className="text-xs text-slate-500">Cancellation window (minutes)</div>
                 </div>
-                <input
+                <TextInput
                   type="number"
-                  className="w-28 border rounded-lg px-2 py-1 text-sm"
+                  className="w-28 px-2 py-1 text-sm"
                   value={loc.cancellation_window_minutes}
                   onChange={(event) =>
                     setLocationsAdmin((prev) =>
@@ -893,22 +901,22 @@ export default function Settings() {
             }
           }}
         >
-          <input
+          <TextInput
             className="border rounded-lg px-3 py-2"
             placeholder="Name"
             value={classTypeForm.name}
             onChange={(event) => setClassTypeForm((prev) => ({ ...prev, name: event.target.value }))}
             required
           />
-          <input
+          <TextInput
             className="border rounded-lg px-3 py-2"
             placeholder="Description"
             value={classTypeForm.description}
             onChange={(event) => setClassTypeForm((prev) => ({ ...prev, description: event.target.value }))}
           />
           <div className="flex gap-2">
-            <input
-              className="border rounded-lg px-3 py-2 flex-1"
+            <TextInput
+              className="flex-1 border rounded-lg px-3 py-2"
               placeholder="Capacity"
               value={classTypeForm.default_capacity}
               onChange={(event) => setClassTypeForm((prev) => ({ ...prev, default_capacity: event.target.value }))}
@@ -997,7 +1005,7 @@ export default function Settings() {
                 }
               }}
             >
-              <input
+              <TextInput
                 className="border rounded-lg px-3 py-2"
                 placeholder="Title"
                 value={noteForm.title}
@@ -1046,26 +1054,26 @@ export default function Settings() {
               }
             }}
           >
-            <input
+            <TextInput
               className="border rounded-lg px-3 py-2"
               placeholder="Domain"
               value={domainForm.domain}
               onChange={(event) => setDomainForm((prev) => ({ ...prev, domain: event.target.value }))}
               required
             />
-            <input
+            <TextInput
               className="border rounded-lg px-3 py-2"
               placeholder="SPF record"
               value={domainForm.spf_record}
               onChange={(event) => setDomainForm((prev) => ({ ...prev, spf_record: event.target.value }))}
             />
-            <input
+            <TextInput
               className="border rounded-lg px-3 py-2"
               placeholder="DKIM selector"
               value={domainForm.dkim_selector}
               onChange={(event) => setDomainForm((prev) => ({ ...prev, dkim_selector: event.target.value }))}
             />
-            <input
+            <TextInput
               className="border rounded-lg px-3 py-2"
               placeholder="DKIM value"
               value={domainForm.dkim_value}
@@ -1102,14 +1110,14 @@ export default function Settings() {
               }
             }}
           >
-            <input
+            <TextInput
               className="border rounded-lg px-3 py-2"
               placeholder="Brand name"
               value={smsForm.brand_name}
               onChange={(event) => setSmsForm((prev) => ({ ...prev, brand_name: event.target.value }))}
               required
             />
-            <input
+            <TextInput
               className="border rounded-lg px-3 py-2"
               placeholder="Campaign name"
               value={smsForm.campaign_name}

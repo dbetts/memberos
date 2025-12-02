@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Card from "../components/Card";
 import Button from "../components/Button";
+import TextInput from "../components/TextInput";
 import { apiFetch, isAbortError } from "../api/client";
 
 type WorkoutForm = {
@@ -100,18 +101,18 @@ export default function WorkoutEditor() {
             <div className="space-y-4">
               <label className="block text-sm font-medium text-slate-700">
                 Name
-                <input
+                <TextInput
+                  className="mt-1"
                   value={form.title}
                   onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
-                  className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
                 />
               </label>
               <label className="block text-sm font-medium text-slate-700">
                 Block
-                <input
+                <TextInput
+                  className="mt-1"
                   value={form.block}
                   onChange={(event) => setForm((prev) => ({ ...prev, block: event.target.value }))}
-                  className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
                 />
               </label>
               <label className="block text-sm font-medium text-slate-700">

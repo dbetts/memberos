@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import Card from "../components/Card";
 import Table from "../components/Table";
 import Button from "../components/Button";
+import TextInput from "../components/TextInput";
 import { apiFetch, isAbortError } from "../api/client";
 
 interface LeadRow {
@@ -153,8 +154,8 @@ export default function CRM() {
         <form className="grid gap-4 md:grid-cols-2" onSubmit={handleMemberCreate}>
           <label className="text-sm">
             First name
-            <input
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+            <TextInput
+              className="mt-1"
               value={memberForm.first_name}
               onChange={(event) => setMemberForm((prev) => ({ ...prev, first_name: event.target.value }))}
               required
@@ -162,8 +163,8 @@ export default function CRM() {
           </label>
           <label className="text-sm">
             Last name
-            <input
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+            <TextInput
+              className="mt-1"
               value={memberForm.last_name}
               onChange={(event) => setMemberForm((prev) => ({ ...prev, last_name: event.target.value }))}
               required
@@ -171,9 +172,9 @@ export default function CRM() {
           </label>
           <label className="text-sm">
             Email
-            <input
+            <TextInput
               type="email"
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              className="mt-1"
               value={memberForm.email}
               onChange={(event) => setMemberForm((prev) => ({ ...prev, email: event.target.value }))}
               placeholder="Optional"
@@ -181,8 +182,8 @@ export default function CRM() {
           </label>
           <label className="text-sm">
             Phone
-            <input
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+            <TextInput
+              className="mt-1"
               value={memberForm.phone}
               onChange={(event) => setMemberForm((prev) => ({ ...prev, phone: event.target.value }))}
               placeholder="+1 (555) 555-0123"
@@ -190,8 +191,8 @@ export default function CRM() {
           </label>
           <label className="text-sm">
             Timezone
-            <input
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+            <TextInput
+              className="mt-1"
               value={memberForm.timezone}
               onChange={(event) => setMemberForm((prev) => ({ ...prev, timezone: event.target.value }))}
               placeholder="Defaults to org timezone"
@@ -199,9 +200,9 @@ export default function CRM() {
           </label>
           <label className="text-sm">
             Portal email
-            <input
+            <TextInput
               type="email"
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              className="mt-1"
               value={memberForm.portal_email}
               onChange={(event) => setMemberForm((prev) => ({ ...prev, portal_email: event.target.value }))}
               placeholder="Creates login if provided"
@@ -209,9 +210,9 @@ export default function CRM() {
           </label>
           <label className="text-sm">
             Portal password
-            <input
+            <TextInput
               type="password"
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              className="mt-1"
               value={memberForm.portal_password}
               onChange={(event) => setMemberForm((prev) => ({ ...prev, portal_password: event.target.value }))}
               placeholder="Leave blank to auto-generate"

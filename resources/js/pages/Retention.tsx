@@ -4,6 +4,8 @@ import Table from "../components/Table";
 import Badge from "../components/Badge";
 import Modal from "../components/Modal";
 import Button from "../components/Button";
+import TextInput from "../components/TextInput";
+import SelectInput from "../components/SelectInput";
 import { apiFetch, isAbortError } from "../api/client";
 
 type HeatmapResponse = { low: number; medium: number; high: number; critical: number };
@@ -261,8 +263,8 @@ export default function Retention() {
           <form className="grid gap-4" onSubmit={logFreezeRequest}>
             <label className="text-sm">
               Member ID
-              <input
-                className="mt-1 w-full border rounded-lg px-3 py-2"
+              <TextInput
+                className="mt-1"
                 value={freezeMemberId}
                 onChange={(event) => setFreezeMemberId(event.target.value)}
                 placeholder="MEM-123"
@@ -270,8 +272,8 @@ export default function Retention() {
             </label>
             <label className="text-sm">
               Reason
-              <input
-                className="mt-1 w-full border rounded-lg px-3 py-2"
+              <TextInput
+                className="mt-1"
                 value={freezeReason}
                 onChange={(event) => setFreezeReason(event.target.value)}
                 placeholder="Travel, recovery, etc."
@@ -334,8 +336,8 @@ export default function Retention() {
         <form id="playbook-form" className="grid gap-4" onSubmit={handleCreatePlaybook}>
           <label className="text-sm">
             Name
-            <input
-              className="mt-1 w-full border rounded-lg px-3 py-2"
+            <TextInput
+              className="mt-1"
               value={name}
               onChange={(event) => setName(event.target.value)}
               required
@@ -343,26 +345,26 @@ export default function Retention() {
           </label>
           <label className="text-sm">
             Trigger
-            <select
-              className="mt-1 w-full border rounded-lg px-3 py-2"
+            <SelectInput
+              className="mt-1"
               value={triggerType}
               onChange={(event) => setTriggerType(event.target.value)}
             >
               <option value="no_check_in">7 days no check‑in</option>
               <option value="missed_classes">Missed 2 booked classes</option>
               <option value="cancel_recent">Cancel within 30 days</option>
-            </select>
+            </SelectInput>
           </label>
           <label className="text-sm">
             Channel
-            <select
-              className="mt-1 w-full border rounded-lg px-3 py-2"
+            <SelectInput
+              className="mt-1"
               value={channel}
               onChange={(event) => setChannel(event.target.value)}
             >
               <option value="sms">SMS</option>
               <option value="email">Email</option>
-            </select>
+            </SelectInput>
           </label>
           <p className="text-xs text-slate-500">
             SMS is convenient but less secure than authenticator apps. Encourage staff to opt into authenticator MFA for

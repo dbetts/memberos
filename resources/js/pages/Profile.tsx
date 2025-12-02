@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import Card from "../components/Card";
 import Button from "../components/Button";
+import TextInput from "../components/TextInput";
 import { apiFetch, isAbortError } from "../api/client";
 
 type ProfilePayload = {
@@ -95,8 +96,8 @@ export default function Profile() {
           <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
             <label className="text-sm">
               Full name
-              <input
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              <TextInput
+                className="mt-1"
                 value={form.name}
                 onChange={(event) => updateField("name", event.target.value)}
                 required
@@ -104,9 +105,9 @@ export default function Profile() {
             </label>
             <label className="text-sm">
               Email
-              <input
+              <TextInput
                 type="email"
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+                className="mt-1"
                 value={form.email}
                 onChange={(event) => updateField("email", event.target.value)}
                 required
@@ -114,65 +115,65 @@ export default function Profile() {
             </label>
             <label className="text-sm">
               Phone
-              <input
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              <TextInput
+                className="mt-1"
                 value={form.phone}
                 onChange={(event) => updateField("phone", event.target.value)}
               />
             </label>
             <label className="text-sm">
               Address line 1
-              <input
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              <TextInput
+                className="mt-1"
                 value={form.address.line1}
                 onChange={(event) => updateAddressField("line1", event.target.value)}
               />
             </label>
             <label className="text-sm">
               Address line 2
-              <input
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              <TextInput
+                className="mt-1"
                 value={form.address.line2}
                 onChange={(event) => updateAddressField("line2", event.target.value)}
               />
             </label>
             <label className="text-sm">
               City
-              <input
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              <TextInput
+                className="mt-1"
                 value={form.address.city}
                 onChange={(event) => updateAddressField("city", event.target.value)}
               />
             </label>
             <label className="text-sm">
               State
-              <input
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              <TextInput
+                className="mt-1"
                 value={form.address.state}
                 onChange={(event) => updateAddressField("state", event.target.value)}
               />
             </label>
             <label className="text-sm">
               Postal code
-              <input
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              <TextInput
+                className="mt-1"
                 value={form.address.postal}
                 onChange={(event) => updateAddressField("postal", event.target.value)}
               />
             </label>
             <label className="text-sm">
               Country
-              <input
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              <TextInput
+                className="mt-1"
                 value={form.address.country}
                 onChange={(event) => updateAddressField("country", event.target.value)}
               />
             </label>
             <label className="text-sm">
               New password
-              <input
+              <TextInput
                 type="password"
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+                className="mt-1"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="Leave blank to keep current"
@@ -181,9 +182,9 @@ export default function Profile() {
             </label>
             <label className="text-sm">
               Confirm password
-              <input
+              <TextInput
                 type="password"
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+                className="mt-1"
                 value={passwordConfirmation}
                 onChange={(event) => setPasswordConfirmation(event.target.value)}
                 placeholder="Repeat new password"
