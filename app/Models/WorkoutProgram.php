@@ -25,8 +25,8 @@ class WorkoutProgram extends Model
         'is_active' => 'bool',
     ];
 
-    public function sessions(): HasMany
+    public function workouts(): HasMany
     {
-        return $this->hasMany(WorkoutSession::class);
+        return $this->hasMany(Workout::class);
     }
 }

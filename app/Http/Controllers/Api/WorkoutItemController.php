@@ -5,32 +5,46 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Api\Concerns\ResolvesOrganization;
 use App\Http\Controllers\Controller;
 use App\Models\Exercise;
+use App\Models\Workout;
 use App\Models\WorkoutItem;
-use App\Models\WorkoutSession;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class WorkoutItemController extends Controller
 {
+    private const METRIC_OPTIONS = [
+        'load',
+        'rpe',
+        'one_rm_percent',
+        'rir',
+        'time',
+        'rounds_reps',
+        'reps',
+        'calories',
+        'meters',
+    ];
+    private const VISIBILITY_OPTIONS = ['everyone', 'coaches', 'programmers'];
+
     use ResolvesOrganization;
 
     public function show(Request $request, WorkoutItem $item): JsonResponse
     {
         $organization = $this->resolveOrganization($request);
-        abort_unless($item->organization_id === $organization->id, 404);
+        $item->loadMissing('workout');
+        abort_unless(optional($item->workout)->organization_id === $organization->id, 404);
 
         return response()->json(['data' => $item]);
     }
 
-    public function store(Request $request, WorkoutSession $session): JsonResponse
+    public function store(Request $request, Workout $workout): JsonResponse
     {
         $organization = $this->resolveOrganization($request);
-        abort_unless($session->organization_id === $organization->id, 404);
+        abort_unless($workout->organization_id === $organization->id, 404);
 
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'block' => ['nullable', 'string', 'max:120'],
             'exercise_type' => ['nullable', 'string', 'max:50'],
             'measurement_type' => ['nullable', 'string', 'max:50'],
             'measurement' => ['nullable', 'array'],
@@ -43,9 +57,15 @@ class WorkoutItemController extends Controller
             'coach_notes' => ['nullable', 'string'],
             'athlete_notes' => ['nullable', 'string'],
             'exercise_id' => ['nullable', 'uuid', 'exists:exercises,id'],
+            'reps' => ['nullable', 'array'],
+            'reps.*.set' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'reps.*.reps' => ['nullable', 'integer', 'min:0', 'max:2000'],
+            'reps.*.prescription' => ['nullable', 'string', 'max:120'],
+            'metric' => ['nullable', Rule::in(self::METRIC_OPTIONS)],
+            'visible_to' => ['nullable', Rule::in(self::VISIBILITY_OPTIONS)],
         ]);
 
-        $position = ($session->items()->max('position') ?? -1) + 1;
+        $position = ($workout->items()->max('position') ?? -1) + 1;
         $exercise = null;
         if (! empty($data['exercise_id'])) {
             $exercise = Exercise::where('id', $data['exercise_id'])
@@ -57,14 +77,16 @@ class WorkoutItemController extends Controller
 
         $measurements = $this->prepareMeasurements($data);
         $primaryMeasurement = $measurements[0] ?? null;
+        $repsPayload = $this->normalizeStrengthSets($data['reps'] ?? null);
 
         $item = WorkoutItem::create([
-            'workout_session_id' => $session->id,
-            'organization_id' => $organization->id,
+            'workout_id' => $workout->id,
             'title' => $data['title'] ?? ($exercise?->name ?? 'Workout'),
-            'block' => $data['block'] ?? 'Workout',
             'exercise_id' => $exercise?->id,
             'exercise_type' => $data['exercise_type'] ?? null,
+            'reps' => $repsPayload,
+            'metric' => $data['metric'] ?? null,
+            'visible_to' => $data['visible_to'] ?? 'everyone',
             'measurement_type' => $primaryMeasurement['type'] ?? ($data['measurement_type'] ?? null),
             'measurement' => $measurements ?: ($data['measurement'] ?? null),
             'rest_seconds' => $data['rest_seconds'] ?? null,
@@ -81,11 +103,11 @@ class WorkoutItemController extends Controller
     public function update(Request $request, WorkoutItem $item): JsonResponse
     {
         $organization = $this->resolveOrganization($request);
-        abort_unless($item->organization_id === $organization->id, 404);
+        $item->loadMissing('workout');
+        abort_unless(optional($item->workout)->organization_id === $organization->id, 404);
 
         $data = $request->validate([
             'title' => ['sometimes', 'string', 'max:255'],
-            'block' => ['sometimes', 'string', 'max:120'],
             'exercise_type' => ['sometimes', 'string', 'max:50'],
             'measurement_type' => ['sometimes', 'string', 'max:50'],
             'measurement' => ['sometimes', 'array'],
@@ -98,6 +120,12 @@ class WorkoutItemController extends Controller
             'coach_notes' => ['nullable', 'string'],
             'athlete_notes' => ['nullable', 'string'],
             'exercise_id' => ['nullable', 'uuid', 'exists:exercises,id'],
+            'reps' => ['nullable', 'array'],
+            'reps.*.set' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'reps.*.reps' => ['nullable', 'integer', 'min:0', 'max:2000'],
+            'reps.*.prescription' => ['nullable', 'string', 'max:120'],
+            'metric' => ['nullable', Rule::in(self::METRIC_OPTIONS)],
+            'visible_to' => ['nullable', Rule::in(self::VISIBILITY_OPTIONS)],
         ]);
 
         if (! empty($data['exercise_id'])) {
@@ -116,6 +144,11 @@ class WorkoutItemController extends Controller
             $item->measurement = $measurements ?: ($data['measurement'] ?? $item->measurement);
         }
 
+        if (array_key_exists('reps', $data)) {
+            $item->reps = $this->normalizeStrengthSets($data['reps']);
+            unset($data['reps']);
+        }
+
         $item->fill($data);
         $item->save();
 
@@ -125,7 +158,8 @@ class WorkoutItemController extends Controller
     public function destroy(Request $request, WorkoutItem $item): JsonResponse
     {
         $organization = $this->resolveOrganization($request);
-        abort_unless($item->organization_id === $organization->id, 404);
+        $item->loadMissing('workout');
+        abort_unless(optional($item->workout)->organization_id === $organization->id, 404);
 
         $item->delete();
 
@@ -135,19 +169,24 @@ class WorkoutItemController extends Controller
     public function move(Request $request, WorkoutItem $item): JsonResponse
     {
         $organization = $this->resolveOrganization($request);
-        abort_unless($item->organization_id === $organization->id, 404);
+        $item->loadMissing('workout');
+        abort_unless(optional($item->workout)->organization_id === $organization->id, 404);
 
         $data = $request->validate([
-            'session_id' => ['required', 'uuid'],
+            'workout_id' => ['nullable', 'uuid'],
+            'session_id' => ['nullable', 'uuid'],
             'position' => ['nullable', 'integer', 'min:0'],
         ]);
 
-        $session = WorkoutSession::where('id', $data['session_id'])
+        $targetWorkoutId = $data['workout_id'] ?? $data['session_id'] ?? null;
+        abort_unless($targetWorkoutId !== null, 422, 'A workout_id is required.');
+
+        $workout = Workout::where('id', $targetWorkoutId)
             ->where('organization_id', $organization->id)
             ->firstOrFail();
 
-        $item->workout_session_id = $session->id;
-        $item->position = $data['position'] ?? ($session->items()->max('position') ?? -1) + 1;
+        $item->workout_id = $workout->id;
+        $item->position = $data['position'] ?? ($workout->items()->max('position') ?? -1) + 1;
         $item->save();
 
         return response()->json(['data' => $item]);
@@ -156,10 +195,11 @@ class WorkoutItemController extends Controller
     public function duplicate(Request $request, WorkoutItem $item): JsonResponse
     {
         $organization = $this->resolveOrganization($request);
-        abort_unless($item->organization_id === $organization->id, 404);
+        $item->loadMissing('workout');
+        abort_unless(optional($item->workout)->organization_id === $organization->id, 404);
 
-        $session = $item->session;
-        $position = ($session->items()->max('position') ?? -1) + 1;
+        $workout = $item->workout;
+        $position = ($workout->items()->max('position') ?? -1) + 1;
 
         $clone = $item->replicate();
         $clone->id = (string) Str::uuid();
@@ -168,6 +208,37 @@ class WorkoutItemController extends Controller
         $clone->save();
 
         return response()->json(['data' => $clone], 201);
+    }
+
+    protected function normalizeStrengthSets(?array $rows): ?array
+    {
+        if (empty($rows) || ! is_array($rows)) {
+            return null;
+        }
+
+        $normalized = [];
+
+        foreach ($rows as $index => $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $setNumber = isset($row['set']) ? max(1, (int) $row['set']) : $index + 1;
+            $reps = array_key_exists('reps', $row)
+                ? ($row['reps'] === null || $row['reps'] === '' ? null : (int) $row['reps'])
+                : null;
+            $prescription = isset($row['prescription']) && $row['prescription'] !== ''
+                ? trim((string) $row['prescription'])
+                : null;
+
+            $normalized[] = [
+                'set' => $setNumber,
+                'reps' => $reps,
+                'prescription' => $prescription,
+            ];
+        }
+
+        return $normalized ?: null;
     }
 
     protected function prepareMeasurements(array $data): array

@@ -5,7 +5,21 @@ import Modal from "../components/Modal";
 import TextInput from "../components/TextInput";
 import SelectInput from "../components/SelectInput";
 import { apiFetch, isAbortError } from "../api/client";
-import { Copy, Trash2, Eye, Pencil, Plus, GripVertical, Settings, Search, Minus } from "lucide-react";
+import {
+  Copy,
+  Trash2,
+  Eye,
+  Pencil,
+  Plus,
+  GripVertical,
+  Settings,
+  Search,
+  Minus,
+  ChevronDown,
+  Calendar as CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import Tooltip from "../components/Tooltip";
 
 type WorkoutProgram = {
@@ -20,12 +34,14 @@ type Weekday = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
 type WorkoutCard = {
   id: string;
   title: string;
-  block: string;
   description?: string | null;
   color?: string | null;
   instructions?: string | null;
   exerciseId?: string | null;
   exerciseType?: string | null;
+  metric?: string | null;
+  visibleTo?: string | null;
+  reps?: StrengthSetPayload[] | null;
   measurementType?: string | null;
   measurement?: Record<string, unknown> | null;
   measurements?: MeasurementEntry[] | null;
@@ -33,6 +49,7 @@ type WorkoutCard = {
   isScored?: boolean;
   coachNotes?: string | null;
   athleteNotes?: string | null;
+  metconStructure?: string | null;
 };
 
 type MeasurementEntry = {
@@ -50,6 +67,61 @@ type WeightSetRow = {
   load: string;
 };
 
+type StrengthSetRow = {
+  id: string;
+  set: number;
+  reps: number | null;
+  prescription: string;
+};
+
+type StrengthSetPayload = {
+  set: number;
+  reps: number | null;
+  prescription: string | null;
+};
+
+const measurementOptions = [
+  { value: "calories", label: "Calories" },
+  { value: "meters", label: "Meters / distance" },
+  { value: "reps", label: "Reps" },
+  { value: "weight", label: "Weight / load" },
+];
+
+const strengthMetricOptions = [
+  { value: "load", label: "Load" },
+  { value: "rpe", label: "RPE" },
+  { value: "one_rm_percent", label: "1RM %" },
+  { value: "rir", label: "RIR" },
+];
+
+const metconStructureOptions = [
+  { value: "", label: "Select format" },
+  { value: "for_time", label: "For time" },
+  { value: "amrap", label: "AMRAP" },
+  { value: "emom", label: "EMOM" },
+  { value: "chipper", label: "Chipper" },
+  { value: "ladder", label: "Ladder" },
+];
+
+const metconMetricOptions = [
+  { value: "time", label: "Time" },
+  { value: "rounds_reps", label: "Rounds + Reps" },
+  { value: "reps", label: "Reps" },
+  { value: "load", label: "Load" },
+  { value: "calories", label: "Calories" },
+  { value: "meters", label: "Meters" },
+];
+
+const metricLabelOptions = [...strengthMetricOptions, ...metconMetricOptions];
+
+const visibilityOptions = [
+  { value: "everyone", label: "Everyone" },
+  { value: "coaches", label: "Coaches" },
+  { value: "programmers", label: "Programmers" },
+];
+
+const strengthRepOptions = Array.from({ length: 30 }, (_, index) => index + 1);
+
 type WorkoutDay = {
   sessionId: string;
   date: string;
@@ -63,6 +135,15 @@ function uid(): string {
 
 function createMeasurementRow(type = "", data: Record<string, unknown> = {}): MeasurementRow {
   return { id: uid(), type, data };
+}
+
+function createStrengthSetRow(set = 1, reps: number | null = null, prescription = ""): StrengthSetRow {
+  return {
+    id: uid(),
+    set,
+    reps,
+    prescription,
+  };
 }
 
 function coerceMeasurementData(type: string, value: unknown): Record<string, unknown> {
@@ -155,6 +236,148 @@ function normalizeMeasurementData(row: MeasurementRow): Record<string, unknown> 
   return row.data ?? {};
 }
 
+function strengthSetsFromCard(card: Partial<WorkoutCard>): StrengthSetRow[] {
+  const raw = Array.isArray(card.reps) ? card.reps : [];
+  if (!raw.length) {
+    return [createStrengthSetRow()];
+  }
+  return raw.map((entry, index) => {
+    const prescription =
+      typeof entry?.prescription === "string"
+        ? entry.prescription
+        : entry?.prescription != null
+          ? String(entry.prescription)
+          : "";
+    return createStrengthSetRow(entry?.set ?? index + 1, entry?.reps ?? null, prescription);
+  });
+}
+
+function serializeStrengthSets(rows: StrengthSetRow[]): StrengthSetPayload[] {
+  return rows
+    .map((row, index) => ({
+      set: row.set ?? index + 1,
+      reps: row.reps ?? null,
+      prescription: row.prescription.trim() !== "" ? row.prescription.trim() : null,
+    }))
+    .filter((entry) => entry.reps !== null || (entry.prescription && entry.prescription.length > 0));
+}
+
+function formatMetricLabel(value?: string | null): string {
+  if (!value) return "";
+  const entry = metricLabelOptions.find((option) => option.value === value);
+  return entry?.label ?? value;
+}
+
+function formatVisibleLabel(value?: string | null): string {
+  if (!value) return "";
+  const entry = visibilityOptions.find((option) => option.value === value);
+  return entry?.label ?? value;
+}
+
+function strengthMetricPlaceholder(metric: string): string {
+  switch (metric) {
+    case "rpe":
+      return "e.g. 8.5 RPE";
+    case "one_rm_percent":
+      return "e.g. 75%";
+    case "rir":
+      return "e.g. 2 reps in reserve";
+    default:
+      return "e.g. 225 lb or 100 kg";
+  }
+}
+
+function isRichTextEmpty(value?: string | null): boolean {
+  if (!value) return true;
+  const stripped = value
+    .replace(/<br\s*\/?>/gi, "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/<[^>]+>/g, "")
+    .trim();
+  return stripped.length === 0;
+}
+
+function isHtmlLike(value?: string | null): boolean {
+  if (!value) return false;
+  return /<\/?[a-z][\s\S]*>/i.test(value);
+}
+
+type RichTextEditorProps = {
+  value: string;
+  onChange: (next: string) => void;
+  placeholder?: string;
+};
+
+function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
+  const editorRef = useRef<HTMLDivElement | null>(null);
+  const [isFocused, setIsFocused] = useState(false);
+
+  useEffect(() => {
+    if (!editorRef.current) return;
+    const current = editorRef.current.innerHTML;
+    if ((value ?? "") === current) return;
+    editorRef.current.innerHTML = value || "";
+  }, [value]);
+
+  function emitChange() {
+    if (!editorRef.current) return;
+    onChange(editorRef.current.innerHTML);
+  }
+
+  function handleCommand(command: string) {
+    editorRef.current?.focus();
+    document.execCommand(command, false);
+    emitChange();
+  }
+
+  const empty = isRichTextEmpty(value);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-600">
+        <button
+          type="button"
+          className="rounded-xl px-3 py-1 text-xs font-semibold uppercase tracking-wide hover:bg-white"
+          onClick={() => handleCommand("bold")}
+        >
+          Bold
+        </button>
+        <button
+          type="button"
+          className="rounded-xl px-3 py-1 text-xs font-semibold uppercase tracking-wide hover:bg-white"
+          onClick={() => handleCommand("italic")}
+        >
+          Italic
+        </button>
+        <button
+          type="button"
+          className="rounded-xl px-3 py-1 text-xs font-semibold uppercase tracking-wide hover:bg-white"
+          onClick={() => handleCommand("insertUnorderedList")}
+        >
+          Bullets
+        </button>
+      </div>
+      <div className="relative">
+        <div
+          ref={editorRef}
+          className="min-h-[180px] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm focus-within:border-slate-300 focus-within:ring-2 focus-within:ring-brand-100"
+          contentEditable
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => {
+            setIsFocused(false);
+            emitChange();
+          }}
+          onInput={emitChange}
+          suppressContentEditableWarning
+        />
+        {empty && !isFocused && (
+          <span className="pointer-events-none absolute left-4 top-3 text-sm text-slate-400">{placeholder}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function getWeightRows(data: Record<string, unknown>): WeightSetRow[] {
   const raw = Array.isArray((data as any)?.setRows)
     ? ((data as any).setRows as Array<{ set?: number; reps?: number | null; load?: string }>)
@@ -235,11 +458,59 @@ function summarizeCardMeasurements(card: WorkoutCard): string[] {
   });
 }
 
+function summarizeStrengthSets(card: WorkoutCard): string[] {
+  if (!Array.isArray(card.reps) || card.reps.length === 0) return [];
+  const metric = formatMetricLabel(card.metric);
+  return card.reps.map((entry, index) => {
+    const setNumber = entry.set ?? index + 1;
+    const reps = entry.reps ?? "—";
+    const target = entry.prescription ? ` @ ${entry.prescription}` : "";
+    const metricText = metric ? ` (${metric})` : "";
+    return `Set ${setNumber}: ${reps} reps${target}${metricText}`;
+  });
+}
+
 function formatLocalDate(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+
+const DEFAULT_WORKOUT_TITLE = "New Workout";
+
+function normalizeWorkoutTitle(title?: string | null): string {
+  const trimmed = title?.trim();
+  if (!trimmed) return DEFAULT_WORKOUT_TITLE;
+  return trimmed.toLowerCase() === DEFAULT_WORKOUT_TITLE.toLowerCase() ? DEFAULT_WORKOUT_TITLE : trimmed;
+}
+
+function isDefaultWorkoutTitle(title?: string | null): boolean {
+  return normalizeWorkoutTitle(title) === DEFAULT_WORKOUT_TITLE;
+}
+
+const CALENDAR_WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+type CalendarCell = {
+  date: Date;
+  inCurrentMonth: boolean;
+};
+
+function buildCalendarGrid(monthDate: Date): CalendarCell[] {
+  const firstOfMonth = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+  const startDayIndex = firstOfMonth.getDay();
+  const gridStart = new Date(firstOfMonth);
+  gridStart.setDate(firstOfMonth.getDate() - startDayIndex);
+  const cells: CalendarCell[] = [];
+  for (let idx = 0; idx < 42; idx += 1) {
+    const cellDate = new Date(gridStart);
+    cellDate.setDate(gridStart.getDate() + idx);
+    cells.push({
+      date: cellDate,
+      inCurrentMonth: cellDate.getMonth() === monthDate.getMonth(),
+    });
+  }
+  return cells;
 }
 
 function startOfWeek(date = new Date(), firstDay: Weekday = "Mon"): string {
@@ -261,6 +532,11 @@ export default function WorkoutBuilder() {
     metcon: "linear-gradient(90deg,#a5f3fc,#67e8f9)",
     skill: "linear-gradient(90deg,#22c55e,#16a34a)",
     cooldown: "linear-gradient(90deg,#ede9fe,#ddd6fe)",
+    endurance: "linear-gradient(90deg,#06b6d4,#0ea5e9)",
+    benchmarks: "linear-gradient(90deg,#fb923c,#f97316)",
+    custom: "linear-gradient(90deg,#a855f7,#c084fc)",
+    unscored: "linear-gradient(90deg,#cbd5f5,#94a3b8)",
+    media: "linear-gradient(90deg,#f472b6,#fb7185)",
     other: "linear-gradient(90deg,#e2e8f0,#f1f5f9)",
   };
   const exerciseTypes = [
@@ -269,13 +545,24 @@ export default function WorkoutBuilder() {
     { value: "metcon", label: "Metcon" },
     { value: "skill", label: "Skill Work" },
     { value: "cooldown", label: "Cool-down" },
+    { value: "endurance", label: "Endurance" },
+    { value: "benchmarks", label: "Benchmarks" },
+    { value: "custom", label: "Custom Workout" },
+    { value: "unscored", label: "Unscored Component" },
+    { value: "media", label: "Media Component" },
     { value: "other", label: "Other" },
   ];
-  const measurementOptions = [
-    { value: "calories", label: "Calories" },
-    { value: "meters", label: "Meters / distance" },
-    { value: "reps", label: "Reps" },
-    { value: "weight", label: "Weight / load" },
+  const workoutTypeChoices = [
+    { value: "strength", label: "Strength" },
+    { value: "metcon", label: "Metcon" },
+    { value: "warmup", label: "Warmup" },
+    { value: "cooldown", label: "Cooldown" },
+    { value: "endurance", label: "Endurance" },
+    { value: "benchmarks", label: "Benchmarks" },
+    { value: "custom", label: "Custom Workout" },
+    { value: "skill", label: "Skill" },
+    { value: "unscored", label: "Unscored Component" },
+    { value: "media", label: "Media Component" },
   ];
   const [programs, setPrograms] = useState<WorkoutProgram[]>([]);
   const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
@@ -290,19 +577,42 @@ export default function WorkoutBuilder() {
   const [editingCard, setEditingCard] = useState<WorkoutCard | null>(null);
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editingForm, setEditingForm] = useState({
-    title: "",
-    block: "Workout",
+    title: "New Workout",
     instructions: "",
     coachNotes: "",
     athleteNotes: "",
     exerciseId: "",
     exerciseType: "strength",
     measurements: [createMeasurementRow()],
+    strengthSets: [createStrengthSetRow()],
+    metric: "load",
+    visibleTo: "everyone",
     restSeconds: "",
     isScored: false,
+    metconStructure: "",
   });
   const [editingErrors, setEditingErrors] = useState<Record<string, string[]>>({});
   const [savingEdit, setSavingEdit] = useState(false);
+  const [newWorkoutMeta, setNewWorkoutMeta] = useState({ type: "", date: "" });
+  const [typePickerOpen, setTypePickerOpen] = useState(false);
+  const [exercisePickerOpen, setExercisePickerOpen] = useState(false);
+  const [exercisePickerVisible, setExercisePickerVisible] = useState(false);
+  const [exercisePickerSearch, setExercisePickerSearch] = useState("");
+  const [metconMetricPickerOpen, setMetconMetricPickerOpen] = useState(false);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [datePickerMonth, setDatePickerMonth] = useState(() => {
+    const today = new Date();
+    today.setDate(1);
+    return today;
+  });
+  const typePickerButtonRef = useRef<HTMLButtonElement | null>(null);
+  const headerTitleInputRef = useRef<HTMLInputElement | null>(null);
+  const typePickerPopoverRef = useRef<HTMLDivElement | null>(null);
+  const datePickerButtonRef = useRef<HTMLButtonElement | null>(null);
+  const datePickerPopoverRef = useRef<HTMLDivElement | null>(null);
+  const metconMetricButtonRef = useRef<HTMLButtonElement | null>(null);
+  const metconMetricPopoverRef = useRef<HTMLDivElement | null>(null);
+  const [headerTitleEditing, setHeaderTitleEditing] = useState(false);
   const [programModalOpen, setProgramModalOpen] = useState(false);
   const [newProgram, setNewProgram] = useState({ name: "", description: "" });
   const [calendarNonce, setCalendarNonce] = useState(0);
@@ -313,18 +623,14 @@ export default function WorkoutBuilder() {
   const [exerciseResults, setExerciseResults] = useState<
     { id: string; name: string; type?: string | null; category?: string | null; modality?: string | null; is_public?: boolean }[]
   >([]);
-  const [exerciseSearch, setExerciseSearch] = useState("");
-  const [expandedTypes, setExpandedTypes] = useState<Record<string, boolean>>({});
-  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
-  const [expandedModalities, setExpandedModalities] = useState<Record<string, boolean>>({});
-  const [exerciseLoading, setExerciseLoading] = useState(false);
 
-  const editingModalTitle = editingForm.title || "Workout";
+  const editingModalTitle = normalizeWorkoutTitle(editingForm.title);
   const editingHeaderColor =
-    exerciseTypeColors[(editingForm.exerciseType ?? "other") as keyof typeof exerciseTypeColors] ??
+    exerciseTypeColors[(newWorkoutMeta.type || editingForm.exerciseType || "other") as keyof typeof exerciseTypeColors] ??
     exerciseTypeColors.other ??
     "var(--brand-accent)";
-  const editingHeaderSubtitle = exerciseTypes.find((t) => t.value === editingForm.exerciseType)?.label ?? "Workout";
+  const editingHeaderSubtitle =
+    exerciseTypes.find((t) => t.value === (newWorkoutMeta.type || editingForm.exerciseType))?.label ?? "Workout";
 
   useEffect(() => {
     const controller = new AbortController();
@@ -367,37 +673,6 @@ export default function WorkoutBuilder() {
   }, []);
 
   useEffect(() => {
-    const query = exerciseSearch.trim();
-    if (query.length < 2) {
-      setExerciseResults(exercises);
-      return;
-    }
-
-    const controller = new AbortController();
-    const timeout = window.setTimeout(async () => {
-      try {
-        setExerciseLoading(true);
-        const response = await apiFetch<{ data: typeof exercises }>(
-          `/workouts/exercises?search=${encodeURIComponent(query)}`,
-          { signal: controller.signal }
-        );
-        if (controller.signal.aborted) return;
-        setExerciseResults(response.data);
-      } catch (err) {
-        if (isAbortError(err) || controller.signal.aborted) return;
-        setError(err instanceof Error ? err.message : "Failed to search exercises");
-      } finally {
-        if (!controller.signal.aborted) setExerciseLoading(false);
-      }
-    }, 250);
-
-    return () => {
-      controller.abort();
-      window.clearTimeout(timeout);
-    };
-  }, [exerciseSearch, exercises]);
-
-  useEffect(() => {
     if (!selectedProgramId) return;
     const controller = new AbortController();
     async function loadCalendar() {
@@ -415,14 +690,19 @@ export default function WorkoutBuilder() {
           cards: (day.cards ?? []).map((card: WorkoutCard) => {
             const measurements = resolveMeasurements(card as any);
             const primaryMeasurement = measurements[0] ?? null;
+            const repsPayload = Array.isArray((card as any).reps)
+              ? ((card as any).reps as StrengthSetPayload[])
+              : card.reps ?? null;
             return {
               id: card.id,
               title: card.title,
-              block: card.block,
               description: card.description ?? (card as any).instructions ?? "",
               instructions: (card as any).instructions ?? card.description ?? "",
               exerciseId: (card as any).exercise_id ?? card.exerciseId ?? null,
               exerciseType: (card as any).exercise_type ?? card.exerciseType ?? null,
+              metric: (card as any).metric ?? card.metric ?? null,
+              visibleTo: (card as any).visible_to ?? (card as any).visibleTo ?? card.visibleTo ?? null,
+              reps: repsPayload,
               measurementType:
                 (card as any).measurement_type ??
                 primaryMeasurement?.type ??
@@ -459,6 +739,75 @@ export default function WorkoutBuilder() {
     });
     return map;
   }, [days]);
+  const availableDates = useMemo(() => new Set(days.map((day) => day.date)), [days]);
+  const metaDateOptions = useMemo(
+    () =>
+      days.map((day) => ({
+        value: day.date,
+        label: new Date(`${day.date}T00:00:00`).toLocaleDateString(undefined, {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+        }),
+      })),
+    [days]
+  );
+  const calendarCells = useMemo(() => buildCalendarGrid(datePickerMonth), [datePickerMonth]);
+  const selectedMetaDateLabel =
+    metaDateOptions.find((option) => option.value === newWorkoutMeta.date)?.label ?? "";
+  const selectedTypeLabel =
+    workoutTypeChoices.find((option) => option.value === newWorkoutMeta.type)?.label ?? "Select type";
+  const selectedExerciseName = useMemo(() => {
+    const source = exercises.length ? exercises : exerciseResults;
+    return source.find((exercise) => exercise.id === editingForm.exerciseId)?.name ?? "";
+  }, [editingForm.exerciseId, exercises, exerciseResults]);
+  const normalizedWorkoutType = normalizeType(newWorkoutMeta.type || editingForm.exerciseType);
+  const isStrengthBuilder = normalizedWorkoutType === "strength";
+  const isMetconBuilder = normalizedWorkoutType === "metcon";
+  const showGeneralBuilder = !isStrengthBuilder && !isMetconBuilder;
+  const requiresExerciseSelection = !isMetconBuilder;
+  const metconMetricLabel =
+    metconMetricOptions.find((option) => option.value === editingForm.metric)?.label ?? "Select metric";
+  const filteredExerciseOptions = useMemo(() => {
+    if (!newWorkoutMeta.type) return [];
+    const normalizedType = normalizeType(newWorkoutMeta.type);
+    const search = exercisePickerSearch.trim().toLowerCase();
+    const source = exercises.length ? exercises : exerciseResults;
+    return source
+      .filter((exercise) => normalizeType(exercise.type) === normalizedType)
+      .filter((exercise) => (search ? exercise.name.toLowerCase().includes(search) : true))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [newWorkoutMeta.type, exercisePickerSearch, exercises, exerciseResults]);
+  const metaSelectionsReady = requiresExerciseSelection
+    ? Boolean((newWorkoutMeta.type || editingForm.exerciseType) && editingForm.exerciseId)
+    : Boolean(newWorkoutMeta.type || editingForm.exerciseType);
+  const headerTitleNode = headerTitleEditing ? (
+    <input
+      ref={headerTitleInputRef}
+      className="w-full rounded-lg border border-white/60 bg-white/90 px-3 py-1 text-lg font-semibold text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100"
+      value={editingForm.title}
+      onChange={(event) => handleHeaderTitleChange(event.target.value)}
+      onBlur={commitHeaderTitle}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          commitHeaderTitle();
+        } else if (event.key === "Escape") {
+          event.preventDefault();
+          setEditingForm((prev) => ({ ...prev, title: normalizeWorkoutTitle(prev.title) }));
+          setHeaderTitleEditing(false);
+        }
+      }}
+    />
+  ) : (
+    <button
+      type="button"
+      className="w-full rounded-lg bg-transparent py-1 text-left text-lg font-semibold text-slate-900 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/60"
+      onClick={() => setHeaderTitleEditing(true)}
+    >
+      {editingModalTitle}
+    </button>
+  );
 
   async function handleCreateProgram(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -476,28 +825,34 @@ export default function WorkoutBuilder() {
     }
   }
 
-  async function handleAddCard(sessionId: string) {
+  async function handleAddCard(targetDay: WorkoutDay) {
+    const sessionId = targetDay.sessionId;
     try {
-      const response = await apiFetch<{ data: WorkoutCard }>(`/workouts/sessions/${sessionId}/items`, {
+      const response = await apiFetch<{ data: WorkoutCard }>(`/workouts/${sessionId}/items`, {
         method: "POST",
         body: JSON.stringify({
-          title: "New workout",
-          block: "Accessory",
+          title: DEFAULT_WORKOUT_TITLE,
           exercise_type: "strength",
           instructions: "Describe goals, load, and cues.",
+          metric: "load",
+          visible_to: "everyone",
+          reps: [],
         }),
       });
       const created = response.data;
       const measurementEntries = resolveMeasurements(created as any);
       const primaryMeasurement = measurementEntries[0] ?? null;
+      const normalizedTitle = normalizeWorkoutTitle(created.title);
       const normalized: WorkoutCard = {
         id: created.id,
-        title: created.title,
-        block: created.block,
+        title: normalizedTitle,
         description: (created as any).instructions ?? created.description ?? "",
         instructions: (created as any).instructions ?? created.description ?? "",
         exerciseId: (created as any).exercise_id ?? null,
         exerciseType: (created as any).exercise_type ?? "strength",
+        metric: (created as any).metric ?? null,
+        visibleTo: (created as any).visible_to ?? null,
+        reps: Array.isArray((created as any).reps) ? ((created as any).reps as StrengthSetPayload[]) : null,
         measurementType: (created as any).measurement_type ?? primaryMeasurement?.type ?? "",
         measurement: primaryMeasurement?.data ?? (created as any).measurement ?? {},
         measurements: measurementEntries,
@@ -506,6 +861,7 @@ export default function WorkoutBuilder() {
         coachNotes: (created as any).coach_notes ?? "",
         athleteNotes: (created as any).athlete_notes ?? "",
         color: created.color ?? null,
+        metconStructure: (created as any).metcon_structure ?? null,
       };
       setDays((prev) =>
         prev.map((day) =>
@@ -515,21 +871,146 @@ export default function WorkoutBuilder() {
       setEditingCard(normalized);
       setEditingSessionId(sessionId);
       setEditingForm({
-        title: normalized.title,
-        block: normalized.block,
+        title: normalizeWorkoutTitle(normalized.title),
         instructions: normalized.instructions ?? "",
         coachNotes: normalized.coachNotes ?? "",
         athleteNotes: normalized.athleteNotes ?? "",
         exerciseId: normalized.exerciseId ?? "",
         exerciseType: normalized.exerciseType ?? "strength",
+        strengthSets: strengthSetsFromCard(normalized),
+        metric: normalized.metric ?? "load",
+        visibleTo: normalized.visibleTo ?? "everyone",
         measurements: rowsFromCard(normalized),
         restSeconds: normalized.restSeconds?.toString() ?? "",
         isScored: normalized.isScored ?? false,
+        metconStructure: (normalized as any).metcon_structure ?? normalized.metconStructure ?? "",
       });
       setEditingErrors({});
+      setNewWorkoutMeta({
+        type: "",
+        date: "",
+      });
+      setHeaderTitleEditing(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create workout");
     }
+  }
+
+  function handleSelectWorkoutType(type: string) {
+    setNewWorkoutMeta((prev) => ({ ...prev, type }));
+    setEditingForm((prev) => {
+      const metricForType =
+        type === "strength"
+          ? "load"
+          : type === "metcon"
+            ? metconMetricOptions.some((option) => option.value === prev.metric)
+              ? prev.metric
+              : metconMetricOptions[0].value
+            : prev.metric;
+      return {
+        ...prev,
+        exerciseType: type,
+        exerciseId: "",
+        strengthSets: type === "strength" ? [createStrengthSetRow()] : prev.strengthSets,
+        metric: metricForType,
+        visibleTo: type === "strength" ? "everyone" : prev.visibleTo,
+        metconStructure: type === "metcon" ? "" : prev.metconStructure,
+        title: isDefaultWorkoutTitle(prev.title) ? DEFAULT_WORKOUT_TITLE : prev.title,
+      };
+    });
+    clearFieldError("exercise_type");
+    setTypePickerOpen(false);
+    setExercisePickerOpen(false);
+    setExercisePickerVisible(type !== "metcon");
+    setExercisePickerSearch("");
+    if (type === "metcon") {
+      setExercisePickerOpen(false);
+    }
+    setMetconMetricPickerOpen(false);
+  }
+
+  function handleSelectWorkoutDate(date: string) {
+    setNewWorkoutMeta((prev) => ({ ...prev, date }));
+    if (!date || !editingCard || !editingSessionId) return;
+    const targetDay = days.find((day) => day.date === date);
+    if (targetDay && targetDay.sessionId !== editingSessionId) {
+      handleMove(editingCard.id, targetDay.sessionId);
+      setEditingSessionId(targetDay.sessionId);
+    }
+    setDatePickerOpen(false);
+  }
+
+  function handleSelectMetaExercise(exercise: {
+    id: string;
+    name: string;
+    type?: string | null;
+    modality?: string | null;
+  }) {
+    const suggestion = deriveMeasurementForExercise(exercise);
+    setEditingForm((prev) => {
+      const rows = prev.measurements.length ? [...prev.measurements] : [createMeasurementRow()];
+      rows[0] = { ...rows[0], type: suggestion.type, data: suggestion.data };
+      const normalizedType = normalizeType(exercise.type ?? prev.exerciseType);
+      const measurementData = suggestion.data as Record<string, unknown>;
+      const defaultStrengthReps =
+        typeof measurementData?.reps === "number" ? Number(measurementData.reps) : 8;
+      const nextStrengthSets =
+        normalizedType === "strength"
+          ? [createStrengthSetRow(1, defaultStrengthReps, "")]
+          : prev.strengthSets;
+      return {
+        ...prev,
+        exerciseId: exercise.id,
+        exerciseType: (exercise.type as string | undefined) ?? prev.exerciseType,
+        strengthSets: nextStrengthSets,
+        metric:
+          normalizedType === "strength"
+            ? "load"
+            : normalizedType === "metcon"
+              ? metconMetricOptions.some((option) => option.value === prev.metric)
+                ? prev.metric
+                : metconMetricOptions[0].value
+              : prev.metric,
+        visibleTo: normalizedType === "strength" ? "everyone" : prev.visibleTo,
+        title: isDefaultWorkoutTitle(prev.title) ? exercise.name : prev.title,
+        measurements: rows,
+      };
+    });
+    clearFieldError("exercise_id");
+    setExercisePickerSearch("");
+    setExercisePickerOpen(false);
+    setExercisePickerVisible(false);
+  }
+
+  function shiftDatePickerMonth(direction: 1 | -1) {
+    setDatePickerMonth((prev) => {
+      const next = new Date(prev);
+      next.setMonth(prev.getMonth() + direction, 1);
+      return next;
+    });
+  }
+
+  function handleHeaderTitleChange(value: string) {
+    setEditingForm((prev) => ({ ...prev, title: value }));
+    clearFieldError("title");
+  }
+
+  function commitHeaderTitle() {
+    setEditingForm((prev) => ({ ...prev, title: normalizeWorkoutTitle(prev.title) }));
+    setHeaderTitleEditing(false);
+  }
+
+  function closeEditingModal() {
+    setEditingCard(null);
+    setEditingErrors({});
+    setNewWorkoutMeta({ type: "", date: "" });
+    setEditingSessionId(null);
+    setTypePickerOpen(false);
+    setExercisePickerOpen(false);
+    setExercisePickerSearch("");
+    setDatePickerOpen(false);
+    setHeaderTitleEditing(false);
+    setMetconMetricPickerOpen(false);
   }
 
   function refreshCalendar() {
@@ -575,7 +1056,7 @@ export default function WorkoutBuilder() {
     try {
       await apiFetch(`/workouts/items/${cardId}/move`, {
         method: "POST",
-        body: JSON.stringify({ session_id: targetSessionId, position: targetIndex ?? null }),
+        body: JSON.stringify({ workout_id: targetSessionId, position: targetIndex ?? null }),
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to move card");
@@ -599,21 +1080,25 @@ export default function WorkoutBuilder() {
       setSavingEdit(true);
       const measurementsPayload = serializeMeasurements(editingForm.measurements);
       const primaryMeasurement = measurementsPayload[0] ?? null;
+      const strengthPayload = serializeStrengthSets(editingForm.strengthSets);
       const response = await apiFetch<{ data: WorkoutCard }>(`/workouts/items/${editingCard.id}`, {
         method: "PUT",
         body: JSON.stringify({
           title: editingForm.title,
-          block: editingForm.block,
           instructions: editingForm.instructions,
           coach_notes: editingForm.coachNotes,
           athlete_notes: editingForm.athleteNotes,
           exercise_id: editingForm.exerciseId || null,
           exercise_type: editingForm.exerciseType,
+          metric: editingForm.metric || null,
+          visible_to: editingForm.visibleTo || null,
+          reps: strengthPayload,
           measurement_type: primaryMeasurement?.type ?? null,
           measurement: primaryMeasurement?.data ?? null,
           measurements: measurementsPayload,
           rest_seconds: editingForm.restSeconds ? Number(editingForm.restSeconds) : null,
           is_scored: editingForm.isScored,
+          metcon_structure: editingForm.metconStructure || null,
         }),
       });
       const updated = response.data;
@@ -634,11 +1119,15 @@ export default function WorkoutBuilder() {
               ? {
                   ...card,
                   title: updated.title,
-                  block: updated.block,
                   description: (updated as any).instructions ?? updated.description ?? "",
                   instructions: (updated as any).instructions ?? updated.description ?? "",
                   exerciseId: (updated as any).exercise_id ?? card.exerciseId ?? null,
                   exerciseType: (updated as any).exercise_type ?? card.exerciseType ?? null,
+                  metric: (updated as any).metric ?? card.metric ?? null,
+                  visibleTo: (updated as any).visible_to ?? (updated as any).visibleTo ?? card.visibleTo ?? null,
+                  reps: Array.isArray((updated as any).reps)
+                    ? ((updated as any).reps as StrengthSetPayload[])
+                    : card.reps ?? null,
                   measurementType: updatedPrimaryType ?? card.measurementType ?? null,
                   measurement: updatedPrimaryMeasurement ?? card.measurement ?? null,
                   measurements: updatedMeasurements,
@@ -646,15 +1135,14 @@ export default function WorkoutBuilder() {
                   isScored: Boolean((updated as any).is_scored ?? card.isScored ?? false),
                   coachNotes: (updated as any).coach_notes ?? card.coachNotes ?? "",
                   athleteNotes: (updated as any).athlete_notes ?? card.athleteNotes ?? "",
+                  metconStructure: (updated as any).metcon_structure ?? card.metconStructure ?? null,
                 }
               : card
           ),
         }))
       );
       refreshCalendar();
-      setEditingErrors({});
-      setEditingCard(null);
-      setEditingSessionId(null);
+      closeEditingModal();
     } catch (err) {
       if (err instanceof Error) {
         try {
@@ -697,6 +1185,78 @@ export default function WorkoutBuilder() {
   useEffect(() => {
     setWeekStart((prev) => startOfWeek(new Date(`${prev}T00:00:00`), config.startOfWeek));
   }, [config.startOfWeek]);
+
+  useEffect(() => {
+    if (!newWorkoutMeta.date) return;
+    const next = new Date(`${newWorkoutMeta.date}T00:00:00`);
+    next.setDate(1);
+    setDatePickerMonth(next);
+  }, [newWorkoutMeta.date]);
+
+  useEffect(() => {
+    if (!datePickerOpen) return;
+    function handleClick(event: MouseEvent) {
+      if (datePickerPopoverRef.current?.contains(event.target as Node)) return;
+      if (datePickerButtonRef.current?.contains(event.target as Node)) return;
+      setDatePickerOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [datePickerOpen]);
+
+  useEffect(() => {
+    if (!typePickerOpen) return;
+    function handleClick(event: MouseEvent) {
+      if (typePickerPopoverRef.current?.contains(event.target as Node)) return;
+      if (typePickerButtonRef.current?.contains(event.target as Node)) return;
+      setTypePickerOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [typePickerOpen]);
+
+  useEffect(() => {
+    if (!metconMetricPickerOpen) return;
+    function handleClick(event: MouseEvent) {
+      if (metconMetricPopoverRef.current?.contains(event.target as Node)) return;
+      if (metconMetricButtonRef.current?.contains(event.target as Node)) return;
+      setMetconMetricPickerOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [metconMetricPickerOpen]);
+
+  useEffect(() => {
+    if (!headerTitleEditing) return;
+    const id = window.requestAnimationFrame(() => {
+      headerTitleInputRef.current?.focus();
+      headerTitleInputRef.current?.select();
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [headerTitleEditing]);
+
+  useEffect(() => {
+    if (!newWorkoutMeta.date) return;
+    if (!availableDates.has(newWorkoutMeta.date)) {
+      setNewWorkoutMeta((prev) => ({ ...prev, date: "" }));
+    }
+  }, [availableDates, newWorkoutMeta.date]);
+
+  useEffect(() => {
+    if (metaDateOptions.length === 0) {
+      setDatePickerOpen(false);
+    }
+  }, [metaDateOptions.length]);
+
+  useEffect(() => {
+    setHeaderTitleEditing(false);
+  }, [editingCard]);
+
+  useEffect(() => {
+    if (!editingForm.exerciseId) {
+      setExercisePickerVisible(true);
+    }
+  }, [editingForm.exerciseId]);
 
   function shiftWeek(direction: 1 | -1) {
     const date = new Date(`${weekStart}T00:00:00`);
@@ -855,7 +1415,49 @@ function updateWeightSet(rowIndex: number, setIndex: number, field: keyof Weight
   clearFieldError(`measurements.${rowIndex}.setRows.${setIndex}.${field}`);
 }
 
-  const normalizeType = (value?: string | null): string => {
+  function addStrengthSet(position?: number) {
+    setEditingForm((prev) => {
+      const current =
+        prev.strengthSets && prev.strengthSets.length > 0 ? [...prev.strengthSets] : [createStrengthSetRow()];
+      const insertAt = typeof position === "number" ? position : current.length;
+      current.splice(insertAt, 0, createStrengthSetRow(insertAt + 1));
+      const resequenced = current.map((row, idx) => ({ ...row, set: idx + 1 }));
+      return { ...prev, strengthSets: resequenced };
+    });
+  }
+
+  function removeStrengthSet(index: number) {
+    setEditingForm((prev) => {
+      const current =
+        prev.strengthSets && prev.strengthSets.length > 1 ? prev.strengthSets : [createStrengthSetRow()];
+      if (current.length <= 1) {
+        return prev;
+      }
+      const next = current.filter((_, idx) => idx !== index).map((row, idx) => ({ ...row, set: idx + 1 }));
+      return { ...prev, strengthSets: next };
+    });
+  }
+
+  function updateStrengthSet(index: number, field: "reps" | "prescription", value: string) {
+    setEditingForm((prev) => {
+      const current =
+        prev.strengthSets && prev.strengthSets.length > 0 ? [...prev.strengthSets] : [createStrengthSetRow()];
+      const next = current.map((row, idx) => {
+        if (idx !== index) return row;
+        if (field === "reps") {
+          if (value === "") {
+            return { ...row, reps: null };
+          }
+          const parsed = Number(value);
+          return { ...row, reps: Number.isNaN(parsed) ? null : parsed };
+        }
+        return { ...row, prescription: value };
+      });
+      return { ...prev, strengthSets: next };
+    });
+  }
+
+  function normalizeType(value?: string | null): string {
     const cleaned = (value ?? "")
       .normalize("NFKC")
       .replace(/\s+/g, " ")
@@ -867,43 +1469,13 @@ function updateWeightSet(rowIndex: number, setIndex: number, field: keyof Weight
     if (["metcon", "met-con", "conditioning"].includes(cleaned)) return "metcon";
     if (["skill", "skill work", "skills"].includes(cleaned)) return "skill";
     if (["strength", "lift"].includes(cleaned)) return "strength";
+    if (["endurance"].includes(cleaned)) return "endurance";
+    if (["benchmark", "benchmarks"].includes(cleaned)) return "benchmarks";
+    if (["custom workout", "custom"].includes(cleaned)) return "custom";
+    if (cleaned.includes("unscored")) return "unscored";
+    if (cleaned.includes("media")) return "media";
     return cleaned;
-  };
-
-  const groupedExercises = useMemo(() => {
-    const groups: Record<
-      string,
-      {
-        label: string;
-        categories: Record<
-          string,
-          {
-            label: string;
-            modalities: Record<string, { label: string; items: typeof exercises }>;
-          }
-        >;
-      }
-    > = {};
-    (exerciseResults ?? []).forEach((ex) => {
-      const typeKey = normalizeType(ex.type);
-      if (!groups[typeKey]) {
-        groups[typeKey] = {
-          label: exerciseTypes.find((t) => t.value === typeKey)?.label ?? "Other",
-          categories: {},
-        };
-      }
-      const catKey = ex.category ?? "General";
-      if (!groups[typeKey].categories[catKey]) {
-        groups[typeKey].categories[catKey] = { label: catKey, modalities: {} };
-      }
-      const modKey = ex.modality ?? "General";
-      if (!groups[typeKey].categories[catKey].modalities[modKey]) {
-        groups[typeKey].categories[catKey].modalities[modKey] = { label: modKey, items: [] };
-      }
-      groups[typeKey].categories[catKey].modalities[modKey].items.push(ex);
-    });
-    return groups;
-  }, [exerciseResults, exerciseTypes]);
+  }
 
 function deriveMeasurementForExercise(exercise: {
   name: string;
@@ -1072,7 +1644,7 @@ function deriveMeasurementForExercise(exercise: {
                 <button type="button"
                       className="rounded-full border border-slate-200 p-2 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-brand-200 hover:-translate-y-0.5"
                       style={{ backgroundImage: 'linear-gradient(90deg, var(--brand-primary), var(--brand-accent))' }}
-                      onClick={() => handleAddCard(day.sessionId)}>
+                      onClick={() => handleAddCard(day)}>
                     <Plus size={16} />
                 </button>
               </div>
@@ -1089,6 +1661,8 @@ function deriveMeasurementForExercise(exercise: {
                   const headerBackground =
                     exerciseTypeColors[cardTypeKey as keyof typeof exerciseTypeColors] ?? exerciseTypeColors.other;
                   const measurementSummaries = summarizeCardMeasurements(card);
+                  const strengthSummaries = summarizeStrengthSets(card);
+                  const detailSummaries = [...strengthSummaries, ...measurementSummaries];
                   const chips: Array<{
                     label: string;
                     tone: "primary" | "neutral" | "note" | "warn";
@@ -1100,6 +1674,12 @@ function deriveMeasurementForExercise(exercise: {
                   if (card.restSeconds) {
                     chips.push({ label: `Rest ${card.restSeconds}s`, tone: "neutral" });
                   }
+                  if (card.metric) {
+                    chips.push({ label: `Metric · ${formatMetricLabel(card.metric)}`, tone: "neutral" });
+                  }
+                  if (card.visibleTo) {
+                    chips.push({ label: `Visible · ${formatVisibleLabel(card.visibleTo)}`, tone: "note" });
+                  }
                   if (card.athleteNotes) {
                     chips.push({ label: "Athlete note", tone: "note", note: card.athleteNotes });
                   }
@@ -1107,6 +1687,7 @@ function deriveMeasurementForExercise(exercise: {
                     chips.push({ label: "Coach note", tone: "warn", note: card.coachNotes });
                   }
                   const instructionText = card.instructions ?? card.description ?? "";
+                  const instructionIsRich = isHtmlLike(instructionText);
                   return (
                     <article
                       key={card.id}
@@ -1150,11 +1731,18 @@ function deriveMeasurementForExercise(exercise: {
                     </div>
                     <div className="p-3 space-y-2">
                       {instructionText && (
-                        <p className="text-sm text-slate-600">{instructionText}</p>
+                        instructionIsRich ? (
+                          <div
+                            className="text-sm text-slate-600 [&>*]:mb-1 [&>*:last-child]:mb-0"
+                            dangerouslySetInnerHTML={{ __html: instructionText }}
+                          />
+                        ) : (
+                          <p className="text-sm text-slate-600">{instructionText}</p>
+                        )
                       )}
-                      {measurementSummaries.length > 0 && (
+                      {detailSummaries.length > 0 && (
                         <ul className="space-y-1 text-xs text-slate-500">
-                          {measurementSummaries.map((line, idx) => (
+                          {detailSummaries.map((line, idx) => (
                             <li key={`${card.id}-summary-${idx}`} className="flex items-start gap-2">
                               <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-slate-300"></span>
                               <span>{line}</span>
@@ -1199,13 +1787,15 @@ function deriveMeasurementForExercise(exercise: {
                             setEditingCard(card);
                             setEditingSessionId(day.sessionId);
                             setEditingForm({
-                              title: card.title,
-                              block: card.block,
+                              title: normalizeWorkoutTitle(card.title),
                               instructions: card.instructions ?? card.description ?? "",
                               coachNotes: card.coachNotes ?? "",
                               athleteNotes: card.athleteNotes ?? "",
                               exerciseId: card.exerciseId ?? "",
                               exerciseType: card.exerciseType ?? "strength",
+                              strengthSets: strengthSetsFromCard(card),
+                              metric: card.metric ?? "load",
+                              visibleTo: card.visibleTo ?? "everyone",
                               measurements:
                                 card.measurements && card.measurements.length
                                   ? card.measurements.map((entry) =>
@@ -1214,8 +1804,14 @@ function deriveMeasurementForExercise(exercise: {
                                   : rowsFromCard(card),
                               restSeconds: card.restSeconds?.toString() ?? "",
                               isScored: card.isScored ?? false,
+                              metconStructure: (card as any).metcon_structure ?? card.metconStructure ?? "",
                             });
                             setEditingErrors({});
+                            setNewWorkoutMeta({
+                              type: card.exerciseType ?? "strength",
+                              date: day.date,
+                            });
+                            setHeaderTitleEditing(false);
                           }}
                           title="Edit"
                           className="hover:text-slate-700"
@@ -1260,248 +1856,699 @@ function deriveMeasurementForExercise(exercise: {
       {editingCard && (
         <Modal
           open={true}
-          onClose={() => !savingEdit && setEditingCard(null)}
-          title={editingModalTitle}
+          onClose={() => {
+            if (savingEdit) return;
+            closeEditingModal();
+          }}
+          title={headerTitleNode}
           subtitle={editingHeaderSubtitle}
           headerStyle={{ background: editingHeaderColor }}
           headerClassName="border-transparent"
         >
-          <form className="space-y-6" onSubmit={handleSaveEdit}>
+          <div className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2">
-              <label className="block text-sm font-medium text-slate-700">
-                Title
-                <TextInput
-                  className="mt-1"
-                  value={editingForm.title}
-                  onChange={(event) => {
-                    setEditingForm((prev) => ({ ...prev, title: event.target.value }));
-                    clearFieldError("title");
-                  }}
-                  required
-                />
-                {editingErrors.title && (
-                  <p className="mt-1 text-xs text-rose-600">{editingErrors.title[0]}</p>
-                )}
-              </label>
-              <div className="flex flex-col justify-end">
-                <p className="text-sm font-medium text-slate-700">Scoring</p>
-                <div className="mt-1 flex items-center gap-3">
+              <div className="block text-sm font-semibold text-slate-700">
+                Workout Type
+                <div className="relative mt-2">
                   <button
+                    ref={typePickerButtonRef}
                     type="button"
-                    className={`rounded-full px-3 py-2 text-sm font-semibold ${
-                      editingForm.isScored ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"
-                    }`}
-                    onClick={() => setEditingForm((prev) => ({ ...prev, isScored: !prev.isScored }))}
+                    onClick={() => setTypePickerOpen((prev) => !prev)}
+                    className="flex w-full items-center justify-between rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-left text-base font-semibold text-slate-800"
                   >
-                    {editingForm.isScored ? "Scored" : "Unscored"}
+                    <span>{selectedTypeLabel}</span>
+                    <ChevronDown size={18} className={`text-slate-500 transition ${typePickerOpen ? "rotate-180" : ""}`} />
                   </button>
-                  <span className="text-xs text-slate-500">Scored workouts can be shared to leaderboards.</span>
+                  {typePickerOpen && (
+                    <div
+                      ref={typePickerPopoverRef}
+                      className="absolute z-20 mt-2 w-full rounded-2xl border border-slate-200 bg-white shadow-2xl"
+                    >
+                      <div className="max-h-64 overflow-y-auto py-2">
+                        {workoutTypeChoices.map((option) => {
+                          const selected = newWorkoutMeta.type === option.value;
+                          return (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => handleSelectWorkoutType(option.value)}
+                              className={`flex w-full items-center justify-between px-4 py-2 text-sm font-semibold ${
+                                selected
+                                  ? "bg-slate-900 text-white"
+                                  : "text-slate-700 hover:bg-slate-50"
+                              }`}
+                            >
+                              <span>{option.label}</span>
+                              {selected && <span className="text-xs uppercase tracking-wide">Selected</span>}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="block text-sm font-semibold text-slate-700">
+                Workout Date
+                <div className="relative mt-2">
+                  <button
+                    ref={datePickerButtonRef}
+                    type="button"
+                    disabled={metaDateOptions.length === 0}
+                    onClick={() => {
+                      if (metaDateOptions.length === 0) return;
+                      setDatePickerOpen((prev) => !prev);
+                    }}
+                    className="flex w-full items-center justify-between rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-left text-base font-semibold text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <span>{selectedMetaDateLabel || "Select date"}</span>
+                    <CalendarIcon size={18} className="text-slate-500" />
+                  </button>
+                  {datePickerOpen && (
+                    <div
+                      ref={datePickerPopoverRef}
+                      className="absolute z-20 mt-2 w-full rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl"
+                    >
+                      <div className="flex items-center justify-between text-sm font-semibold text-slate-700">
+                        <button
+                          type="button"
+                          className="rounded-full border border-slate-200 p-1 text-slate-500 hover:bg-slate-50"
+                          onClick={() => shiftDatePickerMonth(-1)}
+                        >
+                          <ChevronLeft size={16} />
+                        </button>
+                        <span>
+                          {datePickerMonth.toLocaleDateString(undefined, { month: "long", year: "numeric" })}
+                        </span>
+                        <button
+                          type="button"
+                          className="rounded-full border border-slate-200 p-1 text-slate-500 hover:bg-slate-50"
+                          onClick={() => shiftDatePickerMonth(1)}
+                        >
+                          <ChevronRight size={16} />
+                        </button>
+                      </div>
+                      <div className="mt-3 grid grid-cols-7 text-center text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        {CALENDAR_WEEKDAYS.map((label) => (
+                          <span key={label}>{label}</span>
+                        ))}
+                      </div>
+                      <div className="mt-2 grid grid-cols-7 gap-1">
+                        {calendarCells.map((cell) => {
+                          const iso = formatLocalDate(cell.date);
+                          const isAvailable = availableDates.has(iso);
+                          const isSelected = newWorkoutMeta.date === iso;
+                          const classes = [
+                            "h-10 rounded-xl text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200",
+                            isSelected ? "bg-slate-900 text-white" : "text-slate-700",
+                            !cell.inCurrentMonth ? "opacity-50" : "",
+                            isAvailable ? "hover:bg-slate-100" : "cursor-not-allowed opacity-25",
+                          ]
+                            .filter(Boolean)
+                            .join(" ");
+                          return (
+                            <button
+                              type="button"
+                              key={`${iso}-${cell.date.getDate()}`}
+                              disabled={!isAvailable}
+                              onClick={() => handleSelectWorkoutDate(iso)}
+                              className={classes}
+                            >
+                              {cell.date.getDate()}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <p className="mt-3 text-xs text-slate-500">Pick a date inside the currently visible week.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700">
-                Exercise type
-                <SelectInput
-                  className="mt-1"
-                  value={editingForm.exerciseType}
-                  onChange={(event) => {
-                    setEditingForm((prev) => ({ ...prev, exerciseType: event.target.value }));
-                    clearFieldError("exercise_type");
-                  }}
-                >
-                  {exerciseTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </SelectInput>
-                {editingErrors.exercise_type && (
-                  <p className="mt-1 text-xs text-rose-600">{editingErrors.exercise_type[0]}</p>
-                )}
-              </label>
-            </div>
-
-            <label className="block text-sm font-medium text-slate-700">
-              Workout instructions
-              <textarea
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
-                rows={3}
-                placeholder="Describe goals, pacing, and coaching cues"
-                value={editingForm.instructions}
-                onChange={(event) => setEditingForm((prev) => ({ ...prev, instructions: event.target.value }))}
-              />
-            </label>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <label className="block text-sm font-medium text-slate-700">
-                Rest between sets (seconds)
-                <TextInput
-                  type="number"
-                  min={0}
-                  className="mt-1"
-                  value={editingForm.restSeconds}
-                  onChange={(event) => setEditingForm((prev) => ({ ...prev, restSeconds: event.target.value }))}
-                  placeholder="e.g. 60"
-                />
-              </label>
-              <div className="text-xs text-slate-500 self-end">
-                Leave blank if the workout block doesn’t have prescribed rest.
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {editingForm.measurements.map((row, index) => (
-                <div key={row.id} className="rounded-2xl border border-slate-200 bg-white/60 p-4 space-y-4">
-                  <div className="flex items-end gap-2">
-                    <label className="flex-1 text-sm font-medium text-slate-700">
-                      Measurement type
-                      <SelectInput
-                        className="mt-1"
-                        value={row.type}
-                        onChange={(event) => updateMeasurementRowType(index, event.target.value)}
-                      >
-                        <option value="">Select</option>
-                        {measurementOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </SelectInput>
-                      {editingErrors[`measurements.${index}.type`] && (
-                        <p className="mt-1 text-xs text-rose-600">
-                          {editingErrors[`measurements.${index}.type`]![0]}
-                        </p>
-                      )}
-                    </label>
-                    <div className="flex gap-1 pb-1">
-                      <button
-                        type="button"
-                        onClick={() => addMeasurementRow(index + 1)}
-                        className="rounded-full border border-slate-200 p-2 text-slate-500 hover:bg-slate-100"
-                        title="Add measurement"
-                      >
-                        <Plus size={14} />
-                      </button>
-                      {editingForm.measurements.length > 1 && (
+            {newWorkoutMeta.type && !isMetconBuilder && (
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="block text-sm font-semibold text-slate-700 md:col-span-2">
+                  {exercisePickerVisible ? (
+                    <>
+                      <span>Exercise</span>
+                      <div className="relative mt-2">
                         <button
                           type="button"
-                          onClick={() => removeMeasurementRow(index)}
-                          className="rounded-full border border-slate-200 p-2 text-slate-500 hover:bg-rose-50"
-                          title="Remove measurement"
+                          className="flex w-full items-center justify-between rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-left text-base font-semibold text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                          onClick={() => setExercisePickerOpen((prev) => !prev)}
+                          disabled={!newWorkoutMeta.type}
                         >
-                          <Trash2 size={14} />
+                          <span>{selectedExerciseName || "Exercise"}</span>
+                          <ChevronDown
+                            size={18}
+                            className={`text-slate-500 transition ${exercisePickerOpen ? "rotate-180" : ""}`}
+                          />
+                        </button>
+                        {exercisePickerOpen && (
+                          <div className="mt-3 rounded-3xl border border-slate-200 bg-white p-4 shadow-inner">
+                            <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500">
+                              <Search size={16} />
+                              <input
+                                type="text"
+                                className="w-full bg-transparent text-sm font-medium text-slate-700 outline-none"
+                                placeholder="Search exercises..."
+                                value={exercisePickerSearch}
+                                onChange={(event) => setExercisePickerSearch(event.target.value)}
+                              />
+                            </div>
+                            <div className="mt-3 max-h-64 overflow-y-auto rounded-2xl border border-slate-100">
+                              {filteredExerciseOptions.length === 0 ? (
+                                <p className="px-4 py-6 text-center text-sm text-slate-500">
+                                  No exercises match this search.
+                                </p>
+                              ) : (
+                                <div className="flex flex-col">
+                                  {filteredExerciseOptions.map((exercise) => (
+                                    <button
+                                      key={exercise.id}
+                                      type="button"
+                                      className={`flex w-full items-center justify-between px-4 py-2 text-left text-sm font-semibold ${
+                                        editingForm.exerciseId === exercise.id
+                                          ? "bg-slate-900 text-white"
+                                          : "text-slate-700 hover:bg-slate-50"
+                                      }`}
+                                      onClick={() => handleSelectMetaExercise(exercise)}
+                                    >
+                                      <span>{exercise.name}</span>
+                                      <span className="text-[11px] uppercase tracking-wide text-slate-400">
+                                        {exercise.modality || (exercise.is_public ? "Std" : "Custom")}
+                                      </span>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="mt-[30px] flex flex-wrap items-center justify-between gap-4">
+                      <div
+                        className="cursor-pointer select-none text-base font-semibold text-slate-900"
+                        onDoubleClick={() => {
+                          setExercisePickerVisible(true);
+                          setExercisePickerOpen(true);
+                        }}
+                        title="Double-click to change exercise"
+                      >
+                        {selectedExerciseName || editingForm.title}
+                      </div>
+                      {isStrengthBuilder && (
+                        <button
+                          type="button"
+                          className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                            editingForm.isScored ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"
+                          }`}
+                          onClick={() => setEditingForm((prev) => ({ ...prev, isScored: !prev.isScored }))}
+                        >
+                          {editingForm.isScored ? "Scored" : "Unscored"}
                         </button>
                       )}
                     </div>
-                  </div>
-
-                  {row.type === "calories" && (
-                    <label className="block text-sm font-medium text-slate-700">
-                      Calories
-                      <TextInput
-                        type="number"
-                        min={0}
-                        className="mt-1"
-                        value={(row.data.calories as number | undefined) ?? ""}
-                        onChange={(event) => updateMeasurementRowData(index, "calories", Number(event.target.value))}
-                      />
-                    </label>
                   )}
-
-                  {row.type === "meters" && (
-                    <label className="block text-sm font-medium text-slate-700">
-                      Distance (meters)
-                      <TextInput
-                        type="number"
-                        min={0}
-                        className="mt-1"
-                        value={(row.data.meters as number | undefined) ?? ""}
-                        onChange={(event) => updateMeasurementRowData(index, "meters", Number(event.target.value))}
-                      />
-                    </label>
+                  {editingErrors.exercise_id && (
+                    <p className="mt-2 text-xs text-rose-600">{editingErrors.exercise_id[0]}</p>
                   )}
-
-                  {row.type === "reps" && (
-                    <label className="block text-sm font-medium text-slate-700">
-                      Reps
-                      <TextInput
-                        type="number"
-                        min={0}
-                        className="mt-1"
-                        value={(row.data.reps as number | undefined) ?? ""}
-                        onChange={(event) => updateMeasurementRowData(index, "reps", Number(event.target.value))}
-                      />
-                    </label>
-                  )}
-
-                  {row.type === "weight" && (() => {
-                    const weightRows = getWeightRows(row.data);
-                    return (
-                    <div className="space-y-3">
-                      <div className="grid grid-cols-[60px_110px_minmax(0,_1fr)_70px] gap-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        <span>Set #</span>
-                        <span>Reps</span>
-                        <span>Weight / % 1RM</span>
-                        <span className="text-right">Actions</span>
-                      </div>
-                      {weightRows.map((setRow, setIndex) => (
-                        <div
-                          key={`${row.id}-set-${setIndex}`}
-                          className="grid grid-cols-[60px_110px_minmax(0,_1fr)_70px] items-center gap-3"
-                        >
-                          <div className="px-3 py-2 text-center font-semibold text-slate-600">
-                            {setRow.set}
-                          </div>
-                          <TextInput
-                            type="number"
-                            min={0}
-                            value={setRow.reps ?? ""}
-                            onChange={(event) => updateWeightSet(index, setIndex, "reps", event.target.value)}
-                          />
-                          <TextInput
-                            placeholder="e.g. 95 or 75%"
-                            value={setRow.load ?? ""}
-                            onChange={(event) => updateWeightSet(index, setIndex, "load", event.target.value)}
-                          />
-                          <div className="flex items-center justify-end gap-1">
-                            {setIndex === weightRows.length - 1 && (
-                              <button
-                                type="button"
-                                onClick={() => addWeightSet(index, setIndex + 1)}
-                                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:bg-slate-100"
-                                title="Add set"
-                              >
-                                <Plus size={14} />
-                              </button>
-                            )}
-                            {weightRows.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => removeWeightSet(index, setIndex)}
-                                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:bg-rose-50"
-                                title="Remove set"
-                              >
-                                <Trash2 size={14} />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    );
-                  })()}
                 </div>
-              ))}
-              {editingErrors.measurement_type && (
-                <p className="text-xs text-rose-600">{editingErrors.measurement_type[0]}</p>
-              )}
-              {editingErrors.measurement && (
-                <p className="text-xs text-rose-600">{editingErrors.measurement[0]}</p>
-              )}
-            </div>
+              </div>
+            )}
+            {!metaSelectionsReady && (
+              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+                Select a workout type and exercise to begin configuring the workout details.
+              </div>
+            )}
+            {metaSelectionsReady && (
+              <form className="space-y-6" onSubmit={handleSaveEdit}>
+                {showGeneralBuilder && (
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="md:col-span-2 flex flex-wrap items-end justify-between gap-4">
+                      <label className="flex-1 min-w-[220px] block text-sm font-medium text-slate-700">
+                        Title
+                        <TextInput
+                          className="mt-1"
+                          value={editingForm.title}
+                          onChange={(event) => {
+                            setEditingForm((prev) => ({ ...prev, title: event.target.value }));
+                            clearFieldError("title");
+                          }}
+                          required
+                        />
+                        {editingErrors.title && (
+                          <p className="mt-1 text-xs text-rose-600">{editingErrors.title[0]}</p>
+                        )}
+                      </label>
+                      <div className="flex flex-col items-end gap-1 text-right">
+                        <span className="text-xs font-semibold uppercase tracking-wide text-slate-600">Scoring</span>
+                        <button
+                          type="button"
+                          className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                            editingForm.isScored ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"
+                          }`}
+                          onClick={() => setEditingForm((prev) => ({ ...prev, isScored: !prev.isScored }))}
+                        >
+                          {editingForm.isScored ? "Scored" : "Unscored"}
+                        </button>
+                        <span className="text-[11px] text-slate-500">Scored workouts surface on leaderboards.</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {showGeneralBuilder && (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700">
+                      Exercise type
+                      <SelectInput
+                        className="mt-1"
+                        value={editingForm.exerciseType}
+                        onChange={(event) => {
+                          setEditingForm((prev) => ({ ...prev, exerciseType: event.target.value }));
+                          clearFieldError("exercise_type");
+                        }}
+                      >
+                        {exerciseTypes.map((type) => (
+                          <option key={type.value} value={type.value}>
+                            {type.label}
+                          </option>
+                        ))}
+                      </SelectInput>
+                      {editingErrors.exercise_type && (
+                        <p className="mt-1 text-xs text-rose-600">{editingErrors.exercise_type[0]}</p>
+                      )}
+                    </label>
+                  </div>
+                )}
+
+                {isMetconBuilder && (
+                  <>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <label className="block text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <span className="block text-[11px] text-slate-500">Name</span>
+                        <TextInput
+                          className="mt-1"
+                          value={editingForm.title}
+                          onChange={(event) => {
+                            setEditingForm((prev) => ({ ...prev, title: event.target.value }));
+                            clearFieldError("title");
+                          }}
+                          required
+                        />
+                        {editingErrors.title && (
+                          <p className="mt-1 text-xs text-rose-600">{editingErrors.title[0]}</p>
+                        )}
+                      </label>
+                      <div className="flex flex-col">
+                        {/*<span className="text-xs font-semibold uppercase tracking-wide text-slate-600">Scoring</span>*/}
+                        <div className="flex flex-wrap items-end justify-between gap-3">
+                          <label className="block text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                            <span className="block text-[11px] text-slate-500">Visible to</span>
+                            <SelectInput
+                              className="mt-1 min-w-[150px]"
+                              value={editingForm.visibleTo}
+                              onChange={(event) => setEditingForm((prev) => ({ ...prev, visibleTo: event.target.value }))}
+                            >
+                              {visibilityOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </SelectInput>
+                          </label>
+                          <button
+                            type="button"
+                            className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                              editingForm.isScored ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"
+                            }`}
+                            onClick={() => setEditingForm((prev) => ({ ...prev, isScored: !prev.isScored }))}
+                          >
+                            {editingForm.isScored ? "Scored" : "Unscored"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-slate-700">Metcon overview</p>
+                      <div className="mt-2">
+                        <RichTextEditor
+                          value={editingForm.instructions}
+                          onChange={(value) => setEditingForm((prev) => ({ ...prev, instructions: value }))}
+                          placeholder="Describe pacing, loading, and coaching cues"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <label className="block text-sm font-medium text-slate-700">
+                        Format
+                        <SelectInput
+                          className="mt-1"
+                          value={editingForm.metconStructure}
+                          onChange={(event) =>
+                            setEditingForm((prev) => ({ ...prev, metconStructure: event.target.value }))
+                          }
+                        >
+                          {metconStructureOptions.map((option) => (
+                            <option key={option.value || "metcon-format-placeholder"} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </SelectInput>
+                      </label>
+                      <div className="block text-sm font-medium text-slate-700">
+                        Metric
+                        <div className="relative mt-2">
+                          <button
+                            ref={metconMetricButtonRef}
+                            type="button"
+                            className="flex w-full items-center justify-between rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-left text-base font-semibold text-slate-800"
+                            onClick={() => setMetconMetricPickerOpen((prev) => !prev)}
+                          >
+                            <span>{metconMetricLabel}</span>
+                            <ChevronDown
+                              size={18}
+                              className={`text-slate-500 transition ${metconMetricPickerOpen ? "rotate-180" : ""}`}
+                            />
+                          </button>
+                          {metconMetricPickerOpen && (
+                            <div
+                              ref={metconMetricPopoverRef}
+                              className="absolute right-0 z-20 mt-2 w-full rounded-2xl border border-slate-200 bg-white shadow-2xl"
+                            >
+                              <div className="max-h-64 overflow-y-auto py-2">
+                                {metconMetricOptions.map((option) => {
+                                  const selected = editingForm.metric === option.value;
+                                  return (
+                                    <button
+                                      key={option.value}
+                                      type="button"
+                                      className={`flex w-full items-center justify-between px-4 py-2 text-sm font-semibold ${
+                                        selected ? "bg-slate-900 text-white" : "text-slate-700 hover:bg-slate-50"
+                                      }`}
+                                      onClick={() => {
+                                        setEditingForm((prev) => ({ ...prev, metric: option.value }));
+                                        setMetconMetricPickerOpen(false);
+                                      }}
+                                    >
+                                      <span>{option.label}</span>
+                                      {selected && (
+                                        <span className="text-xs uppercase tracking-wide text-white/80">Selected</span>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {showGeneralBuilder && (
+                  <label className="block text-sm font-medium text-slate-700">
+                    Workout instructions
+                    <textarea
+                      className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+                      rows={3}
+                      placeholder="Describe goals, pacing, and coaching cues"
+                      value={editingForm.instructions}
+                      onChange={(event) => setEditingForm((prev) => ({ ...prev, instructions: event.target.value }))}
+                    />
+                  </label>
+                )}
+
+                {showGeneralBuilder && (
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <label className="block text-sm font-medium text-slate-700">
+                      Rest between sets (seconds)
+                      <TextInput
+                        type="number"
+                        min={0}
+                        className="mt-1"
+                        value={editingForm.restSeconds}
+                        onChange={(event) => setEditingForm((prev) => ({ ...prev, restSeconds: event.target.value }))}
+                        placeholder="e.g. 60"
+                      />
+                    </label>
+                    <div className="text-xs text-slate-500 self-end">
+                      Leave blank if the workout block doesn’t have prescribed rest.
+                    </div>
+                  </div>
+                )}
+
+                {isStrengthBuilder ? (
+                  <div className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-[50px_100px_minmax(0,1fr)_140px_80px]">
+                        <div className="contents">
+                      <div />
+                      <div />
+                      <label className="block text-sm font-medium text-slate-700">
+                        Metric
+                        <SelectInput
+                          className="mt-1"
+                          value={editingForm.metric}
+                          onChange={(event) => setEditingForm((prev) => ({ ...prev, metric: event.target.value }))}
+                        >
+                          {strengthMetricOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </SelectInput>
+                      </label>
+                      <label className="block text-sm font-medium text-slate-700">
+                        Visible to
+                        <SelectInput
+                          className="mt-1"
+                          value={editingForm.visibleTo}
+                          onChange={(event) => setEditingForm((prev) => ({ ...prev, visibleTo: event.target.value }))}
+                        >
+                          {visibilityOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </SelectInput>
+                      </label>
+                      <div />
+                    </div>
+
+
+                  {editingForm.strengthSets.map((setRow, index) => (
+                      <div className="contents">
+                        <div className="text-sm font-semibold text-slate-700">Set {index + 1}</div>
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Reps</p>
+                            <SelectInput
+                                className="mt-1"
+                                value={setRow.reps ?? ""}
+                                onChange={(event) => updateStrengthSet(index, "reps", event.target.value)}
+                            >
+                                <option value="">Select</option>
+                                {strengthRepOptions.map((option) => (
+                                    <option key={`strength-reps-${option}`} value={option}>
+                                       {option}
+                                    </option>
+                                ))}
+                            </SelectInput>
+                        </div>
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Metric value</p>
+                            <div className="mt-1 flex items-center gap-2">
+                              <TextInput
+                                className="flex-1"
+                                value={setRow.prescription}
+                                placeholder={strengthMetricPlaceholder(editingForm.metric)}
+                                onChange={(event) => updateStrengthSet(index, "prescription", event.target.value)}
+                              />
+                              {editingForm.metric === "one_rm_percent" && (
+                                <span className="text-sm font-semibold text-slate-500">%</span>
+                              )}
+                            </div>
+                        </div>
+                        <div />
+                      <div className="flex items-center justify-end gap-1 pb-1">
+                        {editingForm.strengthSets.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeStrengthSet(index)}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:bg-rose-50"
+                            title="Remove set"
+                          >
+                            <Minus size={14} />
+                          </button>
+                        )}
+                        {index === editingForm.strengthSets.length - 1 && (
+                          <button
+                            type="button"
+                            onClick={() => addStrengthSet(index + 1)}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:bg-slate-100"
+                            title="Add set"
+                          >
+                            <Plus size={14} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+                ) : showGeneralBuilder ? (
+                  <div className="space-y-4">
+                    {editingForm.measurements.map((row, index) => (
+                  <div key={row.id} className="rounded-2xl border border-slate-200 bg-white/60 p-4 space-y-4">
+                    <div className="flex items-end gap-2">
+                      <label className="flex-1 text-sm font-medium text-slate-700">
+                        Measurement type
+                        <SelectInput
+                          className="mt-1"
+                          value={row.type}
+                          onChange={(event) => updateMeasurementRowType(index, event.target.value)}
+                        >
+                          <option value="">Select</option>
+                          {measurementOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </SelectInput>
+                        {editingErrors[`measurements.${index}.type`] && (
+                          <p className="mt-1 text-xs text-rose-600">
+                            {editingErrors[`measurements.${index}.type`]![0]}
+                          </p>
+                        )}
+                      </label>
+                      <div className="flex gap-1 pb-1">
+                        <button
+                          type="button"
+                          onClick={() => addMeasurementRow(index + 1)}
+                          className="rounded-full border border-slate-200 p-2 text-slate-500 hover:bg-slate-100"
+                          title="Add measurement"
+                        >
+                          <Plus size={14} />
+                        </button>
+                        {editingForm.measurements.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeMeasurementRow(index)}
+                            className="rounded-full border border-slate-200 p-2 text-slate-500 hover:bg-rose-50"
+                            title="Remove measurement"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {row.type === "calories" && (
+                      <label className="block text-sm font-medium text-slate-700">
+                        Calories
+                        <TextInput
+                          type="number"
+                          min={0}
+                          className="mt-1"
+                          value={(row.data.calories as number | undefined) ?? ""}
+                          onChange={(event) => updateMeasurementRowData(index, "calories", Number(event.target.value))}
+                        />
+                      </label>
+                    )}
+
+                    {row.type === "meters" && (
+                      <label className="block text-sm font-medium text-slate-700">
+                        Distance (meters)
+                        <TextInput
+                          type="number"
+                          min={0}
+                          className="mt-1"
+                          value={(row.data.meters as number | undefined) ?? ""}
+                          onChange={(event) => updateMeasurementRowData(index, "meters", Number(event.target.value))}
+                        />
+                      </label>
+                    )}
+
+                    {row.type === "reps" && (
+                      <label className="block text-sm font-medium text-slate-700">
+                        Reps
+                        <TextInput
+                          type="number"
+                          min={0}
+                          className="mt-1"
+                          value={(row.data.reps as number | undefined) ?? ""}
+                          onChange={(event) => updateMeasurementRowData(index, "reps", Number(event.target.value))}
+                        />
+                      </label>
+                    )}
+
+                    {row.type === "weight" && (() => {
+                      const weightRows = getWeightRows(row.data);
+                      return (
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-[60px_110px_minmax(0,_1fr)_70px] gap-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            <span>Set #</span>
+                            <span>Reps</span>
+                            <span>Weight / % 1RM</span>
+                            <span className="text-right">Actions</span>
+                          </div>
+                          {weightRows.map((setRow, setIndex) => (
+                            <div
+                              key={`${row.id}-set-${setIndex}`}
+                              className="grid grid-cols-[60px_110px_minmax(0,_1fr)_70px] items-center gap-3"
+                            >
+                              <div className="px-3 py-2 text-center font-semibold text-slate-600">{setRow.set}</div>
+                              <TextInput
+                                type="number"
+                                min={0}
+                                value={setRow.reps ?? ""}
+                                onChange={(event) => updateWeightSet(index, setIndex, "reps", event.target.value)}
+                              />
+                              <TextInput
+                                placeholder="e.g. 95 or 75%"
+                                value={setRow.load ?? ""}
+                                onChange={(event) => updateWeightSet(index, setIndex, "load", event.target.value)}
+                              />
+                              <div className="flex items-center justify-end gap-1">
+                                {setIndex === weightRows.length - 1 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => addWeightSet(index, setIndex + 1)}
+                                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:bg-slate-100"
+                                    title="Add set"
+                                  >
+                                    <Plus size={14} />
+                                  </button>
+                                )}
+                                {weightRows.length > 1 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => removeWeightSet(index, setIndex)}
+                                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:bg-rose-50"
+                                    title="Remove set"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                ))}
+                {editingErrors.measurement_type && (
+                  <p className="text-xs text-rose-600">{editingErrors.measurement_type[0]}</p>
+                )}
+                {editingErrors.measurement && (
+                  <p className="text-xs text-rose-600">{editingErrors.measurement[0]}</p>
+                )}
+                  </div>
+                ) : null}
 
             <div className="grid gap-4 md:grid-cols-2">
               <label className="block text-sm font-medium text-slate-700">
@@ -1524,138 +2571,10 @@ function deriveMeasurementForExercise(exercise: {
               </label>
             </div>
 
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <div className="flex items-center gap-2">
-                <div className="rounded-full bg-white p-2 text-slate-500">
-                  <Search size={16} />
-                </div>
-                <TextInput
-                  className="flex-1"
-                  placeholder="Search exercises (Bench Press, Back Squat, custom…) "
-                  value={exerciseSearch}
-                  onChange={(event) => setExerciseSearch(event.target.value)}
-                />
-              </div>
-              {editingErrors.exercise_id && (
-                <p className="mt-2 text-xs text-rose-600">{editingErrors.exercise_id[0]}</p>
-              )}
-              <div className="mt-3 max-h-64 overflow-y-auto rounded-xl border border-slate-200 bg-white">
-                {Object.entries(groupedExercises).map(([typeKey, group], typeIdx, arr) => (
-                  <div key={typeKey} className={typeIdx < arr.length - 1 ? "border-b border-slate-100" : ""}>
-                    <button
-                      type="button"
-                      className="flex w-full items-center justify-between px-3 py-2 text-left text-sm font-semibold text-slate-800"
-                      onClick={() =>
-                        setExpandedTypes((prev) => ({
-                          ...prev,
-                          [typeKey]: prev[typeKey] === false,
-                        }))
-                      }
-                    >
-                      <span className="flex items-center gap-2">
-                        {expandedTypes[typeKey] !== false ? <Minus size={14} /> : <Plus size={14} />}
-                        {group.label}
-                      </span>
-                      <span className="text-xs text-slate-400">{Object.keys(group.categories).length} categories</span>
-                    </button>
-                    {expandedTypes[typeKey] !== false && (
-                      <div className="border-t border-slate-100 pl-4">
-                        {Object.entries(group.categories).map(([catKey, cat]) => (
-                          <div key={catKey} className="border-b border-slate-50 last:border-b-0">
-                            <button
-                              type="button"
-                              className="flex w-full items-center justify-between px-3 py-2 text-left text-sm font-semibold text-slate-700"
-                              onClick={() =>
-                                setExpandedCategories((prev) => ({
-                                  ...prev,
-                                  [`${typeKey}::${catKey}`]: prev[`${typeKey}::${catKey}`] === false,
-                                }))
-                              }
-                            >
-                              <span className="flex items-center gap-2">
-                                {expandedCategories[`${typeKey}::${catKey}`] !== false ? <Minus size={12} /> : <Plus size={12} />}
-                                <span className="text-xs uppercase tracking-wide text-slate-500">{cat.label}</span>
-                              </span>
-                              <span className="text-[10px] text-slate-400">{Object.keys(cat.modalities).length} modalities</span>
-                            </button>
-                            {expandedCategories[`${typeKey}::${catKey}`] !== false && (
-                              <div className="border-t border-slate-100 pl-4">
-                                {Object.entries(cat.modalities).map(([modKey, mod]) => (
-                                  <div key={modKey} className="border-b border-slate-50 last:border-b-0">
-                                    <button
-                                      type="button"
-                                      className="flex w-full items-center justify-between px-3 py-2 text-left text-sm font-semibold text-slate-600"
-                                      onClick={() =>
-                                        setExpandedModalities((prev) => ({
-                                          ...prev,
-                                          [`${typeKey}::${catKey}::${modKey}`]: prev[`${typeKey}::${catKey}::${modKey}`] === false,
-                                        }))
-                                      }
-                                    >
-                                      <span className="flex items-center gap-2">
-                                        {expandedModalities[`${typeKey}::${catKey}::${modKey}`] !== false ? <Minus size={12} /> : <Plus size={12} />}
-                                        <span className="text-[11px] uppercase tracking-wide text-slate-500">{mod.label}</span>
-                                      </span>
-                                      <span className="text-[10px] text-slate-400">{mod.items.length} exercises</span>
-                                    </button>
-                                    {expandedModalities[`${typeKey}::${catKey}::${modKey}`] !== false && (
-                                      <div className="grid gap-1 px-3 pb-3 pl-4">
-                                        {mod.items.map((exercise) => (
-                                          <button
-                                            type="button"
-                                            key={exercise.id}
-                                            className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm ${
-                                              editingForm.exerciseId === exercise.id
-                                                ? "border-brand-300 bg-brand-50 text-brand-700"
-                                                : "border-slate-200 text-slate-700 hover:bg-slate-50"
-                                            }`}
-                                            onClick={() => {
-                                              const suggestion = deriveMeasurementForExercise(exercise);
-                                              setEditingForm((prev) => {
-                                                const rows = prev.measurements.length
-                                                  ? [...prev.measurements]
-                                                  : [createMeasurementRow()];
-                                                rows[0] = { ...rows[0], type: suggestion.type, data: suggestion.data };
-                                                return {
-                                                  ...prev,
-                                                  exerciseId: exercise.id,
-                                                  title: exercise.name,
-                                                  exerciseType:
-                                                    (exercise.type as string | undefined) ?? prev.exerciseType,
-                                                  measurements: rows,
-                                                };
-                                              });
-                                              clearFieldError("exercise_id");
-                                            }}
-                                          >
-                                            <span>{exercise.name}</span>
-                                            <span className="text-[10px] uppercase text-slate-400">
-                                              {exercise.modality || (exercise.is_public ? "Std" : "Custom")}
-                                            </span>
-                                          </button>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
             <div className="flex justify-end gap-2">
               <Button
                 type="button"
-                onClick={() => {
-                  setEditingCard(null);
-                  setEditingErrors({});
-                }}
+                onClick={closeEditingModal}
                 disabled={savingEdit}
               >
                 Cancel
@@ -1664,7 +2583,9 @@ function deriveMeasurementForExercise(exercise: {
                 {savingEdit ? "Saving…" : "Save workout"}
               </Button>
             </div>
-          </form>
+              </form>
+            )}
+          </div>
         </Modal>
       )}
 

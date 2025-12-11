@@ -7,7 +7,6 @@ import { apiFetch, isAbortError } from "../api/client";
 
 type WorkoutForm = {
   title: string;
-  block: string;
   instructions: string;
   coach_notes?: string | null;
   athlete_notes?: string | null;
@@ -18,7 +17,6 @@ export default function WorkoutEditor() {
   const navigate = useNavigate();
   const [form, setForm] = useState<WorkoutForm>({
     title: "",
-    block: "Workout",
     instructions: "",
     coach_notes: "",
     athlete_notes: "",
@@ -33,13 +31,12 @@ export default function WorkoutEditor() {
     async function loadItem() {
       try {
         setLoading(true);
-        const response = await apiFetch<{ data: WorkoutForm & { block: string } }>(`/workouts/items/${workoutId}`, {
+        const response = await apiFetch<{ data: WorkoutForm }>(`/workouts/items/${workoutId}`, {
           signal: controller.signal,
         });
         if (controller.signal.aborted) return;
         setForm({
           title: response.data.title,
-          block: response.data.block,
           instructions: response.data.instructions ?? "",
           coach_notes: response.data.coach_notes ?? "",
           athlete_notes: response.data.athlete_notes ?? "",
@@ -105,14 +102,6 @@ export default function WorkoutEditor() {
                   className="mt-1"
                   value={form.title}
                   onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
-                />
-              </label>
-              <label className="block text-sm font-medium text-slate-700">
-                Block
-                <TextInput
-                  className="mt-1"
-                  value={form.block}
-                  onChange={(event) => setForm((prev) => ({ ...prev, block: event.target.value }))}
                 />
               </label>
               <label className="block text-sm font-medium text-slate-700">

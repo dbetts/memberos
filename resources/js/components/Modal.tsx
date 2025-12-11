@@ -12,7 +12,7 @@ export default function Modal({
 }: {
     open: boolean;
     onClose: () => void;
-    title: string;
+    title: ReactNode;
     subtitle?: ReactNode;
     children: ReactNode;
     footer?: ReactNode;
@@ -26,8 +26,8 @@ export default function Modal({
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
             <div className="absolute inset-0 grid place-items-center p-4">
                 <div
-                    className="w-full max-w-xl overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-2xl flex flex-col"
-                    style={{ maxHeight: "80vh" }}
+                    className="w-[650px] min-h-[650px] overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-2xl flex flex-col"
+                    style={{ maxHeight: "80vh", maxWidth: "80vw" }}
                 >
                     <div className={headerClasses} style={headerStyle}>
                         <h3 className="text-lg font-semibold text-slate-900">{title}</h3>

@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\Concerns\ResolvesOrganization;
 use App\Http\Controllers\Controller;
+use App\Models\Workout;
 use App\Models\WorkoutProgram;
-use App\Models\WorkoutSession;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -59,12 +59,12 @@ class WorkoutProgramController extends Controller
             $days[] = $start->addDays($i);
         }
 
-        $sessions = WorkoutSession::query()
+        $sessions = Workout::query()
             ->with('items')
             ->where('workout_program_id', $program->id)
             ->whereBetween('scheduled_for', [$days[0]->toDateString(), end($days)->toDateString()])
             ->get()
-            ->keyBy(fn ($session) => $session->scheduled_for?->toDateString());
+            ->keyBy(fn ($workout) => $workout->scheduled_for?->toDateString());
 
         $responseDays = [];
         foreach ($days as $index => $day) {
@@ -72,7 +72,7 @@ class WorkoutProgramController extends Controller
             $session = $sessions->get($formatted);
 
             if (! $session) {
-                $session = WorkoutSession::create([
+                $session = Workout::create([
                     'workout_program_id' => $program->id,
                     'organization_id' => $organization->id,
                     'scheduled_for' => $formatted,
@@ -87,13 +87,15 @@ class WorkoutProgramController extends Controller
                 ->map(fn ($item) => [
                     'id' => $item->id,
                     'title' => $item->title,
-                    'block' => $item->block,
                     'description' => $item->instructions,
                     'instructions' => $item->instructions,
                     'coach_notes' => $item->coach_notes,
                     'athlete_notes' => $item->athlete_notes,
                     'exercise_id' => $item->exercise_id,
                     'exercise_type' => $item->exercise_type,
+                    'reps' => $item->reps,
+                    'metric' => $item->metric,
+                    'visible_to' => $item->visible_to,
                     'measurement_type' => $item->measurement_type,
                     'measurement' => $item->measurement,
                     'measurements' => is_array($item->measurement)
@@ -110,6 +112,7 @@ class WorkoutProgramController extends Controller
                 ]);
 
             $responseDays[] = [
+                'workout_id' => $session->id,
                 'session_id' => $session->id,
                 'date' => $formatted,
                 'label' => $session->label,

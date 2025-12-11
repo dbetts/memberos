@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\Organization;
+use App\Models\Workout;
 use App\Models\WorkoutItem;
 use App\Models\WorkoutProgram;
-use App\Models\WorkoutSession;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
@@ -87,7 +87,7 @@ class WorkoutProgramSeeder extends Seeder
             );
 
             foreach ($template as $index => $day) {
-                $session = WorkoutSession::updateOrCreate(
+                $session = Workout::updateOrCreate(
                     [
                         'workout_program_id' => $program->id,
                         'scheduled_for' => $day['date']->toDateString(),
@@ -105,12 +105,13 @@ class WorkoutProgramSeeder extends Seeder
 
                 foreach ($day['items'] as $position => $item) {
                     WorkoutItem::create([
-                        'workout_session_id' => $session->id,
-                        'organization_id' => $organization->id,
+                        'workout_id' => $session->id,
                         'title' => Arr::get($item, 'title'),
-                        'block' => Arr::get($item, 'block', 'Workout'),
                         'instructions' => Arr::get($item, 'instructions'),
+                        'metric' => 'load',
+                        'reps' => null,
                         'position' => $position,
+                        'visible_to' => 'everyone',
                     ]);
                 }
             }

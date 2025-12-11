@@ -13,10 +13,8 @@ class WorkoutItem extends Model
     use HasUuidPrimaryKey;
 
     protected $fillable = [
-        'workout_session_id',
-        'organization_id',
+        'workout_id',
         'title',
-        'block',
         'instructions',
         'coach_notes',
         'athlete_notes',
@@ -24,6 +22,9 @@ class WorkoutItem extends Model
         'position',
         'exercise_id',
         'exercise_type',
+        'reps',
+        'metric',
+        'visible_to',
         'measurement_type',
         'measurement',
         'rest_seconds',
@@ -36,10 +37,11 @@ class WorkoutItem extends Model
         'measurement' => 'array',
         'is_scored' => 'boolean',
         'rest_seconds' => 'integer',
+        'reps' => 'array',
     ];
 
-    public function session(): BelongsTo
+    public function workout(): BelongsTo
     {
-        return $this->belongsTo(WorkoutSession::class, 'workout_session_id');
+        return $this->belongsTo(Workout::class);
     }
 }

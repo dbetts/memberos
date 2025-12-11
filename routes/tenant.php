@@ -151,7 +151,7 @@ Route::middleware(['auth'])->prefix('api/v1')->group(function (): void {
         Route::post('programs', [WorkoutProgramController::class, 'store']);
         Route::get('programs/{program}/calendar', [WorkoutProgramController::class, 'calendar']);
 
-        Route::post('sessions/{session}/items', [WorkoutItemController::class, 'store']);
+        Route::post('{workout}/items', [WorkoutItemController::class, 'store']);
         Route::get('items/{item}', [WorkoutItemController::class, 'show']);
         Route::put('items/{item}', [WorkoutItemController::class, 'update']);
         Route::delete('items/{item}', [WorkoutItemController::class, 'destroy']);
