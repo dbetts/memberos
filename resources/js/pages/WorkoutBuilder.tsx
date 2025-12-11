@@ -1985,100 +1985,152 @@ function deriveMeasurementForExercise(exercise: {
                 </div>
               </div>
             </div>
-            {newWorkoutMeta.type && !isMetconBuilder && (
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="block text-sm font-semibold text-slate-700 md:col-span-2">
-                  {exercisePickerVisible ? (
-                    <>
-                      <span>Exercise</span>
-                      <div className="relative mt-2">
-                        <button
-                          type="button"
-                          className="flex w-full items-center justify-between rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-left text-base font-semibold text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
-                          onClick={() => setExercisePickerOpen((prev) => !prev)}
-                          disabled={!newWorkoutMeta.type}
-                        >
-                          <span>{selectedExerciseName || "Exercise"}</span>
-                          <ChevronDown
-                            size={18}
-                            className={`text-slate-500 transition ${exercisePickerOpen ? "rotate-180" : ""}`}
-                          />
-                        </button>
-                        {exercisePickerOpen && (
-                          <div className="mt-3 rounded-3xl border border-slate-200 bg-white p-4 shadow-inner">
-                            <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500">
-                              <Search size={16} />
-                              <input
-                                type="text"
-                                className="w-full bg-transparent text-sm font-medium text-slate-700 outline-none"
-                                placeholder="Search exercises..."
-                                value={exercisePickerSearch}
-                                onChange={(event) => setExercisePickerSearch(event.target.value)}
-                              />
-                            </div>
-                            <div className="mt-3 max-h-64 overflow-y-auto rounded-2xl border border-slate-100">
-                              {filteredExerciseOptions.length === 0 ? (
-                                <p className="px-4 py-6 text-center text-sm text-slate-500">
-                                  No exercises match this search.
-                                </p>
-                              ) : (
-                                <div className="flex flex-col">
-                                  {filteredExerciseOptions.map((exercise) => (
-                                    <button
-                                      key={exercise.id}
-                                      type="button"
-                                      className={`flex w-full items-center justify-between px-4 py-2 text-left text-sm font-semibold ${
-                                        editingForm.exerciseId === exercise.id
-                                          ? "bg-slate-900 text-white"
-                                          : "text-slate-700 hover:bg-slate-50"
-                                      }`}
-                                      onClick={() => handleSelectMetaExercise(exercise)}
-                                    >
-                                      <span>{exercise.name}</span>
-                                      <span className="text-[11px] uppercase tracking-wide text-slate-400">
-                                        {exercise.modality || (exercise.is_public ? "Std" : "Custom")}
-                                      </span>
-                                    </button>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  ) : (
-                    <div className="mt-[30px] flex flex-wrap items-center justify-between gap-4">
-                      <div
-                        className="cursor-pointer select-none text-base font-semibold text-slate-900"
-                        onDoubleClick={() => {
-                          setExercisePickerVisible(true);
-                          setExercisePickerOpen(true);
-                        }}
-                        title="Double-click to change exercise"
-                      >
-                        {selectedExerciseName || editingForm.title}
-                      </div>
-                      {isStrengthBuilder && (
-                        <button
-                          type="button"
-                          className={`rounded-full px-4 py-2 text-sm font-semibold ${
-                            editingForm.isScored ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"
-                          }`}
-                          onClick={() => setEditingForm((prev) => ({ ...prev, isScored: !prev.isScored }))}
-                        >
-                          {editingForm.isScored ? "Scored" : "Unscored"}
-                        </button>
+              {newWorkoutMeta.type && !isMetconBuilder && (
+                  <div className="grid gap-4 md:grid-cols-2">
+                      {exercisePickerVisible
+                          ? [
+                              (
+                                  <div key="exercise-picker" className="flex flex-col gap-2">
+                                      <span>Exercise</span>
+                                      <div className="relative mt-2">
+                                          <button
+                                              type="button"
+                                              className="flex w-full items-center justify-between rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-left text-base font-semibold text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                                              onClick={() => setExercisePickerOpen((prev) => !prev)}
+                                              disabled={!newWorkoutMeta.type}
+                                          >
+                                              <span>{selectedExerciseName || "Exercise"}</span>
+                                              <ChevronDown
+                                                  size={18}
+                                                  className={`text-slate-500 transition ${
+                                                      exercisePickerOpen ? "rotate-180" : ""
+                                                  }`}
+                                              />
+                                          </button>
+
+                                          {exercisePickerOpen && (
+                                              <div className="mt-3 rounded-3xl border border-slate-200 bg-white p-4 shadow-inner">
+                                                  <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500">
+                                                      <Search size={16} />
+                                                      <input
+                                                          type="text"
+                                                          className="w-full bg-transparent text-sm font-medium text-slate-700 outline-none"
+                                                          placeholder="Search exercises..."
+                                                          value={exercisePickerSearch}
+                                                          onChange={(event) =>
+                                                              setExercisePickerSearch(event.target.value)
+                                                          }
+                                                      />
+                                                  </div>
+
+                                                  <div className="mt-3 max-h-64 overflow-y-auto rounded-2xl border border-slate-100">
+                                                      {filteredExerciseOptions.length === 0 ? (
+                                                          <p className="px-4 py-6 text-center text-sm text-slate-500">
+                                                              No exercises match this search.
+                                                          </p>
+                                                      ) : (
+                                                          <div className="flex flex-col">
+                                                              {filteredExerciseOptions.map((exercise) => (
+                                                                  <button
+                                                                      key={exercise.id}
+                                                                      type="button"
+                                                                      className={`flex w-full items-center justify-between px-4 py-2 text-left text-sm font-semibold ${
+                                                                          editingForm.exerciseId === exercise.id
+                                                                              ? "bg-slate-900 text-white"
+                                                                              : "text-slate-700 hover:bg-slate-50"
+                                                                      }`}
+                                                                      onClick={() => handleSelectMetaExercise(exercise)}
+                                                                  >
+                                                                      <span>{exercise.name}</span>
+                                                                      <span className="text-[11px] uppercase tracking-wide text-slate-400">
+                                                                          {exercise.modality ||
+                                                                              (exercise.is_public ? "Std" : "Custom")}
+                                                                      </span>
+                                                                  </button>
+                                                              ))}
+                                                          </div>
+                                                      )}
+                                                  </div>
+                                              </div>
+                                          )}
+                                      </div>
+                                  </div>
+                              ),
+                              // Right column placeholder when picker is visible
+                              <div key="right-empty" />,
+                          ]
+                          : [
+                              // Left column: title
+                              (
+                                  <div
+                                      key="exercise-title"
+                                      className="cursor-pointer select-none text-base font-semibold text-slate-900"
+                                      onDoubleClick={() => {
+                                          setExercisePickerVisible(true);
+                                          setExercisePickerOpen(true);
+                                      }}
+                                      title="Double-click to change exercise"
+                                  >
+                                      {selectedExerciseName || editingForm.title}
+                                  </div>
+                              ),
+                              // Right column: controls or placeholder
+                              (
+                                  isStrengthBuilder ? (
+                                      <div className="flex flex-wrap items-end justify-between">
+                                          <label className="block text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                              <span className="block text-[11px] text-slate-500">
+                                                  Visible to
+                                              </span>
+                                              <SelectInput
+                                                  className="mt-1 min-w-[150px]"
+                                                  value={editingForm.visibleTo}
+                                                  onChange={(event) =>
+                                                      setEditingForm((prev) => ({
+                                                          ...prev,
+                                                          visibleTo: event.target.value,
+                                                      }))
+                                                  }
+                                              >
+                                                  {visibilityOptions.map((option) => (
+                                                      <option key={option.value} value={option.value}>
+                                                          {option.label}
+                                                      </option>
+                                                  ))}
+                                              </SelectInput>
+                                          </label>
+                                          <button
+                                              type="button"
+                                              className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                                                  editingForm.isScored
+                                                      ? "bg-emerald-600 text-white"
+                                                      : "bg-slate-100 text-slate-600"
+                                              }`}
+                                              onClick={() =>
+                                                  setEditingForm((prev) => ({
+                                                      ...prev,
+                                                      isScored: !prev.isScored,
+                                                  }))
+                                              }
+                                          >
+                                              {editingForm.isScored ? "Scored" : "Unscored"}
+                                          </button>
+                                      </div>
+                                  ) : (
+                                      <div key="strength-placeholder" />
+                                  )
+                              ),
+                          ]}
+
+                      {editingErrors.exercise_id && (
+                          <p className="mt-2 text-xs text-rose-600 md:col-span-2">
+                              {editingErrors.exercise_id[0]}
+                          </p>
                       )}
-                    </div>
-                  )}
-                  {editingErrors.exercise_id && (
-                    <p className="mt-2 text-xs text-rose-600">{editingErrors.exercise_id[0]}</p>
-                  )}
-                </div>
-              </div>
-            )}
-            {!metaSelectionsReady && (
+                  </div>
+              )}
+
+              {!metaSelectionsReady && (
               <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
                 Select a workout type and exercise to begin configuring the workout details.
               </div>
@@ -2322,27 +2374,14 @@ function deriveMeasurementForExercise(exercise: {
                           ))}
                         </SelectInput>
                       </label>
-                      <label className="block text-sm font-medium text-slate-700">
-                        Visible to
-                        <SelectInput
-                          className="mt-1"
-                          value={editingForm.visibleTo}
-                          onChange={(event) => setEditingForm((prev) => ({ ...prev, visibleTo: event.target.value }))}
-                        >
-                          {visibilityOptions.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </SelectInput>
-                      </label>
+                      <div />
                       <div />
                     </div>
 
 
                   {editingForm.strengthSets.map((setRow, index) => (
                       <div className="contents">
-                        <div className="text-sm font-semibold text-slate-700">Set {index + 1}</div>
+                        <div className="flex items-center text-sm font-semibold text-slate-700">Set {index + 1}</div>
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Reps</p>
                             <SelectInput
